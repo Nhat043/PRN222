@@ -14,7 +14,7 @@
 4. Paste and execute the copied SQL code to create all necessary tables and initial data
 
 ### 3. Update Connection Strings
-1. Open `MVC/appsettings.json`; if `appssettings.json` don't exists, create it
+1. Open `MVC/appsettings.json`; if `appsettings.json` doesn't exist, create it
 2. Update the `DefaultConnection` string with your SQL Server details:
 ```json
 {
@@ -26,12 +26,12 @@
   },
   "AllowedHosts": "*",
   "ConnectionStrings": {
-    "DefaultConnection": "Server=LAPTOP-F90M82DI\\MSSQLSEVER; Database=PRN222-Final;User ID=sa;Password=123456;Trust Server Certificate=True"
+    "DefaultConnection": "Server=YOUR_SERVER_NAME;Database=PRN222-Final;User ID=YOUR_USERNAME;Password=YOUR_PASSWORD;Trust Server Certificate=True"
   }
 }
 ```
 
-3. Open `Razor/appsettings.json`; if `appssettings.json` don't exists, create it
+3. Open `Razor/appsettings.json`; if `appsettings.json` doesn't exist, create it
 4. Update the `DefaultConnection` string with the same connection string:
 ```json
 {
@@ -43,12 +43,15 @@
   },
   "AllowedHosts": "*",
   "ConnectionStrings": {
-    "DefaultConnection": "Server=LAPTOP-F90M82DI\\MSSQLSEVER; Database=PRN222-Final;User ID=sa;Password=123456;Trust Server Certificate=True"
+    "DefaultConnection": "Server=YOUR_SERVER_NAME;Database=PRN222-Final;User ID=YOUR_USERNAME;Password=YOUR_PASSWORD;Trust Server Certificate=True"
   }
 }
 ```
 
-Replace `YOUR_SERVER_NAME` with your SQL Server instance name (e.g., `localhost` or `.\SQLEXPRESS`)
+Replace:
+- `YOUR_SERVER_NAME` with your SQL Server instance name (e.g., `localhost` or `.\SQLEXPRESS`)
+- `YOUR_USERNAME` with your SQL Server username
+- `YOUR_PASSWORD` with your SQL Server password
 
 ### 4. Verify Setup
 1. Run the application
@@ -56,4 +59,13 @@ Replace `YOUR_SERVER_NAME` with your SQL Server instance name (e.g., `localhost`
    - Database name is correct
    - Server name is correct
    - SQL Server is running
+   - Username and password are correct
    - Connection string format is correct
+
+### 5. Project Structure
+The project uses a three-layer architecture:
+- **DAL (Data Access Layer)**: Contains database models and context
+- **BLL (Business Logic Layer)**: Contains business logic and services
+- **MVC & Razor**: Presentation layers for different user interfaces
+
+The `DemoContext.cs` in the DAL project handles all database connections and entity relationships. Make sure the connection string in `appsettings.json` matches your SQL Server configuration for the application to work correctly.
