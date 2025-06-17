@@ -1,0 +1,193 @@
+CREATE TABLE Product_Status (
+    id INT PRIMARY KEY,
+    name NVARCHAR(20) NOT NULL
+);
+
+CREATE TABLE Product_Item_Status (
+    id INT PRIMARY KEY,
+    name NVARCHAR(20) NOT NULL
+);
+
+CREATE TABLE Order_Status (
+    id INT PRIMARY KEY,
+    name NVARCHAR(20) NOT NULL
+);
+
+CREATE TABLE Account_Status (
+    id INT PRIMARY KEY,
+    name NVARCHAR(20) NOT NULL
+);
+
+CREATE TABLE Comment_Status (
+    id INT PRIMARY KEY,
+    name NVARCHAR(20) NOT NULL
+);
+
+
+-- Ví dụ: Product_Status
+INSERT INTO Product_Status (id, name) VALUES
+(1, 'available'),
+(2, 'unavailable'),
+(3, 'out_of_stock');
+
+-- Order_Status
+INSERT INTO Order_Status (id, name) VALUES
+(1, 'pending'),
+(2, 'approved'),
+(3, 'rejected');
+
+-- Account_Status
+INSERT INTO Account_Status (id, name) VALUES
+(1, 'active'),
+(2, 'banned');
+
+-- Comment_Status
+INSERT INTO Comment_Status (id, name) VALUES
+(1, 'visible'),
+(2, 'hidden');
+
+-- Product_Item_Status
+INSERT INTO Product_Item_Status (id, name) VALUES
+(1, 'active'),
+(2, 'inactive');
+
+
+
+-- 1. Danh mục
+CREATE TABLE Category (
+    id INT IDENTITY(1,1) PRIMARY KEY,
+    name NVARCHAR(50) NOT NULL
+);
+
+-- 2. Role
+CREATE TABLE Role_Name (
+    id INT IDENTITY(1,1) PRIMARY KEY,
+    name NVARCHAR(50) NOT NULL
+);
+
+-- 3. Tài khoản
+CREATE TABLE Account (
+    id INT IDENTITY(1,1) PRIMARY KEY,
+    email NVARCHAR(50) UNIQUE NOT NULL,
+    password NVARCHAR(100) NOT NULL,
+    name NVARCHAR(50),
+    phone NVARCHAR(20),
+    address NVARCHAR(100),
+    role_id INT,
+    status_id INT,
+    FOREIGN KEY (role_id) REFERENCES Role_Name(id),
+    FOREIGN KEY (status_id) REFERENCES Account_Status(id)
+);
+
+-- 4. Sản phẩm
+CREATE TABLE Product (
+    id INT IDENTITY(1,1) PRIMARY KEY,
+    name NVARCHAR(50) NOT NULL,
+    picture NVARCHAR(50),
+    description NVARCHAR(100),
+    category_id INT,
+    status_id INT,
+    FOREIGN KEY (category_id) REFERENCES Category(id),
+    FOREIGN KEY (status_id) REFERENCES Product_Status(id)
+);
+
+-- 5. Biến thể (item)
+CREATE TABLE Product_Item (
+    id INT IDENTITY(1,1) PRIMARY KEY,
+    product_id INT,
+    quantity INT,
+    import_price INT,
+    selling_price INT,
+    discount DECIMAL(10,2),
+    status_id INT,
+    FOREIGN KEY (product_id) REFERENCES Product(id),
+    FOREIGN KEY (status_id) REFERENCES Product_Item_Status(id)
+);
+
+-- 6. Loại biến thể
+CREATE TABLE Variation (
+    id INT IDENTITY(1,1) PRIMARY KEY,
+    name NVARCHAR(50) NOT NULL
+);
+
+-- 7. Tùy chọn biến thể
+CREATE TABLE Variation_Option (
+    id INT IDENTITY(1,1) PRIMARY KEY,
+    variation_id INT,
+    value NVARCHAR(50) NOT NULL,
+    FOREIGN KEY (variation_id) REFERENCES Variation(id)
+);
+
+-- 8. Cấu hình sản phẩm
+CREATE TABLE Product_Configuration (
+    product_item_id INT,
+    variation_option_id INT,
+    PRIMARY KEY (product_item_id, variation_option_id),
+    FOREIGN KEY (product_item_id) REFERENCES Product_Item(id),
+    FOREIGN KEY (variation_option_id) REFERENCES Variation_Option(id)
+);
+
+-- 9. Đơn hàng
+CREATE TABLE [Order] (
+    id INT IDENTITY(1,1) PRIMARY KEY,
+    user_id INT,
+    date DATETIME NOT NULL,
+    price INT NOT NULL,
+    status_id INT,
+    FOREIGN KEY (user_id) REFERENCES Account(id),
+    FOREIGN KEY (status_id) REFERENCES Order_Status(id)
+);
+
+-- 10. Chi tiết đơn hàng
+CREATE TABLE Order_Item (
+    id INT IDENTITY(1,1) PRIMARY KEY,
+    order_id INT,
+    product_item_id INT,
+    quantity INT NOT NULL,
+    price INT NOT NULL,
+    FOREIGN KEY (order_id) REFERENCES [Order](id),
+    FOREIGN KEY (product_item_id) REFERENCES Product_Item(id)
+);
+
+-- 11. Đánh giá
+CREATE TABLE Rating (
+    id INT IDENTITY(1,1) PRIMARY KEY,
+    user_id INT,
+    product_id INT,
+    rating_value INT CHECK (rating_value BETWEEN 1 AND 5),
+    created_at DATETIME NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES Account(id),
+    FOREIGN KEY (product_id) REFERENCES Product(id),
+    CONSTRAINT UC_UserProduct UNIQUE (user_id, product_id)
+);
+
+-- 12. Bình luận
+CREATE TABLE Comment (
+    id INT IDENTITY(1,1) PRIMARY KEY,
+    user_id INT,
+    product_id INT,
+    content NVARCHAR(255) NOT NULL,
+    created_at DATETIME NOT NULL,
+    status_id INT,
+    parent_id INT,
+    FOREIGN KEY (user_id) REFERENCES Account(id),
+    FOREIGN KEY (product_id) REFERENCES Product(id),
+    FOREIGN KEY (parent_id) REFERENCES Comment(id),
+    FOREIGN KEY (status_id) REFERENCES Comment_Status(id)
+);
+
+-- 13. Doanh thu
+CREATE TABLE Revenue_Log (
+    id INT IDENTITY(1,1) PRIMARY KEY,
+    order_id INT,
+    total_revenue INT NOT NULL,
+    total_cost INT NOT NULL,
+    total_profit INT NOT NULL,
+    date DATETIME NOT NULL,
+    FOREIGN KEY (order_id) REFERENCES [Order](id)
+);
+
+
+create database [PRN222-Final]
+drop database [PRN222-Final]
+use [PRN222-Final]
