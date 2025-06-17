@@ -1,0 +1,61 @@
+# Build results
+bin/
+obj/
+
+# User-specific files
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Visual Studio files
+.vs/
+
+# Rider IDE
+.idea/
+
+# Visual Studio Code
+.vscode/
+
+# Mac or Linux files
+.DS_Store
+*.swp
+
+# ASP.NET Core
+wwwroot/
+appsettings.Development.json
+appsettings.Local.json
+
+# Optional: Ignore the base appsettings.json if it contains secrets
+appsettings.json
+
+# Entity Framework Migrations (if generated DB snapshot is temporary)
+Migrations/
+
+# Log files
+*.log
+
+# Database files
+*.mdf
+*.ldf
+
+# Environment secrets
+.env
+.env.*
+
+# dotnet user secrets (if used)
+**/secrets.json
+
+# NuGet packages folder
+packages/
+
+# Ignore test results
+TestResults/
+
+# Resharper
+_ReSharper*/
+*.DotSettings.user
+
+# Global JetBrains Rider ignore
+.idea/
+*.sln.iml

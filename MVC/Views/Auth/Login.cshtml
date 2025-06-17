@@ -1,0 +1,46 @@
+@model MVC.Models.Auth.LoginViewModel
+
+@{
+    ViewData["Title"] = "Login";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-4">
+        <h2>Login</h2>
+        <form asp-action="Login" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            
+            <div class="form-group">
+                <label asp-for="Email" class="control-label"></label>
+                <input asp-for="Email" class="form-control" />
+                <span asp-validation-for="Email" class="text-danger"></span>
+            </div>
+            
+            <div class="form-group">
+                <label asp-for="Password" class="control-label"></label>
+                <input asp-for="Password" class="form-control" />
+                <span asp-validation-for="Password" class="text-danger"></span>
+            </div>
+            
+            <div class="form-group">
+                <div class="custom-control custom-checkbox">
+                    <input asp-for="RememberMe" class="custom-control-input" />
+                    <label asp-for="RememberMe" class="custom-control-label"></label>
+                </div>
+            </div>
+            
+            <div class="form-group mt-3">
+                <input type="submit" value="Login" class="btn btn-primary" />
+            </div>
+        </form>
+        
+        <div class="mt-3">
+            <p>Don't have an account? <a asp-action="Register">Register here</a></p>
+            <p>Forgot password? <a asp-action="ForgotPassword">Reset password here</a></p>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+} 

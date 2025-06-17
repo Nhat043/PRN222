@@ -1,0 +1,36 @@
+@model MVC.Models.Auth.ResetPasswordViewModel
+
+@{
+    ViewData["Title"] = "Verify OTP";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-4">
+        <h2>Verify OTP</h2>
+        <form asp-action="VerifyOtp" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            
+            <input type="hidden" asp-for="Email" />
+            
+            <div class="form-group">
+                <label asp-for="OTP" class="control-label">Enter OTP</label>
+                <input asp-for="OTP" class="form-control" placeholder="Enter 6-digit OTP" />
+                <span asp-validation-for="OTP" class="text-danger"></span>
+            </div>
+            
+            <div class="form-group">
+                <label asp-for="NewPassword" class="control-label">New Password</label>
+                <input asp-for="NewPassword" type="password" class="form-control" />
+                <span asp-validation-for="NewPassword" class="text-danger"></span>
+            </div>
+            
+            <div class="form-group mt-3">
+                <button type="submit" class="btn btn-primary">Reset Password</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
