@@ -14,19 +14,37 @@
 4. Paste and execute the copied SQL code to create all necessary tables and initial data
 
 ### 3. Update Connection Strings
-1. Open `MVC/appsettings.json`
+1. Open `MVC/appsettings.json`; if `appssettings.json` don't exists, create it
 2. Update the `DefaultConnection` string with your SQL Server details:
 ```json
-"ConnectionStrings": {
-    "DefaultConnection": "Server=YOUR_SERVER_NAME;Database=PRN222-Final;Trusted_Connection=True;TrustServerCertificate=True;"
+{
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "Microsoft.AspNetCore": "Warning"
+    }
+  },
+  "AllowedHosts": "*",
+  "ConnectionStrings": {
+    "DefaultConnection": "Server=LAPTOP-F90M82DI\\MSSQLSEVER; Database=PRN222-Final;User ID=sa;Password=123456;Trust Server Certificate=True"
+  }
 }
 ```
 
-3. Open `Razor/appsettings.json`
+3. Open `Razor/appsettings.json`; if `appssettings.json` don't exists, create it
 4. Update the `DefaultConnection` string with the same connection string:
 ```json
-"ConnectionStrings": {
-    "DefaultConnection": "Server=YOUR_SERVER_NAME;Database=PRN222-Final;Trusted_Connection=True;TrustServerCertificate=True;"
+{
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "Microsoft.AspNetCore": "Warning"
+    }
+  },
+  "AllowedHosts": "*",
+  "ConnectionStrings": {
+    "DefaultConnection": "Server=LAPTOP-F90M82DI\\MSSQLSEVER; Database=PRN222-Final;User ID=sa;Password=123456;Trust Server Certificate=True"
+  }
 }
 ```
 
