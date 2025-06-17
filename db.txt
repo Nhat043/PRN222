@@ -51,7 +51,10 @@ INSERT INTO Product_Item_Status (id, name) VALUES
 (1, 'active'),
 (2, 'inactive');
 
-
+--Role
+INSERT INTO [Role_Name](name) VALUES
+('admin'),
+('customer');
 
 -- 1. Danh mục
 CREATE TABLE Category (
