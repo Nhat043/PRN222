@@ -4,6 +4,7 @@ using DAL.Datas;
 using Microsoft.EntityFrameworkCore;
 using DAL.Repository.Interface;
 using DAL.Repository;
+using Microsoft.Extensions.FileProviders;
 
 namespace MVC
 {
@@ -14,13 +15,27 @@ namespace MVC
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
+            //builder.Services.AddRazorPages(options =>
+            //{
+            //    options.Conventions.AddFolderRouteModelConvention("/", model =>
+            //    {
+            //        foreach (var selector in model.Selectors)
+            //        {
+            //            selector.AttributeRouteModel.Template = "razor/" + selector.AttributeRouteModel.Template;
+            //        }
+            //    });
+            //});// For Razor Pages
+
+
             builder.Services.AddControllersWithViews();
             builder.Services.AddDbContext<DemoContext>(options =>
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
             builder.Services.AddScoped<IAccountRepo, AccountRepo>();
             builder.Services.AddScoped(typeof(IAccountService), typeof(AccountService));
-            
+
+            builder.Services.AddScoped<IProductRepo, ProductRepo>();
+            builder.Services.AddScoped<IProductService, ProductService>();
             // Add session services
             builder.Services.AddSession(options =>
             {
@@ -30,6 +45,17 @@ namespace MVC
             });
 
             var app = builder.Build();
+
+            // Cho phép truy cập ảnh từ folder bên ngoài
+            app.UseStaticFiles(); // Đừng bỏ dòng này, dùng cho wwwroot
+
+            // Thêm dòng này để cấu hình dùng SharedImages ở gốc solution
+            app.UseStaticFiles(new StaticFileOptions
+            {
+                FileProvider = new PhysicalFileProvider(
+                    Path.Combine(builder.Environment.ContentRootPath, "..", "SharedImages")),
+                RequestPath = "/SharedImages"
+            });
 
             // Configure the HTTP request pipeline.
             if (!app.Environment.IsDevelopment())
@@ -50,9 +76,22 @@ namespace MVC
             app.UseSession();
 
             app.MapControllerRoute(
-                name: "default",
-                pattern: "{controller=Auth}/{action=Login}/{id?}");
+                name: "mvc",
+                pattern: "mvc/{controller=Auth}/{action=Login}/{id?}");
 
+            app.MapGet("/", context =>
+            {
+                context.Response.Redirect("/mvc/auth/login");
+                return Task.CompletedTask;
+            });
+
+            //app.MapRazorPages(); // Razor Pages routing
+
+            //app.MapGet("/razor", context =>
+            //{
+            //    context.Response.Redirect("/razor/pages/index");
+            //    return Task.CompletedTask;
+            //});
             app.Run();
         }
     }

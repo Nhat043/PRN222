@@ -9,7 +9,7 @@ namespace BLL.Util
 {
     public static class ImageHelper
     {
-        public static async Task<string> UploadImageAsync(IFormFile imageFile, string uploadPath)
+        public static async Task<string> UploadImageAsync(IFormFile imageFile, string uploadPath, string productName)
         {
             Console.WriteLine("Image Helper");
             try
@@ -17,15 +17,16 @@ namespace BLL.Util
                 if (imageFile == null || imageFile.Length == 0)
                     return null;
 
-                var fileName = Guid.NewGuid().ToString() + Path.GetExtension(imageFile.FileName);
-                var fullPath = Path.Combine(uploadPath, fileName);
+                var cleanFileName = (productName + "_" + imageFile.FileName).Replace(" ", "_");
+                var fullPath = Path.Combine(uploadPath, cleanFileName);
+
 
                 using (var stream = new FileStream(fullPath, FileMode.Create))
                 {
                     await imageFile.CopyToAsync(stream);
                 }
 
-                return fileName;
+                return cleanFileName;
             }
             catch (Exception ex)
             {
