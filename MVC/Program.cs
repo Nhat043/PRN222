@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using DAL.Repository.Interface;
 using DAL.Repository;
 using Microsoft.Extensions.FileProviders;
+using MVC.Filters;
 
 namespace MVC
 {
@@ -24,7 +25,13 @@ namespace MVC
                         selector.AttributeRouteModel.Template = "razor/" + selector.AttributeRouteModel.Template;
                     }
                 });
+                // Apply filter cho toàn bộ Razor Pages
+                options.Conventions.AddFolderApplicationModelConvention("/", model =>
+                {
+                    model.Filters.Add(new AdminAuthorizationFilter());
+                });
             });// For Razor Pages
+
 
             builder.Services.AddDbContext<DemoContext>(options =>
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
