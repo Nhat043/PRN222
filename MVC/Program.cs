@@ -14,20 +14,18 @@ namespace MVC
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            // Add services to the container.
-            //builder.Services.AddRazorPages(options =>
-            //{
-            //    options.Conventions.AddFolderRouteModelConvention("/", model =>
-            //    {
-            //        foreach (var selector in model.Selectors)
-            //        {
-            //            selector.AttributeRouteModel.Template = "razor/" + selector.AttributeRouteModel.Template;
-            //        }
-            //    });
-            //});// For Razor Pages
-
-
             builder.Services.AddControllersWithViews();
+            builder.Services.AddRazorPages(options =>
+            {
+                options.Conventions.AddFolderRouteModelConvention("/", model =>
+                {
+                    foreach (var selector in model.Selectors)
+                    {
+                        selector.AttributeRouteModel.Template = "razor/" + selector.AttributeRouteModel.Template;
+                    }
+                });
+            });// For Razor Pages
+
             builder.Services.AddDbContext<DemoContext>(options =>
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
@@ -79,19 +77,14 @@ namespace MVC
                 name: "mvc",
                 pattern: "mvc/{controller=Auth}/{action=Login}/{id?}");
 
+            app.MapRazorPages();
+
             app.MapGet("/", context =>
             {
                 context.Response.Redirect("/mvc/auth/login");
                 return Task.CompletedTask;
             });
 
-            //app.MapRazorPages(); // Razor Pages routing
-
-            //app.MapGet("/razor", context =>
-            //{
-            //    context.Response.Redirect("/razor/pages/index");
-            //    return Task.CompletedTask;
-            //});
             app.Run();
         }
     }
