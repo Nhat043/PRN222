@@ -21,7 +21,7 @@
             </div>
 
             <div class="form-group">
-                <label asp-for="UploadFile" class="control-label"></label>
+                <label class="control-label">Picture</label>
                 <input type="file" name="UploadFile" class="form-control" />
                 <span asp-validation-for="UploadFile" class="text-danger"></span>
             </div>
@@ -33,12 +33,12 @@
             </div>
 
             <div class="form-group">
-                <label asp-for="Product.CategoryId" class="control-label"></label>
+                <label class="control-label">Category</label>
                 <select asp-for="Product.CategoryId" class="form-control" asp-items="ViewBag.CategoryId"></select>
             </div>
 
             <div class="form-group">
-                <label asp-for="Product.StatusId" class="control-label"></label>
+                <label class="control-label">Status</label>
                 <select asp-for="Product.StatusId" class="form-control" asp-items="ViewBag.StatusId"></select>
             </div>
 

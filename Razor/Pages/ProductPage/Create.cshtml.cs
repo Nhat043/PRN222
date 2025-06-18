@@ -59,8 +59,10 @@ namespace Razor.Pages.ProductPage
                 // Xử lý lưu hình ảnh
                 if (UploadFile != null)
                 {
-                    var fileName = await ImageHelper.UploadImageAsync(UploadFile, Path.Combine(_webHost.WebRootPath, "images"));
-                    Product.Picture = fileName;
+                    var productName = Product.Name;
+                    var sharedImagePath = Path.Combine(_webHost.ContentRootPath, "..", "SharedImages");
+                    var fileName = await ImageHelper.UploadImageAsync(UploadFile, sharedImagePath, productName);
+                    Product.Picture = "/SharedImages/" + fileName;
                 }
             }
             catch (Exception ex)

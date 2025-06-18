@@ -4,6 +4,7 @@ using DAL.Datas;
 using DAL.Repository.Interface;
 using DAL.Repository;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.FileProviders;
 
 namespace Razor
 {
@@ -26,6 +27,18 @@ namespace Razor
             builder.Services.AddScoped<IProductService, ProductService>();
 
             var app = builder.Build();
+
+
+            // Cho phép truy cập ảnh từ folder bên ngoài
+            app.UseStaticFiles(); // Đừng bỏ dòng này, dùng cho wwwroot
+
+            // Thêm dòng này để cấu hình dùng SharedImages ở gốc solution
+            app.UseStaticFiles(new StaticFileOptions
+            {
+                FileProvider = new PhysicalFileProvider(
+                    Path.Combine(builder.Environment.ContentRootPath, "..", "SharedImages")),
+                RequestPath = "/SharedImages"
+            });
 
             // Configure the HTTP request pipeline.
             if (!app.Environment.IsDevelopment())
