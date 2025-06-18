@@ -30,6 +30,42 @@ namespace MVC.Controllers
             return View();
         }
 
+        public async Task<IActionResult> CheckIsLogin(){
+            if(Request.Cookies.TryGetValue("CookieUser", out var accountJson)){
+                var accountRaw = JsonSerializer.Deserialize<Account>(accountJson);
+                if(accountRaw != null){
+                    var account = await _accountService.GetAccountByEmailAndPasswordAsync(accountRaw.Email, null);
+                    if(accountRaw.RoleId == 2){
+                        SetSession(account);
+                        return RedirectToAction("Index", "Home");
+                    }else{
+                        SetSession(account);
+                        return Redirect("/razor/Index");
+                    }
+                }
+            }
+            return RedirectToAction("Login", "Auth");
+        }
+
+        public void SetCookie(Account account){
+            var accountJson = new {
+                    Email = account.Email,
+                    RoleId = account.RoleId
+                };
+                Response.Cookies.Append("CookieUser", JsonSerializer.Serialize(accountJson), new CookieOptions
+                {
+                    Expires = DateTimeOffset.UtcNow.AddDays(3),
+                    HttpOnly = true,
+                    Secure = true,
+                    SameSite = SameSiteMode.Lax
+                });
+        }
+
+        public void SetSession(Account account){
+            HttpContext.Session.SetInt32("AccountIdSession", account.Id);
+            HttpContext.Session.SetString("RoleIdSession", account.RoleId.ToString());
+        }
+
         [HttpPost]
         public async Task<IActionResult> Login(LoginViewModel model)
         {
@@ -48,8 +84,11 @@ namespace MVC.Controllers
 
             // TODO: Add authentication logic here (e.g., using ASP.NET Core Identity or custom authentication)
             // For now, we'll just redirect to home page
+            SetCookie(account);
+            SetSession(account);
+
             if (account.RoleId == 2)//Customer
-            {
+            {                
                 return RedirectToAction("Index", "Home");
             }else{
                 //Admin
@@ -206,6 +245,13 @@ namespace MVC.Controllers
 
             TempData["Message"] = "Password reset successful. Please login with your new password.";
             return RedirectToAction("Login");
+        }
+
+        public IActionResult Logout()
+        {
+            Response.Cookies.Delete("CookieUser");
+            HttpContext.Session.Clear();
+            return RedirectToAction("Login", "Auth");
         }
     }
 }

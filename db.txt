@@ -56,6 +56,10 @@ INSERT INTO [Role_Name](name) VALUES
 ('admin'),
 ('customer');
 
+--Admin Account
+Insert Into Account(email, password, name, role_id, status_id) Values
+('admin@gmail.com', 'jGl25bVBBBW96Qi9Te4V37Fnqchz/Eu4qB9vKrRIqRg=', 'admin', 1, 1);
+
 -- 1. Danh mục
 CREATE TABLE Category (
     id INT IDENTITY(1,1) PRIMARY KEY,
