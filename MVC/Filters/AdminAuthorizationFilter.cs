@@ -7,11 +7,10 @@ namespace MVC.Filters
     {
         public async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
         {
-            var roleId = context.HttpContext.Session.GetInt32("RoleId");
-
-            if (roleId != 1) // 1 = Admin
+            var roleIdString = context.HttpContext.Session.GetString("RoleIdSession");
+            if (roleIdString != "1") // 1 = Admin
             {
-                context.Result = new RedirectResult("/mvc/Auth/CheckIsLogin");
+                context.Result = new RedirectResult("/Auth/CheckIsLogin");
                 return;
             }
 
