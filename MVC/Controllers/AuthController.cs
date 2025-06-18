@@ -48,7 +48,13 @@ namespace MVC.Controllers
 
             // TODO: Add authentication logic here (e.g., using ASP.NET Core Identity or custom authentication)
             // For now, we'll just redirect to home page
-            return RedirectToAction("Index", "Home");
+            if (account.RoleId == 2)//Customer
+            {
+                return RedirectToAction("Index", "Home");
+            }else{
+                //Admin
+                return Redirect("razor/Index");
+            }
         }
 
         [HttpGet]
