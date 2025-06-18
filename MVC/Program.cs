@@ -81,7 +81,7 @@ namespace MVC
 
             app.MapGet("/", context =>
             {
-                context.Response.Redirect("/mvc/auth/login");
+                context.Response.Redirect("/mvc/auth/CheckIsLogin");
                 return Task.CompletedTask;
             });
 
