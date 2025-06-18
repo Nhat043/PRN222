@@ -1,3 +1,14 @@
+# PRN222-Final Project Overview
+
+This project is a multi-interface web application using ASP.NET Core, featuring both MVC and Razor Pages in a single solution:
+
+- **Run the MVC project** to start the application. Razor Pages will be available automatically alongside MVC.
+- **MVC** is designed for customers and guests, accessible via URLs with the `/mvc/` prefix (e.g., `/mvc/auth/login`).
+- **Razor Pages** are for admin users, accessible via URLs with the `/razor/` prefix (e.g., `/razor/Index`).
+- On the login page, if you log in as an admin, you will be redirected to the Razor admin interface. Customers and guests will be directed to the MVC interface.
+
+---
+
 # PRN222-Final Project Setup Guide
 
 ## Database Setup Instructions
