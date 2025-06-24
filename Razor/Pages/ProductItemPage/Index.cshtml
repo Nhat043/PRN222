@@ -1,0 +1,91 @@
+﻿@page
+@model Razor.Pages.ProductItemPage.IndexModel
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Index</h1>
+
+<p>
+    <a asp-page="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.ProductItem[0].Quantity)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ProductItem[0].ImportPrice)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ProductItem[0].SellingPrice)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ProductItem[0].Discount)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ProductItem[0].Product)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ProductItem[0].Status)
+            </th>
+            <th>
+                Variation Options
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model.ProductItem) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Quantity)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.ImportPrice)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.SellingPrice)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Discount)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Product.Name)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Status.Name)
+            </td>
+            <td>
+                @if (item.VariationOptions != null && item.VariationOptions.Any())
+                {
+                    var groupedOptions = item.VariationOptions
+                        .GroupBy(vo => vo.Variation?.Name ?? "Unknown")
+                        .ToList();
+                    
+                    foreach (var group in groupedOptions)
+                    {
+                        <div class="small">
+                            <strong class="text-primary">@group.Key:</strong>
+                            <span class="ms-1">
+                                @string.Join(", ", group.Select(vo => vo.Value))
+                            </span>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <span class="text-muted small">None</span>
+                }
+            </td>
+            <td>
+                <a asp-page="./Edit" asp-route-id="@item.Id">Edit</a> |
+                <a asp-page="./Details" asp-route-id="@item.Id">Details</a> |
+                <a asp-page="./Delete" asp-route-id="@item.Id">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
