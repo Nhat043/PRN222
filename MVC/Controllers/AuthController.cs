@@ -66,6 +66,7 @@ namespace MVC.Controllers
             HttpContext.Session.SetInt32("AccountIdSession", account.Id);
             HttpContext.Session.SetString("RoleIdSession", account.RoleId.ToString());
             HttpContext.Session.SetString("AccountName", account.Name ?? "Guest");
+            HttpContext.Session.SetString("AccountEmail", account.Email);
         }
 
         [HttpPost]
@@ -250,6 +251,36 @@ namespace MVC.Controllers
             TempData["Message"] = "Password reset successful. Please login with your new password.";
             return RedirectToAction("Login");
         }
+        [HttpGet]
+        public async Task<IActionResult> ChangePassword()
+        {
+            // Get email from session
+            var email = HttpContext.Session.GetString("AccountEmail");
+
+            if (string.IsNullOrEmpty(email))
+            {
+                return RedirectToAction("Login");
+            }
+
+            var account = await _accountService.GetAccountByEmailAndPasswordAsync(email);
+            if (account == null)
+            {
+                TempData["Message"] = "Account not found.";
+                return RedirectToAction("Login");
+            }
+
+            // Generate OTP
+            var otp = new Random().Next(1000, 9999).ToString();
+            HttpContext.Session.SetString("ResetOTP", otp);
+            HttpContext.Session.SetString("ResetEmail", email);
+
+            // Send OTP via email
+            await EmailHelper.SendChangePasswordEmail(email, otp);
+
+            // Redirect to VerifyOtp
+            return RedirectToAction("VerifyOtp", new { email = email });
+        }
+
 
         public IActionResult Logout()
         {

@@ -26,5 +26,15 @@
         </dl>
     </div>
     <a asp-controller="User" asp-action="EditProfile" class="btn btn-outline-primary">Edit Profile</a>
+    <a href="javascript:void(0);" class="btn btn-outline-danger ml-2" onclick="confirmChangePassword()">Change Password</a>
+    @section Scripts {
+        <script>
+            function confirmChangePassword() {
+                if (confirm("Are you sure you want to change your password? An OTP will be sent to your email.")) {
+                    window.location.href = '@Url.Action("ChangePassword", "Auth")';
+                }
+            }
+        </script>
+    }
 
 </div>
