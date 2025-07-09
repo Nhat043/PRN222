@@ -37,6 +37,7 @@ namespace MVC.Controllers
                     var account = await _accountService.GetAccountByEmailAndPasswordAsync(accountRaw.Email, null);
                     if(accountRaw.RoleId == 2){
                         SetSession(account);
+                        
                         return RedirectToAction("Index", "Home");
                     }else{
                         SetSession(account);
@@ -64,6 +65,7 @@ namespace MVC.Controllers
         public void SetSession(Account account){
             HttpContext.Session.SetInt32("AccountIdSession", account.Id);
             HttpContext.Session.SetString("RoleIdSession", account.RoleId.ToString());
+            HttpContext.Session.SetString("AccountName", account.Name ?? "Guest");
         }
 
         [HttpPost]
@@ -88,7 +90,9 @@ namespace MVC.Controllers
             SetSession(account);
 
             if (account.RoleId == 2)//Customer
-            {                
+            {
+               
+
                 return RedirectToAction("Index", "Home");
             }else{
                 //Admin

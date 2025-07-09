@@ -11,6 +11,7 @@ namespace DAL.Repository.Interface
     {
         Task<IEnumerable<Account>> GetAllAccountsAsync();
         Task<Account> GetAccountByIdAsync(int id);
+        Task<Account> GetAccountByUserNameAsync(string username);
         Task<Account> GetAccountByEmailAndPasswordAsync(string email, string? password);
 
         Task AddAccountAsync(Account account);

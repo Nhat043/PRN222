@@ -28,7 +28,10 @@ namespace DAL.Repository
         {
             return await _demoContext.Accounts.FirstOrDefaultAsync(c => c.Id == accountId);
         }
-
+        public async Task<Account> GetAccountByUserNameAsync(string username)
+        {
+            return await _demoContext.Accounts.FirstOrDefaultAsync(c => c.Name == username);
+        }
         public async Task<Account> GetAccountByEmailAndPasswordAsync(string email, string? password)
         {
             if(string.IsNullOrEmpty(password)){

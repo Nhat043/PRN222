@@ -50,6 +50,12 @@ namespace BLL.Service
             return await _accountRepo.GetAccountByEmailAndPasswordAsync(email, password);
             
         }
+        public async Task<Account> GetAccountByUserNameAsync(string username)
+        {
+            
+            return await _accountRepo.GetAccountByUserNameAsync(username);
+
+        }
 
         public async Task<Boolean> CheckDuplicateAccount(string email)
         {
