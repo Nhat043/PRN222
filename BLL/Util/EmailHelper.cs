@@ -15,7 +15,7 @@ namespace BLL.Util
             string _from = "meocho0432004@gmail.com";
             string _password = "pnrc uxpz dlxw pjqp";
             string _subject = "Electronic Shop Register Account";
-            string _body = $"Click here to active your account: https://localhost:7086/Auth/Verify?email={_to}";
+            string _body = $"Click here to active your account: https://localhost:7086/mvc/Auth/Verify?email={_to}";
             MailMessage message = new MailMessage(_from, _to, _subject, _body);
             message.BodyEncoding = System.Text.Encoding.UTF8;
             message.SubjectEncoding = System.Text.Encoding.UTF8;

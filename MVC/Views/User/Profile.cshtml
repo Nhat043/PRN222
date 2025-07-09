@@ -1,0 +1,28 @@
+﻿@model MVC.Models.User.ProfileViewModel
+
+@{
+    ViewData["Title"] = "User Profile";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<div class="card mt-3">
+    <div class="card-header bg-primary text-white">
+        <h4 class="mb-0">Profile Details</h4>
+    </div>
+    <div class="card-body">
+        <dl class="row">
+            <dt class="col-sm-3">@Html.DisplayNameFor(model => model.Email)</dt>
+            <dd class="col-sm-9">@Html.DisplayFor(model => model.Email)</dd>
+
+            <dt class="col-sm-3">@Html.DisplayNameFor(model => model.Name)</dt>
+            <dd class="col-sm-9">@Html.DisplayFor(model => model.Name)</dd>
+
+            <dt class="col-sm-3">@Html.DisplayNameFor(model => model.Phone)</dt>
+            <dd class="col-sm-9">@Html.DisplayFor(model => model.Phone)</dd>
+
+            <dt class="col-sm-3">@Html.DisplayNameFor(model => model.Address)</dt>
+            <dd class="col-sm-9">@Html.DisplayFor(model => model.Address)</dd>
+        </dl>
+    </div>
+</div>
