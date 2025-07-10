@@ -49,6 +49,12 @@ namespace MVC
           
             builder.Services.AddScoped<IProductItemRepo, ProductItemRepo>();
             builder.Services.AddScoped<IProductItemService, ProductItemService>();
+           
+            builder.Services.AddScoped<IRatingService, RatingService>();
+            builder.Services.AddScoped<IRatingRepo, RatingRepo>();
+
+            builder.Services.AddScoped<IComService, ComService>();
+            builder.Services.AddScoped<IComRepo, ComRepo>();
 
             // Add session services
             builder.Services.AddSession(options =>
