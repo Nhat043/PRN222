@@ -1,0 +1,95 @@
+﻿@model DAL.Models.Product
+
+@{
+    ViewData["Title"] = "Chi tiết sản phẩm";
+    var price = Model.ProductItems.FirstOrDefault()?.SellingPrice ?? 0;
+}
+
+<div class="container mt-5">
+    <div class="row">
+        <!-- Hình ảnh -->
+        <div class="col-md-5 text-center">
+            <img src="@Model.Picture" alt="@Model.Name" class="img-fluid rounded shadow" />
+        </div>
+
+        <!-- Thông tin -->
+        <div class="col-md-7">
+            <h2 class="fw-bold">@Model.Name</h2>
+            <h4 id="displayPrice" class="text-secondary mb-3">@price.ToString("N0") VND</h4>
+
+
+            <form asp-controller="Cart" asp-action="AddToCart" method="post">
+                <input type="hidden" name="productId" value="@Model.Id" />
+
+                <p class="fw-semibold">Select Option:</p>
+                <div class="d-flex flex-wrap gap-3 mb-4">
+                    @foreach (var item in Model.ProductItems)
+                    {
+                        var optionText = string.Join("<br/>", item.VariationOptions.Select(v => $"{v.Variation?.Name}: {v.Value}"));
+                        <div class="form-check form-check-inline">
+                            <input class="btn-check" type="radio" name="productItemId" id="option-@item.Id" value="@item.Id" data-price="@item.SellingPrice" autocomplete="off" />
+                            <label class="btn btn-outline-primary px-4 py-3 text-start" for="option-@item.Id">
+                                @Html.Raw(optionText)
+                            </label>
+                           
+
+                        </div>
+                        
+                    }
+                </div>
+
+                <button type="submit" class="btn btn-danger me-2" id="addToCartBtn" disabled>AddToCart</button>
+                <a asp-controller="Home" asp-action="Index" class="btn btn-secondary">Cancel</a>
+            </form>
+
+            
+        </div>
+    </div>
+    <!-- MÔ TẢ: Dưới full chiều ngang -->
+    <div class="row mt-5">
+        <div class="col-12">
+            <h5>Description</h5>
+            <p>@Model.Description</p>
+        </div>
+    </div>
+    <hr class="my-5" />
+
+    <!-- ĐÁNH GIÁ -->
+    <h5 class="mb-3">Rating</h5>
+
+    
+
+    <!-- BÌNH LUẬN -->
+    <h5 class="mb-3 mt-5">Comment</h5>
+
+    
+
+</div>
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+
+@section Scripts {
+    <script>
+        document.querySelectorAll('input[name="productItemId"]').forEach(radio => {
+            radio.addEventListener('change', function () {
+                const selectedId = this.value;
+                const selectedPrice = this.getAttribute('data-price');
+                document.getElementById('displayPrice').innerText = parseInt(selectedPrice).toLocaleString() + ' VND';
+            });
+        });
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const radioButtons = document.querySelectorAll('input[name="productItemId"]');
+            const addToCartBtn = document.getElementById('addToCartBtn');
+
+            radioButtons.forEach(radio => {
+                radio.addEventListener('change', function () {
+                    addToCartBtn.disabled = false;
+                });
+            });
+        });
+    </script>
+}

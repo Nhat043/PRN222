@@ -1,0 +1,61 @@
+﻿@model List<MVC.Models.CartItemViewModel>
+
+<h2>Your Cart</h2>
+<h2> <a asp-controller="Home" asp-action="Index" class="btn btn-secondary">Back</a></h2>
+@if (!Model.Any())
+{
+    <p>Your cart is empty.</p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Image</th>
+                <th>Product</th>
+                <th>Price</th>
+                <th>Quantity</th>
+                <th>Discount</th>
+                <th>Total</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td><img src="@item.Picture" width="80" /></td>
+                    <td>@item.ProductName</td>
+                    <td>@item.SellingPrice?.ToString("N0")</td>
+                    <td>
+                        <form asp-action="UpdateQuantity" method="post" style="display:inline;">
+                            <input type="hidden" name="productItemId" value="@item.ProductItemId" />
+                            <input type="hidden" name="change" value="-1" />
+                            <button class="btn btn-sm btn-outline-secondary">-</button>
+                        </form>
+
+                        <span class="mx-2">@item.Quantity</span>
+
+                        <form asp-action="UpdateQuantity" method="post" style="display:inline;">
+                            <input type="hidden" name="productItemId" value="@item.ProductItemId" />
+                            <input type="hidden" name="change" value="1" />
+                            <button class="btn btn-sm btn-outline-secondary">+</button>
+                        </form>
+                    </td>
+
+                    <td>@(item.Discount?.ToString("N0") ?? "0")</td>
+                    <td>@item.TotalPrice.ToString("N0")</td>
+                  
+                    <td>
+                        <a asp-action="Remove" asp-route-id="@item.ProductItemId" class="btn btn-danger btn-sm">Remove</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    <a asp-action="Clear" class="btn btn-warning">Clear Cart</a>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}

@@ -30,8 +30,13 @@ namespace DAL.Repository
 
         public async Task<Product> GetProductByIdAsync(int productId)
         {
-            return await _demoContext.Products.FirstOrDefaultAsync(p => p.Id == productId);
+            return await _demoContext.Products
+                .Include(p => p.ProductItems)
+                    .ThenInclude(pi => pi.VariationOptions)
+                        .ThenInclude(vo => vo.Variation)
+                .FirstOrDefaultAsync(p => p.Id == productId);
         }
+
 
         public async Task AddProductAsync(Product product)
         {

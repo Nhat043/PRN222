@@ -41,6 +41,15 @@ namespace MVC
 
             builder.Services.AddScoped<IProductRepo, ProductRepo>();
             builder.Services.AddScoped<IProductService, ProductService>();
+
+
+            builder.Services.AddScoped<ICategoryRepo, CategoryRepo>();
+            builder.Services.AddScoped<ICategoryService, CategoryService>();
+
+          
+            builder.Services.AddScoped<IProductItemRepo, ProductItemRepo>();
+            builder.Services.AddScoped<IProductItemService, ProductItemService>();
+
             // Add session services
             builder.Services.AddSession(options =>
             {
@@ -48,6 +57,9 @@ namespace MVC
                 options.Cookie.HttpOnly = true;
                 options.Cookie.IsEssential = true;
             });
+
+            builder.Services.AddHttpContextAccessor();
+
 
             var app = builder.Build();
 
