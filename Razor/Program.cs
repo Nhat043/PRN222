@@ -57,6 +57,12 @@ namespace Razor
 
             app.MapRazorPages();
 
+            // Redirect root to ProductPage/Index
+            app.MapGet("/", context => {
+                context.Response.Redirect("/ProductPage/Index");
+                return Task.CompletedTask;
+            });
+
             app.Run();
         }
     }

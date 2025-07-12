@@ -51,19 +51,18 @@ public partial class DemoContext : DbContext
     public virtual DbSet<VariationOption> VariationOptions { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-    {
-
-    }
+#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
+        => optionsBuilder.UseSqlServer("Server=ANHNGUYEN;Database=PRN222-Final;User ID=sa;Password=123456;TrustServerCertificate=True");
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Account>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__Account__3213E83F5C2A60C3");
+            entity.HasKey(e => e.Id).HasName("PK__Account__3213E83FCA190B80");
 
             entity.ToTable("Account");
 
-            entity.HasIndex(e => e.Email, "UQ__Account__AB6E616401BDCE69").IsUnique();
+            entity.HasIndex(e => e.Email, "UQ__Account__AB6E616467EB8898").IsUnique();
 
             entity.Property(e => e.Id).HasColumnName("id");
             entity.Property(e => e.Address)
@@ -95,7 +94,7 @@ public partial class DemoContext : DbContext
 
         modelBuilder.Entity<AccountStatus>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__Account___3213E83FB73FC788");
+            entity.HasKey(e => e.Id).HasName("PK__Account___3213E83F21C78A92");
 
             entity.ToTable("Account_Status");
 
@@ -109,7 +108,7 @@ public partial class DemoContext : DbContext
 
         modelBuilder.Entity<Category>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__Category__3213E83F1A789986");
+            entity.HasKey(e => e.Id).HasName("PK__Category__3213E83F191EB66D");
 
             entity.ToTable("Category");
 
@@ -121,7 +120,7 @@ public partial class DemoContext : DbContext
 
         modelBuilder.Entity<Comment>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__Comment__3213E83F9987954D");
+            entity.HasKey(e => e.Id).HasName("PK__Comment__3213E83F60513B48");
 
             entity.ToTable("Comment");
 
@@ -156,7 +155,7 @@ public partial class DemoContext : DbContext
 
         modelBuilder.Entity<CommentStatus>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__Comment___3213E83F9AD4D84C");
+            entity.HasKey(e => e.Id).HasName("PK__Comment___3213E83FB1C11CF3");
 
             entity.ToTable("Comment_Status");
 
@@ -170,7 +169,7 @@ public partial class DemoContext : DbContext
 
         modelBuilder.Entity<Order>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__Order__3213E83F7F539C85");
+            entity.HasKey(e => e.Id).HasName("PK__Order__3213E83FD0283A50");
 
             entity.ToTable("Order");
 
@@ -193,7 +192,7 @@ public partial class DemoContext : DbContext
 
         modelBuilder.Entity<OrderItem>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__Order_It__3213E83FCF90A84A");
+            entity.HasKey(e => e.Id).HasName("PK__Order_It__3213E83F72CB47B3");
 
             entity.ToTable("Order_Item");
 
@@ -214,7 +213,7 @@ public partial class DemoContext : DbContext
 
         modelBuilder.Entity<OrderStatus>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__Order_St__3213E83F702863CE");
+            entity.HasKey(e => e.Id).HasName("PK__Order_St__3213E83F4DAE5F16");
 
             entity.ToTable("Order_Status");
 
@@ -228,7 +227,7 @@ public partial class DemoContext : DbContext
 
         modelBuilder.Entity<Product>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__Product__3213E83F7C1DD8B5");
+            entity.HasKey(e => e.Id).HasName("PK__Product__3213E83FA54FADE7");
 
             entity.ToTable("Product");
 
@@ -256,7 +255,7 @@ public partial class DemoContext : DbContext
 
         modelBuilder.Entity<ProductItem>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__Product___3213E83F1F99D8FC");
+            entity.HasKey(e => e.Id).HasName("PK__Product___3213E83F0CDC2571");
 
             entity.ToTable("Product_Item");
 
@@ -291,7 +290,7 @@ public partial class DemoContext : DbContext
                         .HasConstraintName("FK__Product_C__produ__5629CD9C"),
                     j =>
                     {
-                        j.HasKey("ProductItemId", "VariationOptionId").HasName("PK__Product___B8C15F9DBD00281F");
+                        j.HasKey("ProductItemId", "VariationOptionId").HasName("PK__Product___B8C15F9D47D5B78C");
                         j.ToTable("Product_Configuration");
                         j.IndexerProperty<int>("ProductItemId").HasColumnName("product_item_id");
                         j.IndexerProperty<int>("VariationOptionId").HasColumnName("variation_option_id");
@@ -300,7 +299,7 @@ public partial class DemoContext : DbContext
 
         modelBuilder.Entity<ProductItemStatus>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__Product___3213E83FE38571D7");
+            entity.HasKey(e => e.Id).HasName("PK__Product___3213E83F2E1C3682");
 
             entity.ToTable("Product_Item_Status");
 
@@ -314,7 +313,7 @@ public partial class DemoContext : DbContext
 
         modelBuilder.Entity<ProductStatus>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__Product___3213E83F508413DF");
+            entity.HasKey(e => e.Id).HasName("PK__Product___3213E83F77AEE104");
 
             entity.ToTable("Product_Status");
 
@@ -328,7 +327,7 @@ public partial class DemoContext : DbContext
 
         modelBuilder.Entity<Rating>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__Rating__3213E83F8395ABC3");
+            entity.HasKey(e => e.Id).HasName("PK__Rating__3213E83FE659E727");
 
             entity.ToTable("Rating");
 
@@ -353,7 +352,7 @@ public partial class DemoContext : DbContext
 
         modelBuilder.Entity<RevenueLog>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__Revenue___3213E83F15A2C4FA");
+            entity.HasKey(e => e.Id).HasName("PK__Revenue___3213E83FF99E6639");
 
             entity.ToTable("Revenue_Log");
 
@@ -373,7 +372,7 @@ public partial class DemoContext : DbContext
 
         modelBuilder.Entity<RoleName>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__Role_Nam__3213E83F9D12FC27");
+            entity.HasKey(e => e.Id).HasName("PK__Role_Nam__3213E83F1649FCE8");
 
             entity.ToTable("Role_Name");
 
@@ -385,7 +384,7 @@ public partial class DemoContext : DbContext
 
         modelBuilder.Entity<Variation>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__Variatio__3213E83F770C757A");
+            entity.HasKey(e => e.Id).HasName("PK__Variatio__3213E83FA1338295");
 
             entity.ToTable("Variation");
 
@@ -397,7 +396,7 @@ public partial class DemoContext : DbContext
 
         modelBuilder.Entity<VariationOption>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__Variatio__3213E83FF916763D");
+            entity.HasKey(e => e.Id).HasName("PK__Variatio__3213E83F097F08A9");
 
             entity.ToTable("Variation_Option");
 

@@ -19,12 +19,14 @@ namespace Razor.Pages.VariationOptionPage
             _context = context;
         }
 
-        public IList<VariationOption> VariationOption { get;set; } = default!;
+        public IList<VariationOption> RamOptions { get; set; } = new List<VariationOption>();
+        public IList<VariationOption> StorageOptions { get; set; } = new List<VariationOption>();
 
         public async Task OnGetAsync()
         {
-            VariationOption = await _context.VariationOptions
-                .Include(v => v.Variation).ToListAsync();
+            var allOptions = await _context.VariationOptions.Include(v => v.Variation).ToListAsync();
+            RamOptions = allOptions.Where(vo => vo.Variation != null && vo.Variation.Name.ToLower() == "ram").ToList();
+            StorageOptions = allOptions.Where(vo => vo.Variation != null && vo.Variation.Name.ToLower() == "storage").ToList();
         }
     }
 }

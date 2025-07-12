@@ -7,68 +7,109 @@
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/Razor.styles.css" asp-append-version="true" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <style>
+        body {
+            background: #f8f9fa;
+        }
+        .navbar {
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        }
+        .navbar-brand {
+            font-weight: bold;
+            letter-spacing: 1px;
+            font-size: 1.4rem;
+        }
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 500;
+            font-size: 1.05rem;
+            border-radius: 8px;
+            transition: background 0.2s;
+        }
+        .nav-link.active, .nav-link:focus, .nav-link:hover {
+            background: #e9ecef;
+            color: #495057 !important;
+        }
+        .navbar-nav .nav-item:not(:last-child) {
+            margin-right: 0.5rem;
+        }
+        .main-content {
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: 0 2px 16px rgba(0,0,0,0.04);
+            padding: 2rem 2.5rem;
+            margin-top: 2rem;
+            margin-bottom: 2rem;
+            min-width: 1000px;
+        }
+        footer {
+            background: #fff;
+            border-top: 1px solid #e3e6f0;
+            padding: 1.2rem 0;
+            font-size: 1rem;
+            color: #6c757d;
+            box-shadow: 0 -2px 8px rgba(0,0,0,0.03);
+        }
+    </style>
 </head>
 <body>
     <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+        <nav class="navbar navbar-expand-lg navbar-light bg-white">
             <div class="container">
-                <a class="navbar-brand" asp-area="" asp-page="/Index">Razor</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
+                <a class="navbar-brand d-flex align-items-center" asp-area="" asp-page="/ProductPage/Index">
+                    <i class="fas fa-cube me-2 text-primary"></i> Razor Admin
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar" aria-controls="mainNavbar" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
+                <div class="collapse navbar-collapse" id="mainNavbar">
+                    <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-page="/Index">Home</a>
+                            <a class="nav-link @(Context.Request.Path.Value.ToLower().Contains("/productpage/index") ? "active" : "")" asp-area="" asp-page="/ProductPage/Index">
+                                <i class="fas fa-box"></i> Products
+                            </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-page="/Privacy">Privacy</a>
+                            <a class="nav-link @(Context.Request.Path.Value.ToLower().Contains("/categorypage/index") ? "active" : "")" asp-area="" asp-page="/CategoryPage/Index">
+                                <i class="fas fa-tags"></i> Categories
+                            </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-page="/CategoryPage/Index">Category</a>
+                            <a class="nav-link @(Context.Request.Path.Value.ToLower().Contains("/variationoptionpage/index") ? "active" : "")" asp-area="" asp-page="/VariationOptionPage/Index">
+                                <i class="fas fa-cogs"></i> Variation Options
+                            </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-page="/ProductPage/Index">Product</a>
-                        </li>
-                        
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-page="/VariationPage/Index">Variation</a>
+                            <a class="nav-link @(Context.Request.Path.Value.ToLower().Contains("/commentpage/index") ? "active" : "")" asp-area="" asp-page="/CommentPage/Index">
+                                <i class="fas fa-comments"></i> Comments
+                            </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-page="/VariationOptionPage/Index">VariationOption</a>
+                            <a class="nav-link" href="/mvc/auth/logout">
+                                <i class="fas fa-sign-out-alt"></i> Logout
+                            </a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-page="/ProductItemPage/Index">ProductItem</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-page="/CommentPage/Index">Comment</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" href="/mvc/auth/logout">Logout</a>
-                        </li>
-
                     </ul>
                 </div>
             </div>
         </nav>
     </header>
     <div class="container">
-        <main role="main" class="pb-3">
+        <main role="main" class="main-content">
             @RenderBody()
         </main>
     </div>
-
-    <footer class="border-top footer text-muted">
+    <footer class="text-center">
         <div class="container">
-            &copy; 2025 - Razor - <a asp-area="" asp-page="/Privacy">Privacy</a>
+            &copy; 2025 - Razor Admin &mdash; <a asp-area="" asp-page="/Privacy">Privacy</a>
         </div>
     </footer>
-
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
-
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
