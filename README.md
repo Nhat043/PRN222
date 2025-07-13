@@ -64,7 +64,21 @@ Replace:
 - `YOUR_USERNAME` with your SQL Server username
 - `YOUR_PASSWORD` with your SQL Server password
 
-### 4. Verify Setup
+### 4. Create SharedImages Folder
+**Important**: Create a `SharedImages` folder at the root level of the project (same level as BLL, DAL, MVC, Razor folders). This folder is required for storing uploaded product images.
+
+Project structure should look like:
+```
+PRN222-Final/
+├── BLL/
+├── DAL/
+├── MVC/
+├── Razor/
+├── SharedImages/  ← Create this folder
+└── README.md
+```
+
+### 5. Verify Setup
 1. Run the application
 2. If you encounter any database connection errors, double-check:
    - Database name is correct
@@ -72,8 +86,9 @@ Replace:
    - SQL Server is running
    - Username and password are correct
    - Connection string format is correct
+   - SharedImages folder exists at the root level
 
-### 5. Project Structure
+### 6. Project Structure
 The project uses a three-layer architecture:
 - **DAL (Data Access Layer)**: Contains database models and context
 - **BLL (Business Logic Layer)**: Contains business logic and services
