@@ -85,6 +85,13 @@ namespace MVC.Controllers
                 return View(model);
             }
 
+            // Prevent banned users from logging in
+            if (account.StatusId == 2)
+            {
+                ModelState.AddModelError("", "Your account has been banned.");
+                return View(model);
+            }
+
             // TODO: Add authentication logic here (e.g., using ASP.NET Core Identity or custom authentication)
             // For now, we'll just redirect to home page
             SetCookie(account);
