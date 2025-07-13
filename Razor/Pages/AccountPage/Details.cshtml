@@ -1,0 +1,65 @@
+@page
+@model Razor.Pages_AccountPage.DetailsModel
+@{
+    ViewData["Title"] = "Account Details";
+    Layout = "../Shared/_Layout.cshtml";
+}
+<div class="d-flex justify-content-center align-items-center" style="min-height: 70vh;">
+    <div class="card shadow-lg p-4" style="min-width: 400px; max-width: 500px; width: 100%;">
+        <h3 class="mb-4 text-center"><i class="fas fa-user text-info me-2"></i> Account Details</h3>
+        <dl class="row mb-0">
+            <dt class="col-sm-4">Email</dt>
+            <dd class="col-sm-8">@Model.Account.Email</dd>
+            <dt class="col-sm-4">Password</dt>
+            <dd class="col-sm-8"><span class="text-muted">••••••••</span></dd>
+            <dt class="col-sm-4">Name</dt>
+            <dd class="col-sm-8">@Model.Account.Name</dd>
+            <dt class="col-sm-4">Phone</dt>
+            <dd class="col-sm-8">@Model.Account.Phone</dd>
+            <dt class="col-sm-4">Address</dt>
+            <dd class="col-sm-8">@Model.Account.Address</dd>
+            <dt class="col-sm-4">Role</dt>
+            <dd class="col-sm-8">
+                @if (Model.Account.Role != null)
+                {
+                    <span class="badge bg-info text-dark"><i class="fas fa-user-tag me-1"></i> @Model.Account.Role.Name</span>
+                }
+            </dd>
+            <dt class="col-sm-4">Status</dt>
+            <dd class="col-sm-8">
+                @if (Model.Account.Status != null)
+                {
+                    <span class="badge bg-@(Model.Account.StatusId == 1 ? "success" : "secondary")">@Model.Account.Status.Name</span>
+                }
+            </dd>
+        </dl>
+        <div class="mt-4 text-center">
+            @if (Model.Account.StatusId == 1)
+            {
+                <form method="post" asp-page-handler="Ban" asp-route-id="@Model.Account.Id" class="d-inline">
+                    <button type="submit" class="btn btn-danger me-2" data-bs-toggle="tooltip" data-bs-placement="top" title="Ban">
+                        <i class="fas fa-user-slash me-1"></i> Ban
+                    </button>
+                </form>
+            }
+            else if (Model.Account.StatusId == 2)
+            {
+                <form method="post" asp-page-handler="Unban" asp-route-id="@Model.Account.Id" class="d-inline">
+                    <button type="submit" class="btn btn-success me-2" data-bs-toggle="tooltip" data-bs-placement="top" title="Unban">
+                        <i class="fas fa-user-check me-1"></i> Unban
+                    </button>
+                </form>
+            }
+            <a asp-page="./Index" class="btn btn-outline-secondary"><i class="fas fa-arrow-left me-1"></i> Back to List</a>
+        </div>
+    </div>
+</div>
+@section Scripts {
+    <script>
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+    </script>
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+}

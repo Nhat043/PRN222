@@ -83,6 +83,11 @@
                             </a>
                         </li>
                         <li class="nav-item">
+                            <a class="nav-link @(Context.Request.Path.Value.ToLower().Contains("/accountpage/index") ? "active" : "")" asp-area="" asp-page="/AccountPage/Index">
+                                <i class="fas fa-users-gear"></i> Accounts
+                            </a>
+                        </li>
+                        <li class="nav-item">
                             <a class="nav-link @(Context.Request.Path.Value.ToLower().Contains("/commentpage/index") ? "active" : "")" asp-area="" asp-page="/CommentPage/Index">
                                 <i class="fas fa-comments"></i> Comments
                             </a>
