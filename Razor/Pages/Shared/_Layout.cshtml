@@ -8,100 +8,197 @@
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/Razor.styles.css" asp-append-version="true" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-    <style>
-        body {
-            background: #f8f9fa;
-        }
-        .navbar {
-            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-        }
-        .navbar-brand {
-            font-weight: bold;
-            letter-spacing: 1px;
-            font-size: 1.4rem;
-        }
-        .nav-link {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            font-weight: 500;
-            font-size: 1.05rem;
-            border-radius: 8px;
-            transition: background 0.2s;
-        }
-        .nav-link.active, .nav-link:focus, .nav-link:hover {
-            background: #e9ecef;
-            color: #495057 !important;
-        }
-        .navbar-nav .nav-item:not(:last-child) {
-            margin-right: 0.5rem;
-        }
-        .main-content {
-            background: #fff;
-            border-radius: 16px;
-            box-shadow: 0 2px 16px rgba(0,0,0,0.04);
-            padding: 2rem 2.5rem;
-            margin-top: 2rem;
-            margin-bottom: 2rem;
-            min-width: 1000px;
-        }
-        footer {
-            background: #fff;
-            border-top: 1px solid #e3e6f0;
-            padding: 1.2rem 0;
-            font-size: 1rem;
-            color: #6c757d;
-            box-shadow: 0 -2px 8px rgba(0,0,0,0.03);
-        }
-    </style>
+   <style>
+body {
+    background: #f8f9fa;
+}
+.navbar {
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+.navbar-brand {
+    font-weight: bold;
+    letter-spacing: 1px;
+    font-size: 1.4rem;
+}
+.nav-link {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 500;
+    font-size: 1.05rem;
+    border-radius: 8px;
+    transition: background 0.2s;
+}
+.nav-link.active, .nav-link:focus, .nav-link:hover {
+    background: #e9ecef;
+    color: #495057 !important;
+}
+.navbar-nav .nav-item:not(:last-child) {
+    margin-right: 0.5rem;
+}
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    width: 240px;
+    background: #fff;
+    box-shadow: 2px 0 8px rgba(0,0,0,0.04);
+    z-index: 1040;
+    transition: transform 0.2s;
+    padding-top: 1.5rem;
+}
+.sidebar.collapsed {
+    transform: translateX(-100%);
+}
+.sidebar .sidebar-header {
+    font-weight: bold;
+    font-size: 1.4rem;
+    padding: 0 1.5rem 1.5rem 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+.sidebar .nav-link {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    font-weight: 500;
+    font-size: 1.08rem;
+    border-radius: 8px;
+    margin: 0.2rem 0.7rem;
+    padding: 0.7rem 1rem;
+    transition: background 0.2s;
+}
+.sidebar .nav-link.active, .sidebar .nav-link:focus, .sidebar .nav-link:hover {
+    background: #e9ecef;
+    color: #495057 !important;
+}
+.sidebar .nav-item:not(:last-child) {
+    margin-bottom: 0.2rem;
+}
+.sidebar-toggle {
+    position: fixed;
+    top: 1.2rem;
+    left: 1.2rem;
+    z-index: 1100;
+    background: #fff;
+    border: none;
+    border-radius: 50%;
+    width: 44px;
+    height: 44px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    transition: left 0.2s;
+}
+.sidebar.collapsed + .sidebar-toggle {
+    left: 1.2rem;
+}
+.main-content {
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 2px 16px rgba(0,0,0,0.04);
+    padding: 2rem 2.5rem;
+    margin-top: 2rem;
+    margin-bottom: 2rem;
+    min-width: 1000px;
+    margin-left: 260px;
+    transition: margin-left 0.2s;
+}
+.sidebar.collapsed ~ .container .main-content {
+    margin-left: 0;
+}
+footer {
+    background: #fff;
+    border-top: 1px solid #e3e6f0;
+    padding: 1.2rem 0;
+    font-size: 1rem;
+    color: #6c757d;
+    box-shadow: 0 -2px 8px rgba(0,0,0,0.03);
+}
+@@media (max-width: 991.98px) {
+    .sidebar {
+        transform: translateX(-100%);
+    }
+    .sidebar.show {
+        transform: translateX(0);
+    }
+    .main-content {
+        margin-left: 0;
+    }
+}
+.sidebar-toggle-outer {
+    position: absolute;
+    top: 32px;
+    left: 230px;
+    z-index: 1200;
+    background: #fff;
+    border: none;
+    border-radius: 50%;
+    width: 44px;
+    height: 44px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    transition: left 0.2s;
+}
+.sidebar.collapsed ~ .sidebar-toggle-outer {
+    left: 0;
+}
+@@media (max-width: 991.98px) {
+    .sidebar-toggle-outer {
+        left: 0;
+    }
+}
+</style>
 </head>
 <body>
-    <header>
-        <nav class="navbar navbar-expand-lg navbar-light bg-white">
-            <div class="container">
-                <a class="navbar-brand d-flex align-items-center" asp-area="" asp-page="/ProductPage/Index">
-                    <i class="fas fa-cube me-2 text-primary"></i> Razor Admin
+    <!-- Removed the top navbar -->
+    <div class="sidebar" id="sidebarMenu">
+        <div class="sidebar-header d-flex align-items-center">
+            <i class="fas fa-cube text-primary me-2"></i> <span>Razor Admin</span>
+        </div>
+        <ul class="nav flex-column">
+            <li class="nav-item">
+                <a class="nav-link @(Context.Request.Path.Value.ToLower().Contains("/productpage/index") ? "active" : "")" asp-area="" asp-page="/ProductPage/Index">
+                    <i class="fas fa-box"></i> Products
                 </a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar" aria-controls="mainNavbar" aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="collapse navbar-collapse" id="mainNavbar">
-                    <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
-                        <li class="nav-item">
-                            <a class="nav-link @(Context.Request.Path.Value.ToLower().Contains("/productpage/index") ? "active" : "")" asp-area="" asp-page="/ProductPage/Index">
-                                <i class="fas fa-box"></i> Products
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link @(Context.Request.Path.Value.ToLower().Contains("/categorypage/index") ? "active" : "")" asp-area="" asp-page="/CategoryPage/Index">
-                                <i class="fas fa-tags"></i> Categories
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link @(Context.Request.Path.Value.ToLower().Contains("/variationoptionpage/index") ? "active" : "")" asp-area="" asp-page="/VariationOptionPage/Index">
-                                <i class="fas fa-cogs"></i> Variation Options
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link @(Context.Request.Path.Value.ToLower().Contains("/accountpage/index") ? "active" : "")" asp-area="" asp-page="/AccountPage/Index">
-                                <i class="fas fa-users-gear"></i> Accounts
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link @(Context.Request.Path.Value.ToLower().Contains("/commentpage/index") ? "active" : "")" asp-area="" asp-page="/CommentPage/Index">
-                                <i class="fas fa-comments"></i> Comments
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="/mvc/auth/logout">
-                                <i class="fas fa-sign-out-alt"></i> Logout
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-        </nav>
-    </header>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link @(Context.Request.Path.Value.ToLower().Contains("/categorypage/index") ? "active" : "")" asp-area="" asp-page="/CategoryPage/Index">
+                    <i class="fas fa-tags"></i> Categories
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link @(Context.Request.Path.Value.ToLower().Contains("/variationoptionpage/index") ? "active" : "")" asp-area="" asp-page="/VariationOptionPage/Index">
+                    <i class="fas fa-cogs"></i> Variation Options
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link @(Context.Request.Path.Value.ToLower().Contains("/accountpage/index") ? "active" : "")" asp-area="" asp-page="/AccountPage/Index">
+                    <i class="fas fa-users-gear"></i> Accounts
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link @(Context.Request.Path.Value.ToLower().Contains("/commentpage/index") ? "active" : "")" asp-area="" asp-page="/CommentPage/Index">
+                    <i class="fas fa-comments"></i> Comments
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/mvc/auth/logout">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </a>
+            </li>
+        </ul>
+    </div>
+    <button class="sidebar-toggle-outer" id="sidebarToggle" aria-label="Toggle menu">
+        <i id="sidebarToggleIcon" class="fas fa-arrow-left"></i>
+    </button>
     <div class="container">
         <main role="main" class="main-content">
             @RenderBody()
@@ -115,6 +212,33 @@
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+    <script>
+        const sidebar = document.getElementById('sidebarMenu');
+        const toggleBtn = document.getElementById('sidebarToggle');
+        const toggleIcon = document.getElementById('sidebarToggleIcon');
+        function updateSidebarIcon() {
+            if (sidebar.classList.contains('collapsed')) {
+                toggleIcon.classList.remove('fa-arrow-left');
+                toggleIcon.classList.add('fa-arrow-right');
+            } else {
+                toggleIcon.classList.remove('fa-arrow-right');
+                toggleIcon.classList.add('fa-arrow-left');
+            }
+        }
+        function toggleSidebar() {
+            sidebar.classList.toggle('collapsed');
+            if(window.innerWidth <= 991) {
+                sidebar.classList.toggle('show');
+            }
+            updateSidebarIcon();
+        }
+        toggleBtn.addEventListener('click', toggleSidebar);
+        // Hide sidebar by default on small screens
+        if(window.innerWidth <= 991) {
+            sidebar.classList.add('collapsed');
+            updateSidebarIcon();
+        }
+    </script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
