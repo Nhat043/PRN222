@@ -9,20 +9,26 @@ using Microsoft.EntityFrameworkCore;
 using DAL.Datas;
 using DAL.Models;
 using BLL.Service.Interface;
+using BLL.Util;
 
 namespace Razor.Pages.ProductPage
 {
     public class EditModel : PageModel
     {
         private readonly IProductService _productService;
+        private readonly IWebHostEnvironment _webHost;
 
-        public EditModel(IProductService productService)
+        public EditModel(IProductService productService, IWebHostEnvironment webHost)
         {
             _productService = productService;
+            _webHost = webHost;
         }
 
         [BindProperty]
         public Product Product { get; set; } = default!;
+
+        [BindProperty]
+        public IFormFile? UploadFile { get; set; }
 
         public async Task<IActionResult> OnGetAsync(int? id)
         {
@@ -50,11 +56,24 @@ namespace Razor.Pages.ProductPage
         {
             if (!ModelState.IsValid)
             {
+                var categories = await _productService.GetAllCategoriesAsync();
+                var statuses = await _productService.GetAllProductStatusAsync();
+                ViewData["CategoryId"] = new SelectList(categories, "Id", "Name");
+                ViewData["StatusId"] = new SelectList(statuses, "Id", "Name");
                 return Page();
             }
 
             try
             {
+                // Handle image upload
+                if (UploadFile != null)
+                {
+                    var productName = Product.Name;
+                    var sharedImagePath = Path.Combine(_webHost.ContentRootPath, "..", "SharedImages");
+                    var fileName = await ImageHelper.UploadImageAsync(UploadFile, sharedImagePath, productName);
+                    Product.Picture = "/SharedImages/" + fileName;
+                }
+                
                 await _productService.UpdateProductAsync(Product);
             }
             catch (InvalidOperationException)
