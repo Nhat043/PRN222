@@ -1,0 +1,27 @@
+﻿@page
+@model Razor.Pages.OrderPage.IndexModel
+
+<h2>Danh sách đơn hàng</h2>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Mã đơn</th>
+            <th>Người đặt</th>
+            <th>Ngày đặt</th>
+            <th>Tổng tiền</th>
+            <th>Trạng thái</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var order in Model.Orders)
+        {
+            <tr>
+                <td>@order.Id</td>
+                <td>@order.UserId</td>
+                <td>@order.Date.ToString("dd/MM/yyyy HH:mm")</td>
+                <td>@order.Price.ToString("n0") đ</td>
+                <td>@order.StatusId</td>
+            </tr>
+        }
+    </tbody>
+</table>

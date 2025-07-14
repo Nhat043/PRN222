@@ -54,6 +54,9 @@ else
         </tbody>
     </table>
     <a asp-action="Clear" class="btn btn-warning">Clear Cart</a>
+    <form asp-action="Buy" method="post" style="display:inline;">
+        <button type="submit" class="btn btn-success ms-2">Buy</button>
+    </form>
 }
 @if (TempData["Error"] != null)
 {

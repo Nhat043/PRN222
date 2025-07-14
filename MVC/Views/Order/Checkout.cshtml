@@ -1,0 +1,48 @@
+﻿@model MVC.Models.Order.CheckoutViewModel
+
+<h2>Xác nhận đơn hàng</h2>
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+
+<form asp-action="Checkout" method="post">
+    <h4>Danh sách sản phẩm</h4>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Sản phẩm</th>
+                <th>Ảnh</th>
+                <th>Giá</th>
+                <th>Số lượng</th>
+                <th>Tạm tính</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.CartItems)
+            {
+                <tr>
+                    <td>@item.ProductName</td>
+                    <td>
+                        @if (!string.IsNullOrEmpty(item.Picture))
+                        {
+                            <img src="@item.Picture" alt="@item.ProductName" width="50" />
+                        }
+                    </td>
+                    <td>@item.SellingPrice đ</td>
+                    <td>@item.Quantity</td>
+                    <td>@((item.SellingPrice - (item.Discount ?? 0)) * item.Quantity).ToString("n0") đ</td>
+                </tr>
+            }
+        </tbody>
+        <tfoot>
+            <tr>
+                <th colspan="4" style="text-align:right">Tổng cộng:</th>
+                <th>@Model.TotalPrice.ToString("n0") đ</th>
+            </tr>
+        </tfoot>
+    </table>
+
+    <button type="submit" class="btn btn-success">Xác nhận thanh toán</button>
+</form>

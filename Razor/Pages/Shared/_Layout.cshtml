@@ -190,6 +190,11 @@ footer {
                 </a>
             </li>
             <li class="nav-item">
+                <a class="nav-link @(Context.Request.Path.Value.ToLower().Contains("/orderpage/index") ? "active" : "")" asp-area="" asp-page="/OrderPage/Index">
+                    <i class="fas fa-receipt"></i> Orders
+                </a>
+            </li>
+            <li class="nav-item">
                 <a class="nav-link" href="/mvc/auth/logout">
                     <i class="fas fa-sign-out-alt"></i> Logout
                 </a>

@@ -111,4 +111,16 @@ public class CartController : Controller
         HttpContext.Session.Remove("Cart");
         return RedirectToAction("Index");
     }
+
+    [HttpPost]
+    public IActionResult Buy()
+    {
+        var accountId = HttpContext.Session.GetInt32("AccountIdSession");
+        if (accountId == null)
+        {
+            return RedirectToAction("Login", "Auth");
+        }
+
+        return RedirectToAction("Checkout", "Order");
+    }
 }

@@ -56,6 +56,9 @@ namespace MVC
             builder.Services.AddScoped<IComService, ComService>();
             builder.Services.AddScoped<IComRepo, ComRepo>();
 
+            builder.Services.AddScoped<IOrderRepository, OrderRepository>();
+            builder.Services.AddScoped<IOrderService, OrderService>();
+
             // Add session services
             builder.Services.AddSession(options =>
             {
