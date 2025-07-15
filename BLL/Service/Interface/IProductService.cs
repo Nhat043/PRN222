@@ -20,5 +20,8 @@ namespace BLL.Service.Interface
         Task<IEnumerable<ProductStatus>> GetAllProductStatusAsync();
 
         Task<IEnumerable<Category>> GetAllCategoriesAsync();
+
+        Task<IEnumerable<Product>> SearchProductsByNameAsync(string name);
+
     }
 }

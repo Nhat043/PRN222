@@ -5,6 +5,7 @@ using DAL.Repository;
 using DAL.Repository.Interface;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -84,5 +85,42 @@ namespace BLL.Service
         {
             return await _productRepo.GetAllCategoriesAsync();
         }
+
+
+
+        public async Task<IEnumerable<Product>> SearchProductsByNameAsync(string name)
+        {
+            var allProducts = await _productRepo.GetAllProductsAsync();
+
+            if (string.IsNullOrWhiteSpace(name))
+                return allProducts;
+
+            string keyword = RemoveDiacritics(name).ToLower();
+
+            return allProducts.Where(p =>
+                !string.IsNullOrEmpty(p.Name) &&
+                RemoveDiacritics(p.Name).ToLower().Contains(keyword)).ToList();
+        }
+
+        private static string RemoveDiacritics(string text)
+        {
+            if (string.IsNullOrEmpty(text))
+                return text;
+
+            var normalizedString = text.Normalize(NormalizationForm.FormD);
+            var stringBuilder = new StringBuilder();
+
+            foreach (var c in normalizedString)
+            {
+                var unicodeCategory = CharUnicodeInfo.GetUnicodeCategory(c);
+                if (unicodeCategory != UnicodeCategory.NonSpacingMark)
+                {
+                    stringBuilder.Append(c);
+                }
+            }
+
+            return stringBuilder.ToString().Normalize(NormalizationForm.FormC);
+        }
+
     }
 }
