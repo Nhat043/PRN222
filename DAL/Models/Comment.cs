@@ -28,4 +28,6 @@ public partial class Comment
     public virtual CommentStatus? Status { get; set; }
 
     public virtual Account? User { get; set; }
+   
+
 }

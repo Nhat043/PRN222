@@ -62,7 +62,7 @@ namespace MVC.Controllers
         }
 
         [HttpPost]
-        public IActionResult PostComment(int productId, string content)
+        public IActionResult PostComment(int productId, string content, int? parentId)
         {
             int? userId = HttpContext.Session.GetInt32("AccountIdSession");
             if (userId == null)
@@ -76,12 +76,14 @@ namespace MVC.Controllers
                 ProductId = productId,
                 UserId = userId,
                 Content = content,
-                CreatedAt = DateTime.Now
+                CreatedAt = DateTime.Now,
+                ParentId = parentId
             };
 
             _comService.CreateComment(comment);
             return RedirectToAction("Detail", new { id = productId });
         }
+
 
         [HttpPost]
         public IActionResult HideComment(int commentId)

@@ -3,6 +3,7 @@
 
 @{
     ViewData["Title"] = "Create Comment";
+    var isReply = Model.IsReplyMode;
 }
 
 <div class="container-fluid">
@@ -27,55 +28,76 @@
             <div class="card shadow-sm">
                 <div class="card-header bg-primary text-white">
                     <h5 class="mb-0">
-                        <i class="fas fa-plus me-2"></i>Create New Comment
+                        <i class="fas fa-plus me-2"></i>
+                        @(isReply ? "Reply to Comment" : "Create New Comment")
                     </h5>
                 </div>
                 <div class="card-body p-4">
                     <form method="post">
                         <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
-                        
+
                         <div class="row">
-                            <div class="col-md-6">
-                                <div class="mb-4">
-                                    <label class="form-label fw-semibold">
-                                        <i class="fas fa-user me-2"></i>User
-                                    </label>
-                                    <select asp-for="Comment.UserId" class="form-select form-select-lg" asp-items="ViewBag.UserId">
-                                        <option value="">Select a user...</option>
-                                    </select>
-                                    <span asp-validation-for="Comment.UserId" class="text-danger small"></span>
+                            @if (!isReply)
+                            {
+                                <div class="col-md-6">
+                                    <div class="mb-4">
+                                        <label class="form-label fw-semibold">
+                                            <i class="fas fa-user me-2"></i>User
+                                        </label>
+                                        <select asp-for="Comment.UserId" class="form-select form-select-lg" asp-items="ViewBag.UserId">
+                                            <option value="">Select a user...</option>
+                                        </select>
+                                        <span asp-validation-for="Comment.UserId" class="text-danger small"></span>
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="mb-4">
-                                    <label class="form-label fw-semibold">
-                                        <i class="fas fa-box me-2"></i>Product
-                                    </label>
-                                    <select asp-for="Comment.ProductId" class="form-select form-select-lg" asp-items="ViewBag.ProductId">
-                                        <option value="">Select a product...</option>
-                                    </select>
-                                    <span asp-validation-for="Comment.ProductId" class="text-danger small"></span>
+                                <div class="col-md-6">
+                                    <div class="mb-4">
+                                        <label class="form-label fw-semibold">
+                                            <i class="fas fa-box me-2"></i>Product
+                                        </label>
+                                        <select asp-for="Comment.ProductId" class="form-select form-select-lg" asp-items="ViewBag.ProductId">
+                                            <option value="">Select a product...</option>
+                                        </select>
+                                        <span asp-validation-for="Comment.ProductId" class="text-danger small"></span>
+                                    </div>
                                 </div>
-                            </div>
+                            }
+                            else
+                            {
+                                <input type="hidden" asp-for="Comment.ProductId" />
+                                <input type="hidden" asp-for="Comment.UserId" value="1" />
+                            }
                         </div>
 
-                        <div class="mb-4">
-                            <label class="form-label fw-semibold">
-                                <i class="fas fa-reply me-2"></i>Parent Comment (Optional)
-                            </label>
-                            <select asp-for="Comment.ParentId" class="form-select form-select-lg" asp-items="ViewBag.ParentId">
-                                <option value="">Select a parent comment (optional)...</option>
-                            </select>
-                            <small class="text-muted">Leave empty for a main comment, or select a parent comment for a reply</small>
-                            <span asp-validation-for="Comment.ParentId" class="text-danger small"></span>
-                        </div>
+                        @if (!isReply)
+                        {
+                            <div class="mb-4">
+                                <label class="form-label fw-semibold">
+                                    <i class="fas fa-reply me-2"></i>Parent Comment (Optional)
+                                </label>
+                                <select asp-for="Comment.ParentId" class="form-select form-select-lg" asp-items="ViewBag.ParentId">
+                                    <option value="">Select a parent comment...</option>
+                                </select>
+                                <small class="text-muted">Leave empty for a main comment, or select a parent comment for a reply</small>
+                                <span asp-validation-for="Comment.ParentId" class="text-danger small"></span>
+                            </div>
+                        }
+                        else
+                        {
+                            <input type="hidden" asp-for="Comment.ParentId" />
+                            <div class="alert alert-info">
+                                You are replying to
+                                <strong>@Model.ReplyingToUserName</strong>
+                               
+                            </div>
+                        }
 
                         <div class="mb-4">
                             <label asp-for="Comment.Content" class="form-label fw-semibold">
                                 <i class="fas fa-comment me-2"></i>Comment Content
                             </label>
-                            <textarea asp-for="Comment.Content" class="form-control" rows="5" 
-                                      placeholder="Enter your comment or review..."></textarea>
+                            <textarea asp-for="Comment.Content" class="form-control" rows="5"
+                                      placeholder="Enter your comment or reply..."></textarea>
                             <span asp-validation-for="Comment.Content" class="text-danger small"></span>
                         </div>
 
@@ -96,7 +118,7 @@
                                 <i class="fas fa-arrow-left me-2"></i>Back to List
                             </a>
                             <button type="submit" class="btn btn-primary">
-                                <i class="fas fa-save me-2"></i>Create Comment
+                                <i class="fas fa-save me-2"></i>@(isReply ? "Submit Reply" : "Create Comment")
                             </button>
                         </div>
                     </form>
@@ -106,60 +128,8 @@
     </div>
 </div>
 
-<style>
-    .card {
-        border: none;
-        border-radius: 15px;
-    }
-    
-    .card-header {
-        border-radius: 15px 15px 0 0 !important;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
-    }
-    
-    .form-control, .form-select {
-        border-radius: 8px;
-        border: 2px solid #e3e6f0;
-        transition: all 0.3s ease;
-    }
-    
-    .form-control:focus, .form-select:focus {
-        border-color: #667eea;
-        box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
-    }
-    
-    .btn {
-        border-radius: 8px;
-        padding: 0.75rem 1.5rem;
-        font-weight: 500;
-        transition: all 0.3s ease;
-    }
-    
-    .btn:hover {
-        transform: translateY(-1px);
-        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-    }
-    
-    .breadcrumb {
-        background: none;
-        padding: 0;
-    }
-    
-    .breadcrumb-item a {
-        color: #667eea;
-        text-decoration: none;
-    }
-    
-    .breadcrumb-item.active {
-        color: #6c757d;
-    }
-    
-    hr {
-        border-color: #e3e6f0;
-        opacity: 0.5;
-    }
-</style>
-
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }
