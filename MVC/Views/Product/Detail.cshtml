@@ -3,35 +3,51 @@
 @{
     ViewData["Title"] = "Chi tiết sản phẩm";
     var price = Model.ProductItems.FirstOrDefault()?.SellingPrice ?? 0;
+    var accountName = Context.Session.GetString("AccountName");
+    var commentVM = ViewBag.CommentVM as CommentViewModel;
+    var comments = commentVM?.Comments;
+    var currentUserId = commentVM?.CurrentUserId;
+    var roleId = Context.Session.GetString("RoleIdSession");
+    int? editCommentId = TempData["EditCommentId"] as int?;
+    int productId = Model.Id;
+    var userId = commentVM?.CurrentUserId;
 }
+
 <style>
-    .rating input { display: none; }
+    .rating input {
+        display: none;
+    }
+
     .rating span {
         font-size: 24px;
         color: #ddd;
         cursor: pointer;
     }
+
     .rating input:checked ~ span {
         color: gold;
+    }
+
+    .comment-actions {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        margin-bottom: 8px;
     }
 </style>
 
 <div class="container mt-5">
     <div class="row">
-        <!-- Hình ảnh -->
         <div class="col-md-5 text-center">
             <img src="@Model.Picture" alt="@Model.Name" class="img-fluid rounded shadow" />
         </div>
 
-        <!-- Thông tin -->
         <div class="col-md-7">
             <h2 class="fw-bold">@Model.Name</h2>
             <h4 id="displayPrice" class="text-secondary mb-3">@price.ToString("N0") VND</h4>
 
-
             <form class="add-to-cart-form" asp-controller="Cart" asp-action="AddToCart" method="post">
                 <input type="hidden" name="productId" value="@Model.Id" />
-
                 <p class="fw-semibold">Select Option:</p>
                 <div class="d-flex flex-wrap gap-3 mb-4">
                     @foreach (var item in Model.ProductItems)
@@ -42,31 +58,26 @@
                             <label class="btn btn-outline-primary px-4 py-3 text-start" for="option-@item.Id">
                                 @Html.Raw(optionText)
                             </label>
-                           
-
                         </div>
-                        
                     }
                 </div>
                 <button type="submit" class="btn btn-danger me-2" id="addToCartBtn" disabled>AddToCart</button>
-            </form>           
+            </form>
         </div>
     </div>
-    <!-- MÔ TẢ: Dưới full chiều ngang -->
+
     <div class="row mt-5">
         <div class="col-12">
             <h5>Description</h5>
             <p>@Model.Description</p>
         </div>
     </div>
+
     <hr class="my-5" />
 
-    <!-- ĐÁNH GIÁ -->
+    <!-- Rating -->
     <div class="rating-container mt-4">
         <h5 class="mb-3 mt-5">Rating</h5>
-        @{
-            var accountName = Context.Session.GetString("AccountName");
-        }
         @if (!string.IsNullOrEmpty(accountName))
         {
             <form method="post" asp-action="Rate" asp-controller="Product">
@@ -86,66 +97,69 @@
         {
             <p class="text-muted">You must <a asp-controller="Auth" asp-action="Login">log in</a> to rate this product.</p>
         }
+
         <div>
             <span>Average: @ViewBag.AvgRating.ToString("0.0") / 5</span>
         </div>
     </div>
 
-
-
-    
-
-    <!-- BÌNH LUẬN -->
+    <!-- Comments -->
     <h5 class="mb-3 mt-5">Comments</h5>
-
-    @{
-        var commentVM = ViewBag.CommentVM as CommentViewModel;
-        var comments = commentVM?.Comments;
-        var userId = commentVM?.CurrentUserId;
-    }
 
     @if (comments != null && comments.Count > 0)
     {
-        @foreach (var c in comments)
+        @foreach (var parent in comments.Where(c => c.ParentId == null))
         {
-            <div class="border p-2 mb-2">
-                <p>
-                    <strong>@c.User?.Name</strong> (@c.CreatedAt.ToShortDateString())
+            <div class="border p-3 mb-3 rounded">
+                <p class="fw-semibold mb-1">
+                    <i class="fas fa-user text-primary"></i> @parent.User?.Name
+                    <small class="text-muted">(@parent.CreatedAt.ToShortDateString())</small>
                 </p>
 
-                @if (userId == c.UserId || Context.Session.GetString("RoleIdSession") == "1")
-                {
-                    if (TempData["EditCommentId"] != null && (int)TempData["EditCommentId"] == c.Id)
+                <p class="mb-2">@parent.Content</p>
+
+                <div class="comment-actions">
+                    @if (userId == parent.UserId || roleId == "1")
                     {
-                        <!-- Edit Form -->
-                        <form method="post" asp-action="EditComment">
-                            <input type="hidden" name="commentId" value="@c.Id" />
-                            <textarea name="newContent" class="form-control mb-2">@c.Content</textarea>
-                            <button type="submit" class="btn btn-success btn-sm me-1">Save</button>
-                            <a asp-action="Detail" asp-route-id="@Model.Id" class="btn btn-secondary btn-sm">Cancel</a>
+                        <form method="post" asp-action="EditTrigger">
+                            <input type="hidden" name="commentId" value="@parent.Id" />
+                            <button type="submit" class="btn btn-sm btn-outline-primary">Edit</button>
                         </form>
-                    }
-                    else
-                    {
-                        <!-- Display Mode -->
-                        <p>@c.Content</p>
-                        <form method="post" asp-action="EditTrigger" class="d-inline">
-                            <input type="hidden" name="commentId" value="@c.Id" />
-                            <button type="submit" class="btn btn-sm btn-outline-primary me-1">Edit</button>
-                        </form>
-                        <form method="post" asp-action="HideComment" class="d-inline">
-                            <input type="hidden" name="commentId" value="@c.Id" />
+                        <form method="post" asp-action="HideComment">
+                            <input type="hidden" name="commentId" value="@parent.Id" />
                             <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
                         </form>
                     }
-                }
-                else
+
+                    @if (!string.IsNullOrEmpty(accountName))
+                    {
+                        <button class="btn btn-sm btn-outline-secondary" type="button" onclick="toggleReplyForm(@parent.Id)">Reply</button>
+                    }
+                </div>
+
+                <!-- Reply Form (toggle) -->
+                <form method="post" asp-action="PostComment" class="mt-2 d-none" id="reply-form-@parent.Id">
+                    <input type="hidden" name="productId" value="@Model.Id" />
+                    <input type="hidden" name="parentId" value="@parent.Id" />
+                    <div class="mb-2">
+                        <textarea name="content" class="form-control" rows="2" placeholder="Write your reply..."></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-sm btn-primary">Submit Reply</button>
+                </form>
+
+                <!-- Replies -->
+                @foreach (var reply in comments.Where(c => c.ParentId == parent.Id).OrderBy(r => r.CreatedAt))
                 {
-                    <p>@c.Content</p>
+                    <div class="border-start ps-3 ms-3 mt-2">
+                        <p class="mb-1 fw-semibold">
+                            <i class="fas fa-reply text-secondary"></i> @reply.User?.Name
+                            <small class="text-muted">(@reply.CreatedAt.ToShortDateString())</small>
+                        </p>
+                        <p>@reply.Content</p>
+                    </div>
                 }
             </div>
         }
-
     }
     else
     {
@@ -155,7 +169,7 @@
     @if (!string.IsNullOrEmpty(accountName))
     {
         <form method="post" asp-action="PostComment" class="mt-4">
-            <input type="hidden" name="productId" value="@Model.Id" />
+            <input type="hidden" name="productId" value="@productId" />
             <div class="mb-3">
                 <textarea name="content" class="form-control" rows="3" placeholder="Add your comment..."></textarea>
             </div>
@@ -166,36 +180,35 @@
     {
         <p class="text-muted mt-4">You must <a asp-controller="Auth" asp-action="Login">log in</a> to post a comment.</p>
     }
-
-
-
-    
-
 </div>
+
 @if (TempData["Error"] != null)
 {
     <div class="alert alert-danger">@TempData["Error"]</div>
 }
 
-
 @section Scripts {
     <script>
+        function toggleReplyForm(commentId) {
+            const form = document.getElementById('reply-form-' + commentId);
+            if (form) {
+                form.classList.toggle('d-none');
+            }
+        }
+
         document.querySelectorAll('input[name="productItemId"]').forEach(radio => {
             radio.addEventListener('change', function () {
-                const selectedId = this.value;
                 const selectedPrice = this.getAttribute('data-price');
                 document.getElementById('displayPrice').innerText = parseInt(selectedPrice).toLocaleString() + ' VND';
             });
         });
-    </script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const radioButtons = document.querySelectorAll('input[name="productItemId"]');
-            const addToCartBtn = document.getElementById('addToCartBtn');
 
-            radioButtons.forEach(radio => {
+        document.addEventListener('DOMContentLoaded', function () {
+            const radios = document.querySelectorAll('input[name="productItemId"]');
+            const addBtn = document.getElementById('addToCartBtn');
+            radios.forEach(radio => {
                 radio.addEventListener('change', function () {
-                    addToCartBtn.disabled = false;
+                    addBtn.disabled = false;
                 });
             });
         });
