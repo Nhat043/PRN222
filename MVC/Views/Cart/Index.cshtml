@@ -1,64 +1,103 @@
 ﻿@model List<MVC.Models.CartItemViewModel>
-
-<h2>Your Cart</h2>
-<h2> <a asp-controller="Home" asp-action="Index" class="btn btn-secondary">Back</a></h2>
-@if (!Model.Any())
-{
-    <p>Your cart is empty.</p>
+@{
+    var subtotal = Model.Sum(item => (item.SellingPrice ?? 0) * item.Quantity);
+    var totalDiscount = Model.Sum(item => (decimal)(item.Discount ?? 0) * item.Quantity);
+    var total = subtotal - totalDiscount;
 }
-else
-{
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Image</th>
-                <th>Product</th>
-                <th>Price</th>
-                <th>Quantity</th>
-                <th>Discount</th>
-                <th>Total</th>
-                <th></th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var item in Model)
-            {
-                <tr>
-                    <td><img src="@item.Picture" width="80" /></td>
-                    <td>@item.ProductName</td>
-                    <td>@item.SellingPrice?.ToString("N0")</td>
-                    <td>
-                        <form asp-action="UpdateQuantity" method="post" style="display:inline;">
-                            <input type="hidden" name="productItemId" value="@item.ProductItemId" />
-                            <input type="hidden" name="change" value="-1" />
-                            <button class="btn btn-sm btn-outline-secondary">-</button>
-                        </form>
-
-                        <span class="mx-2">@item.Quantity</span>
-
-                        <form asp-action="UpdateQuantity" method="post" style="display:inline;">
-                            <input type="hidden" name="productItemId" value="@item.ProductItemId" />
-                            <input type="hidden" name="change" value="1" />
-                            <button class="btn btn-sm btn-outline-secondary">+</button>
-                        </form>
-                    </td>
-
-                    <td>@(item.Discount?.ToString("N0") ?? "0")</td>
-                    <td>@item.TotalPrice.ToString("N0")</td>
-                  
-                    <td>
-                        <a asp-action="Remove" asp-route-id="@item.ProductItemId" class="btn btn-danger btn-sm">Remove</a>
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
-    <a asp-action="Clear" class="btn btn-warning">Clear Cart</a>
-    <form asp-action="Buy" method="post" style="display:inline;">
-        <button type="submit" class="btn btn-success ms-2">Buy</button>
-    </form>
-}
-@if (TempData["Error"] != null)
-{
-    <div class="alert alert-danger">@TempData["Error"]</div>
-}
+<div class="container py-5">
+    <h2 class="fw-bold mb-4">Shopping Cart</h2>
+    @if (!Model.Any())
+    {
+        <div class="alert alert-info">Your cart is empty.</div>
+    }
+    else
+    {
+        <div class="row">
+            <div class="col-lg-8">
+                @foreach (var item in Model)
+                {
+                    <div class="card mb-4 shadow-sm">
+                        <div class="card-body d-flex align-items-center">
+                            <img src="@item.Picture" alt="@item.ProductName" width="100" class="rounded me-4" style="object-fit:cover; height:100px;">
+                            <div class="flex-grow-1">
+                                <h5 class="fw-bold">@item.ProductName</h5>
+                                <div class="mb-1 text-muted" style="font-size:0.95rem;">
+                                    @if (!string.IsNullOrEmpty(item.Ram) || !string.IsNullOrEmpty(item.Rom))
+                                    {
+                                        <span>
+                                            @if (!string.IsNullOrEmpty(item.Ram))
+                                            {
+                                                <span>@item.Ram</span>
+                                            }
+                                            @if (!string.IsNullOrEmpty(item.Ram) && !string.IsNullOrEmpty(item.Rom))
+                                            {
+                                                <span> • </span>
+                                            }
+                                            @if (!string.IsNullOrEmpty(item.Rom))
+                                            {
+                                                <span>@item.Rom</span>
+                                            }
+                                        </span>
+                                    }
+                                </div>
+                                <div>
+                                    <form asp-action="UpdateQuantity" method="post" style="display:inline;">
+                                        <input type="hidden" name="productItemId" value="@item.ProductItemId" />
+                                        <input type="hidden" name="change" value="-1" />
+                                        <button class="btn btn-sm btn-outline-secondary">-</button>
+                                    </form>
+                                    <span class="mx-2">@item.Quantity</span>
+                                    <form asp-action="UpdateQuantity" method="post" style="display:inline;">
+                                        <input type="hidden" name="productItemId" value="@item.ProductItemId" />
+                                        <input type="hidden" name="change" value="1" />
+                                        <button class="btn btn-sm btn-outline-secondary">+</button>
+                                    </form>
+                                </div>
+                            </div>
+                            <div class="text-end" style="min-width:130px;">
+                                <div class="fw-bold fs-5 text-primary">@item.SellingPrice?.ToString("N0") VND</div>
+                                <div class="text-danger small">
+                                    @if (item.Discount > 0)
+                                    {
+                                        <span>Discount: @item.Discount?.ToString("N0") VND</span>
+                                    }
+                                </div>
+                                <div class="fw-semibold mt-1">Total: @item.TotalPrice.ToString("N0") VND</div>
+                                <a asp-action="Remove" asp-route-id="@item.ProductItemId" class="btn btn-link text-danger p-0 mt-2"><i class="bi bi-trash"></i> Remove</a>
+                            </div>
+                        </div>
+                    </div>
+                }
+                <div>
+                    <a asp-action="Clear" class="btn btn-warning">Clear Cart</a>
+                    <form asp-action="Buy" method="post" style="display:inline;">
+                        <button type="submit" class="btn btn-success ms-2">Proceed to Checkout</button>
+                    </form>
+                </div>
+                @if (TempData["Error"] != null)
+                {
+                    <div class="alert alert-danger mt-2">@TempData["Error"]</div>
+                }
+            </div>
+            <div class="col-lg-4">
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <h4 class="fw-bold mb-3">Order Summary</h4>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Subtotal</span>
+                            <span>@subtotal.ToString("N0") VND</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Total Discount</span>
+                            <span class="text-danger">-@totalDiscount.ToString("N0") VND</span>
+                        </div>
+                        <div class="d-flex justify-content-between fs-5 fw-bold">
+                            <span>Total</span>
+                            <span class="text-primary">@total.ToString("N0") VND</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>

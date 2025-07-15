@@ -124,7 +124,7 @@
                             <div>@item.Ram • @item.Rom</div>
                             <div class="fw-bold fs-5 mb-2 text-primary">@item.Price?.ToString("N0") VND</div>
                             <a asp-controller="Product" asp-action="Detail" asp-route-id="@item.Id" class="btn btn-outline-primary w-100 mb-2">View</a>
-                            <form asp-controller="Cart" asp-action="AddToCart" method="post">
+                            <form class="add-to-cart-form" asp-controller="Cart" asp-action="AddToCart" method="post">
                                 <input type="hidden" name="productItemId" value="@item.ProductItemId" />
                                 <button type="submit" class="btn btn-primary w-100">Add to Cart</button>
                             </form>

@@ -24,21 +24,19 @@ public class CartController : Controller
 
     // POST: /Cart/AddToCart
     [HttpPost]
+    [HttpPost]
     public async Task<IActionResult> AddToCart(int productItemId)
     {
         var productItem = await _productItemService.GetProductItemByIdAsync(productItemId);
-        if (productItem == null) return NotFound();
+        if (productItem == null) return Json(new { success = false, message = "Product not found" });
 
         var cart = HttpContext.Session.GetObject<List<CartItemViewModel>>("Cart") ?? new List<CartItemViewModel>();
-
         var existingItem = cart.FirstOrDefault(x => x.ProductItemId == productItemId);
         int cartQuantity = existingItem?.Quantity ?? 0;
 
-        // ❌ Nếu tổng số lượng vượt quá hàng tồn kho
         if (cartQuantity + 1 > productItem.Quantity)
         {
-            TempData["Error"] = $" Sản phẩm trong kho không còn. Không thể thêm nữa!";
-            return RedirectToAction("Detail", "Product", new { id = productItem.ProductId });
+            return Json(new { success = false, message = "Out of stock!" });
         }
 
         if (existingItem != null)
@@ -59,8 +57,12 @@ public class CartController : Controller
         }
 
         HttpContext.Session.SetObject("Cart", cart);
-        return RedirectToAction("Index");
+
+        var cartCount = cart.Sum(x => x.Quantity);
+
+        return Json(new { success = true, cartCount });
     }
+
     [HttpPost]
     public async Task<IActionResult> UpdateQuantity(int productItemId, int change)
     {

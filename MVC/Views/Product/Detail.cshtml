@@ -29,7 +29,7 @@
             <h4 id="displayPrice" class="text-secondary mb-3">@price.ToString("N0") VND</h4>
 
 
-            <form asp-controller="Cart" asp-action="AddToCart" method="post">
+            <form class="add-to-cart-form" asp-controller="Cart" asp-action="AddToCart" method="post">
                 <input type="hidden" name="productId" value="@Model.Id" />
 
                 <p class="fw-semibold">Select Option:</p>
@@ -48,12 +48,8 @@
                         
                     }
                 </div>
-
                 <button type="submit" class="btn btn-danger me-2" id="addToCartBtn" disabled>AddToCart</button>
-                <a asp-controller="Home" asp-action="Index" class="btn btn-secondary">Cancel</a>
-            </form>
-
-            
+            </form>           
         </div>
     </div>
     <!-- MÔ TẢ: Dưới full chiều ngang -->

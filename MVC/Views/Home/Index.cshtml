@@ -55,7 +55,7 @@
                             
                             var productItemId = item.ProductItemId;                                                                     
                         }
-                        <form asp-controller="Cart" asp-action="AddToCart" method="post">
+                        <form class="add-to-cart-form" asp-controller="Cart" asp-action="AddToCart" method="post">
                             <input type="hidden" name="productItemId" value="@productItemId" />
                             <button type="submit" class="btn btn-primary w-100">Add to Cart</button>
                         </form>

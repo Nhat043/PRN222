@@ -1,4 +1,11 @@
-﻿<!DOCTYPE html>
+﻿@using MVC.Models
+@using MVC.Helpers
+@{
+    var cart = Context.Session.GetObject<List<CartItemViewModel>>("Cart") ?? new List<CartItemViewModel>();
+    var cartCount = cart.Sum(x => x.Quantity);
+    var accountName = Context.Session.GetString("AccountName");
+}
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -7,31 +14,30 @@
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/MVC.styles.css" asp-append-version="true" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" />
 </head>
 <body>
     <!-- NAVBAR -->
     <nav class="navbar navbar-expand-sm navbar-light bg-white border-bottom box-shadow mb-3 px-4">
         <div class="container-fluid">
-            <!-- Brand/logo -->
             <a class="navbar-brand fw-bold fs-3 text-primary" asp-area="" asp-controller="Home" asp-action="Index">
                 Shop Laptop
             </a>
-
-            <!-- Search bar -->
             <form class="d-flex ms-auto me-3" action="/mvc/Product/Index" method="get">
                 <input class="form-control me-2" type="search" name="search" placeholder="Search laptops..." />
                 <button class="btn btn-outline-primary" type="submit">Search</button>
             </form>
-
-
             <div class="navbar-collapse collapse d-sm-inline-flex justify-content-end">
                 <ul class="navbar-nav">
-                    <li class="nav-item">
-                        <a class="nav-link text-dark" asp-area="" asp-controller="Cart" asp-action="Index">Cart</a>
+                    <li class="nav-item position-relative">
+                        <a class="nav-link text-dark position-relative" asp-area="" asp-controller="Cart" asp-action="Index">
+                            <i class="bi bi-cart"></i>
+                            Cart
+                            <span id="cartCount" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 0.8rem;">
+                                @(cartCount)
+                            </span>
+                        </a>
                     </li>
-                    @{
-                        var accountName = Context.Session.GetString("AccountName");
-                    }
                     @if (!string.IsNullOrEmpty(accountName))
                     {
                         <li class="nav-item">
@@ -51,14 +57,11 @@
             </div>
         </div>
     </nav>
-    <!-- /NAVBAR -->
-
     <div class="container">
         <main role="main" class="pb-3">
             @RenderBody()
         </main>
     </div>
-
     <footer class="border-top footer text-muted mt-5">
         <div class="container">
             &copy; 2025 - Shop Laptop
@@ -68,5 +71,42 @@
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).on('submit', '.add-to-cart-form', function(e) {
+            e.preventDefault();
+            var $form = $(this);
+            var formData = $form.serialize();
+
+            $.ajax({
+                url: $form.attr('action'),
+                type: 'POST',
+                data: formData,
+                success: function(response) {
+                    if (response.success) {
+                        // Update cart count badge
+                        $('#cartCount').text(response.cartCount);
+                        // Optional: Hiện toast/alert thành công
+                        if(window.bootstrap) {
+                            var toast = document.createElement('div');
+                            toast.className = 'toast align-items-center text-bg-success border-0 show position-fixed bottom-0 end-0 m-5';
+                            toast.role = 'alert'; toast.ariaLive = 'assertive'; toast.ariaAtomic = 'true';
+                            toast.innerHTML = '<div class="d-flex"><div class="toast-body">Added to cart!</div><button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button></div>';
+                            document.body.appendChild(toast);
+                            setTimeout(() => { toast.remove(); }, 2000);
+                        } else {
+                            alert("Added to cart!");
+                        }
+                    } else {
+                        alert(response.message || "Error!");
+                    }
+                },
+                error: function() {
+                    alert("Server error");
+                }
+            });
+        });
+    </script>
+
 </body>
 </html>
