@@ -35,9 +35,19 @@ namespace Razor
 
             builder.Services.AddScoped<ICommentStatusService, CommentStatusService>();
 
+
+            builder.Services.AddDistributedMemoryCache(); // Cho phép lưu session trong RAM
+            builder.Services.AddSession(options =>
+            {
+                options.IdleTimeout = TimeSpan.FromMinutes(60); // thời gian hết hạn session
+                options.Cookie.HttpOnly = true;
+                options.Cookie.IsEssential = true;
+            });
+
+
             var app = builder.Build();
 
-
+           
             // Cho phép truy cập ảnh từ folder bên ngoài
             app.UseStaticFiles(); // Đừng bỏ dòng này, dùng cho wwwroot
 
@@ -61,7 +71,7 @@ namespace Razor
             app.UseStaticFiles();
 
             app.UseRouting();
-
+            app.UseSession();
             app.UseAuthorization();
 
             app.MapRazorPages();
