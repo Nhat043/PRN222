@@ -8,9 +8,7 @@
     var comments = commentVM?.Comments;
     var currentUserId = commentVM?.CurrentUserId;
     var roleId = Context.Session.GetString("RoleIdSession");
-    int? editCommentId = TempData["EditCommentId"] as int?;
-    int productId = Model.Id;
-    var userId = commentVM?.CurrentUserId;
+    var productId = Model.Id;
 }
 
 <style>
@@ -37,16 +35,16 @@
 </style>
 
 <div class="container mt-5">
+    <!-- Product Section -->
     <div class="row">
         <div class="col-md-5 text-center">
             <img src="@Model.Picture" alt="@Model.Name" class="img-fluid rounded shadow" />
         </div>
-
         <div class="col-md-7">
             <h2 class="fw-bold">@Model.Name</h2>
             <h4 id="displayPrice" class="text-secondary mb-3">@price.ToString("N0") VND</h4>
 
-            <form class="add-to-cart-form" asp-controller="Cart" asp-action="AddToCart" method="post">
+            <form asp-controller="Cart" asp-action="AddToCart" method="post">
                 <input type="hidden" name="productId" value="@Model.Id" />
                 <p class="fw-semibold">Select Option:</p>
                 <div class="d-flex flex-wrap gap-3 mb-4">
@@ -66,6 +64,7 @@
         </div>
     </div>
 
+    <!-- Description -->
     <div class="row mt-5">
         <div class="col-12">
             <h5>Description</h5>
@@ -97,7 +96,6 @@
         {
             <p class="text-muted">You must <a asp-controller="Auth" asp-action="Login">log in</a> to rate this product.</p>
         }
-
         <div>
             <span>Average: @ViewBag.AvgRating.ToString("0.0") / 5</span>
         </div>
@@ -116,28 +114,35 @@
                     <small class="text-muted">(@parent.CreatedAt.ToShortDateString())</small>
                 </p>
 
-                <p class="mb-2">@parent.Content</p>
+                <!-- Comment content + edit form -->
+                <div id="comment-content-@parent.Id">
+                    <p class="mb-2">@parent.Content</p>
+                </div>
+                <form method="post" asp-action="EditComment" class="d-none" id="edit-form-@parent.Id">
+                    <input type="hidden" name="commentId" value="@parent.Id" />
+                    <div class="mb-2">
+                        <textarea name="newContent" class="form-control" rows="2">@parent.Content</textarea>
+                    </div>
+                    <button type="submit" class="btn btn-sm btn-warning">Save</button>
+                    <button type="button" class="btn btn-sm btn-secondary" onclick="cancelEdit(@parent.Id)">Cancel</button>
+                </form>
 
                 <div class="comment-actions">
-                    @if (userId == parent.UserId || roleId == "1")
+                    @if (currentUserId == parent.UserId || roleId == "1")
                     {
-                        <form method="post" asp-action="EditTrigger">
-                            <input type="hidden" name="commentId" value="@parent.Id" />
-                            <button type="submit" class="btn btn-sm btn-outline-primary">Edit</button>
-                        </form>
-                        <form method="post" asp-action="HideComment">
+                        <button type="button" class="btn btn-sm btn-outline-primary" onclick="toggleEdit(@parent.Id)">Edit</button>
+                        <form method="post" asp-action="HideComment" class="d-inline">
                             <input type="hidden" name="commentId" value="@parent.Id" />
                             <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
                         </form>
                     }
-
                     @if (!string.IsNullOrEmpty(accountName))
                     {
                         <button class="btn btn-sm btn-outline-secondary" type="button" onclick="toggleReplyForm(@parent.Id)">Reply</button>
                     }
                 </div>
 
-                <!-- Reply Form (toggle) -->
+                <!-- Reply Form -->
                 <form method="post" asp-action="PostComment" class="mt-2 d-none" id="reply-form-@parent.Id">
                     <input type="hidden" name="productId" value="@Model.Id" />
                     <input type="hidden" name="parentId" value="@parent.Id" />
@@ -155,7 +160,29 @@
                             <i class="fas fa-reply text-secondary"></i> @reply.User?.Name
                             <small class="text-muted">(@reply.CreatedAt.ToShortDateString())</small>
                         </p>
-                        <p>@reply.Content</p>
+
+                        <div id="comment-content-@reply.Id">
+                            <p>@reply.Content</p>
+                        </div>
+                        <form method="post" asp-action="EditComment" class="d-none" id="edit-form-@reply.Id">
+                            <input type="hidden" name="commentId" value="@reply.Id" />
+                            <div class="mb-2">
+                                <textarea name="newContent" class="form-control" rows="2">@reply.Content</textarea>
+                            </div>
+                            <button type="submit" class="btn btn-sm btn-warning">Save</button>
+                            <button type="button" class="btn btn-sm btn-secondary" onclick="cancelEdit(@reply.Id)">Cancel</button>
+                        </form>
+
+                        @if (currentUserId == reply.UserId || roleId == "1")
+                        {
+                            <div class="comment-actions">
+                                <button type="button" class="btn btn-sm btn-outline-primary" onclick="toggleEdit(@reply.Id)">Edit</button>
+                                <form method="post" asp-action="HideComment" class="d-inline">
+                                    <input type="hidden" name="commentId" value="@reply.Id" />
+                                    <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+                                </form>
+                            </div>
+                        }
                     </div>
                 }
             </div>
@@ -196,20 +223,21 @@
             }
         }
 
+        function toggleEdit(commentId) {
+            document.getElementById('comment-content-' + commentId)?.classList.add('d-none');
+            document.getElementById('edit-form-' + commentId)?.classList.remove('d-none');
+        }
+
+        function cancelEdit(commentId) {
+            document.getElementById('comment-content-' + commentId)?.classList.remove('d-none');
+            document.getElementById('edit-form-' + commentId)?.classList.add('d-none');
+        }
+
         document.querySelectorAll('input[name="productItemId"]').forEach(radio => {
             radio.addEventListener('change', function () {
                 const selectedPrice = this.getAttribute('data-price');
                 document.getElementById('displayPrice').innerText = parseInt(selectedPrice).toLocaleString() + ' VND';
-            });
-        });
-
-        document.addEventListener('DOMContentLoaded', function () {
-            const radios = document.querySelectorAll('input[name="productItemId"]');
-            const addBtn = document.getElementById('addToCartBtn');
-            radios.forEach(radio => {
-                radio.addEventListener('change', function () {
-                    addBtn.disabled = false;
-                });
+                document.getElementById('addToCartBtn').disabled = false;
             });
         });
     </script>
