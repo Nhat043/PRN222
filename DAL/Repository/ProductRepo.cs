@@ -138,28 +138,42 @@ namespace DAL.Repository
                 .ToListAsync();
         }
 
-        public async Task<List<Product>> GetFilteredProductsAsync(string ram, string rom, string price, int? categoryId)
+        public async Task<List<Product>> GetFilteredProductsAsync(string search, string ram, string rom, string price, int? categoryId)
         {
-            var products = await GetAllProductsFullAsync();
+            var query = _demoContext.Products
+                .Include(p => p.ProductItems)
+                    .ThenInclude(i => i.VariationOptions)
+                        .ThenInclude(v => v.Variation)
+                .Include(p => p.Category)
+                .Include(p => p.Ratings)
+                .AsQueryable();
+
+            if (!string.IsNullOrEmpty(search))
+                query = query.Where(p => p.Name.Contains(search));
 
             if (!string.IsNullOrEmpty(ram))
-                products = products.Where(p => p.ProductItems.Any(i => i.VariationOptions.Any(v => v.Variation.Name == "RAM" && v.Value == ram))).ToList();
+                query = query.Where(p => p.ProductItems.Any(i =>
+                    i.VariationOptions.Any(v => v.Variation.Name == "RAM" && v.Value == ram)));
 
             if (!string.IsNullOrEmpty(rom))
-                products = products.Where(p => p.ProductItems.Any(i => i.VariationOptions.Any(v => v.Variation.Name == "STORAGE" && v.Value == rom))).ToList();
+                query = query.Where(p => p.ProductItems.Any(i =>
+                    i.VariationOptions.Any(v => v.Variation.Name == "STORAGE" && v.Value == rom)));
 
             if (!string.IsNullOrEmpty(price))
             {
                 var split = price.Split('-');
-                if (split.Length == 2 && int.TryParse(split[0], out int min) && int.TryParse(split[1], out int max))
-                    products = products.Where(p => p.ProductItems.Any(i => i.SellingPrice >= min && i.SellingPrice <= max)).ToList();
+                if (split.Length == 2 && int.TryParse(split[0], out var min) && int.TryParse(split[1], out var max))
+                {
+                    query = query.Where(p => p.ProductItems.Any(i => i.SellingPrice >= min && i.SellingPrice <= max));
+                }
             }
 
-            if (categoryId.HasValue && categoryId.Value > 0)
-                products = products.Where(p => p.CategoryId == categoryId.Value).ToList();
+            if (categoryId.HasValue && categoryId > 0)
+                query = query.Where(p => p.CategoryId == categoryId);
 
-            return products;
+            return await query.ToListAsync();
         }
+
 
     }
 }

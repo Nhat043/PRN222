@@ -3,11 +3,13 @@
 <div class="container mt-4">
     <h2 class="fw-bold">All Laptops</h2>
     <form method="get" class="border rounded-3 p-4 mb-4 bg-white">
-        <div class="row g-3 align-items-end">
-            <div class="col-md-2">
-                <label class="form-label fw-semibold">RAM</label>
-                <select name="ram" class="form-select">
-                    <option value="">All RAM</option>
+    <div class="row g-3 align-items-end">
+
+        <!-- RAM -->
+        <div class="col-md-2">
+            <label class="form-label fw-semibold">RAM</label>
+            <select name="ram" class="form-select">
+                <option value="">All RAM</option>
                     @foreach (var r in Model.RamOptions)
                     {
                         if (Model.SelectedRam == r)
@@ -19,12 +21,13 @@
                             <option value="@r">@r</option>
                         }
                     }
-                </select>
-            </div>
-            <div class="col-md-2">
-                <label class="form-label fw-semibold">ROM</label>
-                <select name="rom" class="form-select">
-                    <option value="">All ROM</option>
+            </select>
+        </div>
+        <!-- ROM -->
+        <div class="col-md-2">
+            <label class="form-label fw-semibold">ROM</label>
+            <select name="rom" class="form-select">
+                <option value="">All ROM</option>
                     @foreach (var r in Model.RomOptions)
                     {
                         if (Model.SelectedRom == r)
@@ -36,21 +39,23 @@
                             <option value="@r">@r</option>
                         }
                     }
-                </select>
-            </div>
-            <div class="col-md-2">
-                <label class="form-label fw-semibold">Price</label>
-                <select name="price" class="form-select">
-                    <option value="">All Prices</option>
-                    @{
-                        var priceOpts = new List<(string v, string t)>
-                                        {
-                                        ("0-15000000", "Dưới 15 triệu"),
-                                        ("15000000-25000000", "15 - 25 triệu"),
-                                        ("25000000-40000000", "25 - 40 triệu"),
-                                        ("40000000-100000000", "Trên 40 triệu")
-                                        };
-                    }
+
+            </select>
+        </div>
+        <!-- Price -->
+        <div class="col-md-2">
+            <label class="form-label fw-semibold">Price</label>
+            <select name="price" class="form-select">
+                <option value="">All Prices</option>
+                @{
+                    var priceOpts = new List<(string v, string t)>
+                    {
+                        ("0-15000000", "Dưới 15 triệu"),
+                        ("15000000-25000000", "15 - 25 triệu"),
+                        ("25000000-40000000", "25 - 40 triệu"),
+                        ("40000000-100000000", "Trên 40 triệu")
+                    };
+                }
                     @foreach (var op in priceOpts)
                     {
                         if (Model.SelectedPrice == op.v)
@@ -62,12 +67,13 @@
                             <option value="@op.v">@op.t</option>
                         }
                     }
-                </select>
-            </div>
-            <div class="col-md-3">
-                <label class="form-label fw-semibold">Category</label>
-                <select name="category" class="form-select">
-                    <option value="">All Categories</option>
+            </select>
+        </div>
+        <!-- Category -->
+        <div class="col-md-3">
+            <label class="form-label fw-semibold">Category</label>
+            <select name="category" class="form-select">
+                <option value="">All Categories</option>
                     @foreach (var cate in Model.Categories)
                     {
                         if (Model.SelectedCategory == cate.Id)
@@ -79,41 +85,53 @@
                             <option value="@cate.Id">@cate.Name</option>
                         }
                     }
-                </select>
-            </div>
-            <div class="col-md-3 d-flex align-items-end">
-                <button type="submit" class="btn btn-primary px-4 fw-bold">Filter</button>
-                <a href="@Url.Action("Index", "Product")" class="btn btn-outline-secondary px-4 ms-2">Clear Filters</a>
-            </div>
+            </select>
         </div>
-    </form>
+        <div class="col-md-3 d-flex align-items-end">
+            <button type="submit" class="btn btn-primary px-4 fw-bold">Filter</button>
+            <a href="@Url.Action("Index", "Product", new { search = "" })" class="btn btn-outline-secondary px-4 ms-2">Clear Filters</a>
+        </div>
+    </div>
+</form>
+
 
     <div class="row g-4">
-        @foreach (var item in Model.Products)
+        @if (!Model.Products.Any())
         {
-            <div class="col-md-4">
-                <div class="card shadow-sm border-0 h-100">
-                    <img src="@item.Picture" alt="@item.Name" class="card-img-top" style="object-fit:cover;height:180px">
-                    <div class="card-body">
-                        <span class="text-primary fw-semibold">@item.CategoryName</span>
-                        <h5 class="card-title fw-bold">@item.Name</h5>
-                        <div class="mb-2 text-warning fw-semibold">
-                            @if (item.AvgRating != null)
-                            {
-                                <span>&#9733; @item.AvgRating.Value.ToString("0.0")</span>
-                                <span class="text-muted" style="font-size:1rem;">(@item.ReviewCount reviews)</span>
-                            }
-                        </div>
-                        <div>@item.Ram • @item.Rom</div>
-                        <div class="fw-bold fs-5 mb-2 text-primary">@item.Price?.ToString("N0") VND</div>
-                        <a asp-controller="Product" asp-action="Detail" asp-route-id="@item.Id" class="btn btn-outline-primary w-100 mb-2">View</a>
-                        <form asp-controller="Cart" asp-action="AddToCart" method="post">
-                            <input type="hidden" name="productItemId" value="@item.ProductItemId" />
-                            <button type="submit" class="btn btn-primary w-100">Add to Cart</button>
-                        </form>
-                    </div>
+            <div class="col-12 text-center py-5">
+                <div class="alert alert-warning">
+                    <b>Không tìm thấy sản phẩm phù hợp.</b>
                 </div>
             </div>
+        }
+        else
+        {
+    @foreach (var item in Model.Products)
+            {
+                <div class="col-md-4">
+                    <div class="card shadow-sm border-0 h-100">
+                        <img src="@item.Picture" alt="@item.Name" class="card-img-top" style="object-fit:cover;height:180px">
+                        <div class="card-body">
+                            <span class="text-primary fw-semibold">@item.CategoryName</span>
+                            <h5 class="card-title fw-bold">@item.Name</h5>
+                            <div class="mb-2 text-warning fw-semibold">
+                                @if (item.AvgRating != null)
+                                {
+                                    <span>&#9733; @item.AvgRating.Value.ToString("0.0")</span>
+                                    <span class="text-muted" style="font-size:1rem;">(@item.ReviewCount reviews)</span>
+                                }
+                            </div>
+                            <div>@item.Ram • @item.Rom</div>
+                            <div class="fw-bold fs-5 mb-2 text-primary">@item.Price?.ToString("N0") VND</div>
+                            <a asp-controller="Product" asp-action="Detail" asp-route-id="@item.Id" class="btn btn-outline-primary w-100 mb-2">View</a>
+                            <form asp-controller="Cart" asp-action="AddToCart" method="post">
+                                <input type="hidden" name="productItemId" value="@item.ProductItemId" />
+                                <button type="submit" class="btn btn-primary w-100">Add to Cart</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            }
         }
     </div>
 </div>

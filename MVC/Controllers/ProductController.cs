@@ -115,21 +115,17 @@ namespace MVC.Controllers
             return RedirectToAction("Detail", new { id = comment?.ProductId ?? 0 });
         }
 
-        public async Task<IActionResult> Index(string ram, string rom, string price, int? category)
+        public async Task<IActionResult> Index(string search, string ram, string rom, string price, int? category)
         {
-            // Lấy options cho filter dropdown
             var ramOptions = await _productService.GetAllRamOptionsAsync();
             var romOptions = await _productService.GetAllRomOptionsAsync();
             var categories = await _productService.GetAllCategoriesAsync();
 
-            // Nếu tất cả filter đều null/rỗng thì show all products, ngược lại thì filter
-            var products = string.IsNullOrEmpty(ram) && string.IsNullOrEmpty(rom) && string.IsNullOrEmpty(price) && (!category.HasValue || category == 0)
-                ? await _productService.GetAllProductsFullAsync()
-                : await _productService.GetFilteredProductsAsync(ram, rom, price, category);
+            // Nếu search, filter theo search + 4 trường còn lại (có thể là all hoặc chọn)
+            var products = await _productService.GetFilteredProductsAsync(search, ram, rom, price, category);
 
             var productVms = products.Select(p =>
             {
-                // Ưu tiên lấy ProductItem đúng với filter (nếu có), còn không thì lấy option đầu tiên
                 ProductItem item = null;
                 if (!string.IsNullOrEmpty(ram) && !string.IsNullOrEmpty(rom))
                     item = p.ProductItems.FirstOrDefault(i =>
@@ -174,7 +170,8 @@ namespace MVC.Controllers
                 SelectedRam = ram,
                 SelectedRom = rom,
                 SelectedPrice = price,
-                SelectedCategory = category
+                SelectedCategory = category,
+                SearchText = search
             };
 
             return View(model);

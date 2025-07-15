@@ -30,6 +30,7 @@
         public string SelectedRom { get; set; }
         public string SelectedPrice { get; set; }
         public int? SelectedCategory { get; set; }
+        public string SearchText { get; set; }
     }
 
 }
