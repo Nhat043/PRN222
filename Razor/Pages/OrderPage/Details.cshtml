@@ -1,0 +1,58 @@
+﻿@page "{id:int}"
+@model Razor.Pages.OrderPage.DetailsModel
+
+<h2>Chi tiết đơn hàng</h2>
+
+<table class="table">
+    <tr><th>Mã đơn:</th><td>@Model.Order.Id</td></tr>
+    <tr><th>Người đặt:</th><td>@Model.Order.UserId</td></tr>
+    <tr><th>Ngày đặt:</th><td>@Model.Order.Date.ToString("dd/MM/yyyy HH:mm")</td></tr>
+    <tr><th>Tổng tiền:</th><td>@Model.Order.Price.ToString("n0") đ</td></tr>
+    <tr>
+        <th>Trạng thái:</th>
+        <td>@Model.Order.Status?.Name</td>
+    </tr>
+</table>
+
+<h4>Sản phẩm trong đơn hàng</h4>
+@if (Model.Order.OrderItems.Any())
+{
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Sản phẩm</th>
+                <th>Ảnh</th>
+                <th>Số lượng</th>
+                <th>Giá</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.Order.OrderItems)
+            {
+                <tr>
+                    <td>@item.Id</td>
+                    <td>@item.ProductItem?.Product?.Name</td>
+                    <td>
+                        @if (!string.IsNullOrEmpty(item.ProductItem?.Product?.Picture))
+                        {
+                            <img src="@item.ProductItem.Product.Picture" alt="Ảnh sản phẩm" style="width: 100px;" />
+                        }
+                        else
+                        {
+                            <span>Không có ảnh</span>
+                        }
+                    </td>
+                    <td>@item.Quantity</td>
+                    <td>@item.Price.ToString("n0") đ</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+}
+else
+{
+    <p>Không có sản phẩm nào trong đơn hàng.</p>
+}

@@ -1,4 +1,4 @@
-﻿@model MVC.Models.Order.CheckoutViewModel
+﻿@model MVC.Models.Orders.CheckoutViewModel
 @{
     var subtotal = Model.CartItems.Sum(item => (item.SellingPrice ?? 0) * item.Quantity);
     var totalDiscount = Model.CartItems.Sum(item => (decimal)(item.Discount ?? 0) * item.Quantity);

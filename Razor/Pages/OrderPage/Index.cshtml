@@ -10,6 +10,8 @@
             <th>Ngày đặt</th>
             <th>Tổng tiền</th>
             <th>Trạng thái</th>
+            <th>Thao tác</th>
+            <th>Chi tiết</th>
         </tr>
     </thead>
     <tbody>
@@ -20,8 +22,25 @@
                 <td>@order.UserId</td>
                 <td>@order.Date.ToString("dd/MM/yyyy HH:mm")</td>
                 <td>@order.Price.ToString("n0") đ</td>
-                <td>@order.StatusId</td>
+                <td>@order.Status?.Name</td>
+
+                <td colspan="2">
+                    <form method="post" asp-page-handler="UpdateStatus">
+                        <input type="hidden" name="orderId" value="@order.Id" />
+                        <select name="statusId">
+                            <option value="1" selected="@(order.StatusId == 1)">Pending</option>
+                            <option value="2" selected="@(order.StatusId == 2)">Approved</option>
+                            <option value="3" selected="@(order.StatusId == 3)">Rejected</option>
+                        </select>
+                        <button type="submit">Lưu</button>
+                    </form>
+                </td>
+
+                <td>
+                    <a asp-page="/OrderPage/Details" asp-route-id="@order.Id">Xem</a>
+                </td>
             </tr>
         }
+
     </tbody>
 </table>

@@ -1,4 +1,4 @@
-﻿namespace MVC.Models.Order
+﻿namespace MVC.Models.Orders
 {
     public class CheckoutViewModel
     {

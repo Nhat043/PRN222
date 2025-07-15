@@ -10,10 +10,12 @@ namespace MVC.Controllers
     public class UserController : Controller
     {
         private readonly IAccountService _accountService;
+        private readonly IOrderService _orderService;
 
-        public UserController(IAccountService accountService)
+        public UserController(IAccountService accountService, IOrderService orderService)
         {
             _accountService = accountService; // ✅ assign to the private field
+            _orderService = orderService;
         }
 
         public async Task<IActionResult> Profile(string username)
@@ -24,22 +26,25 @@ namespace MVC.Controllers
             }
 
             var account = await _accountService.GetAccountByUserNameAsync(username);
-
             if (account == null)
             {
                 return NotFound("Account not found.");
             }
+
+            var orders = await _orderService.GetOrdersByUserIdAsync(account.Id); // 👈 load orders
 
             var viewModel = new ProfileViewModel
             {
                 Email = account.Email,
                 Name = account.Name,
                 Phone = account.Phone,
-                Address = account.Address
+                Address = account.Address,
+                Orders = orders
             };
 
             return View(viewModel);
         }
+
         [HttpGet]
         public async Task<IActionResult> EditProfile()
         {

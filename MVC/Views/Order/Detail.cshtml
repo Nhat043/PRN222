@@ -1,0 +1,52 @@
+﻿@model MVC.Models.Orders.OrderDetailViewModel
+
+@{
+    ViewData["Title"] = "Chi tiết đơn hàng #" + Model.Id;
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<div class="mb-3">
+    <strong>Ngày đặt:</strong> @Model.Date.ToString("dd/MM/yyyy HH:mm") <br />
+    <strong>Tổng tiền:</strong> @Model.Price.ToString("n0") đ <br />
+    <strong>Trạng thái:</strong> @Model.StatusName
+</div>
+
+<h4>Sản phẩm</h4>
+<table class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>Ảnh</th>
+            <th>Tên sản phẩm</th>
+            <th>Số lượng</th>
+            <th>Giá</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.OrderItems)
+        {
+            <tr>
+                <td>
+                    @if (!string.IsNullOrEmpty(item.ProductItem?.Product?.Picture))
+                    {
+                        <img src="@item.ProductItem.Product.Picture" alt="Ảnh sản phẩm" width="80" />
+                    }
+                    else
+                    {
+                        <span>Không có ảnh</span>
+                    }
+                </td>
+                <td>@item.ProductItem?.Product?.Name</td>
+                <td>@item.Quantity</td>
+                <td>@item.Price.ToString("n0") đ</td>
+            </tr>
+        }
+    </tbody>
+    <tfoot>
+        <tr>
+            <td colspan="3" class="text-end fw-bold">Tổng tiền:</td>
+            <td class="fw-bold">@Model.Price.ToString("n0") đ</td>
+        </tr>
+    </tfoot>
+</table>
+

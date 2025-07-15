@@ -21,7 +21,9 @@ namespace DAL.Repository
 
         public async Task<List<Order>> GetAllAsync()
         {
-            return await _dbContext.Orders.ToListAsync();
+            return await _dbContext.Orders
+       .Include(o => o.Status) // ✅ Load the Status name
+       .ToListAsync();
         }
 
         public async Task AddOrderAsync(Order order)
@@ -35,6 +37,30 @@ namespace DAL.Repository
             _dbContext.OrderItems.AddRange(orderItems);
             await _dbContext.SaveChangesAsync();
         }
+        public async Task<Order> GetOrderByIdAsync(int id)
+        {
+            return await _dbContext.Orders
+                .Include(o => o.OrderItems)
+                    .ThenInclude(oi => oi.ProductItem)
+                        .ThenInclude(pi => pi.Product)
+                        .Include(o => o.Status)
+                .FirstOrDefaultAsync(o => o.Id == id);
+        }
+        public async Task UpdateOrderAsync(Order order)
+        {
+            _dbContext.Orders.Update(order);
+            await _dbContext.SaveChangesAsync();
+        }
+
+        public async Task<List<Order>> GetOrdersByUserIdAsync(int userId)
+        {
+            return await _dbContext.Orders
+                .Where(o => o.UserId == userId)
+                .Include(o => o.Status)
+                .OrderByDescending(o => o.Date)
+                .ToListAsync();
+        }
+
     }
 
 }
