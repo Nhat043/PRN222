@@ -22,7 +22,8 @@ namespace DAL.Repository
         public async Task<List<Order>> GetAllAsync()
         {
             return await _dbContext.Orders
-       .Include(o => o.Status) // ✅ Load the Status name
+       .Include(o => o.Status)
+       .Include(o => o.User)
        .ToListAsync();
         }
 
@@ -40,6 +41,7 @@ namespace DAL.Repository
         public async Task<Order> GetOrderByIdAsync(int id)
         {
             return await _dbContext.Orders
+                .Include(o => o.User)
                 .Include(o => o.OrderItems)
                     .ThenInclude(oi => oi.ProductItem)
                         .ThenInclude(pi => pi.Product)
@@ -55,11 +57,13 @@ namespace DAL.Repository
         public async Task<List<Order>> GetOrdersByUserIdAsync(int userId)
         {
             return await _dbContext.Orders
-                .Where(o => o.UserId == userId)
+                .Where(o => o.UserId == userId) // ✅ CORRECT
+                .Include(o => o.User)
                 .Include(o => o.Status)
                 .OrderByDescending(o => o.Date)
                 .ToListAsync();
         }
+
 
     }
 

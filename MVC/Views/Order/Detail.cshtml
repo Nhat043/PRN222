@@ -1,25 +1,25 @@
 ﻿@model MVC.Models.Orders.OrderDetailViewModel
 
 @{
-    ViewData["Title"] = "Chi tiết đơn hàng #" + Model.Id;
+    ViewData["Title"] = "Order Details #" + Model.Id;
 }
 
 <h2>@ViewData["Title"]</h2>
 
 <div class="mb-3">
-    <strong>Ngày đặt:</strong> @Model.Date.ToString("dd/MM/yyyy HH:mm") <br />
-    <strong>Tổng tiền:</strong> @Model.Price.ToString("n0") đ <br />
-    <strong>Trạng thái:</strong> @Model.StatusName
+    <strong>Order Date:</strong> @Model.Date.ToString("dd/MM/yyyy HH:mm") <br />
+    <strong>Total Price:</strong> @Model.Price.ToString("n0") đ <br />
+    <strong>Status:</strong> @Model.StatusName
 </div>
 
-<h4>Sản phẩm</h4>
+<h4>Products</h4>
 <table class="table table-bordered table-striped">
     <thead>
         <tr>
-            <th>Ảnh</th>
-            <th>Tên sản phẩm</th>
-            <th>Số lượng</th>
-            <th>Giá</th>
+            <th>Image</th>
+            <th>Product Name</th>
+            <th>Quantity</th>
+            <th>Price</th>
         </tr>
     </thead>
     <tbody>
@@ -29,11 +29,11 @@
                 <td>
                     @if (!string.IsNullOrEmpty(item.ProductItem?.Product?.Picture))
                     {
-                        <img src="@item.ProductItem.Product.Picture" alt="Ảnh sản phẩm" width="80" />
+                        <img src="@item.ProductItem.Product.Picture" alt="Product image" width="80" />
                     }
                     else
                     {
-                        <span>Không có ảnh</span>
+                        <span>No image</span>
                     }
                 </td>
                 <td>@item.ProductItem?.Product?.Name</td>
@@ -44,9 +44,8 @@
     </tbody>
     <tfoot>
         <tr>
-            <td colspan="3" class="text-end fw-bold">Tổng tiền:</td>
+            <td colspan="3" class="text-end fw-bold">Total:</td>
             <td class="fw-bold">@Model.Price.ToString("n0") đ</td>
         </tr>
     </tfoot>
 </table>
-

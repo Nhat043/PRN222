@@ -1,31 +1,34 @@
 ﻿@page "{id:int}"
 @model Razor.Pages.OrderPage.DetailsModel
 
-<h2>Chi tiết đơn hàng</h2>
+<h2>Order Details</h2>
 
 <table class="table">
-    <tr><th>Mã đơn:</th><td>@Model.Order.Id</td></tr>
-    <tr><th>Người đặt:</th><td>@Model.Order.UserId</td></tr>
-    <tr><th>Ngày đặt:</th><td>@Model.Order.Date.ToString("dd/MM/yyyy HH:mm")</td></tr>
-    <tr><th>Tổng tiền:</th><td>@Model.Order.Price.ToString("n0") đ</td></tr>
+    <tr><th>Order ID:</th><td>@Model.Order.Id</td></tr>
     <tr>
-        <th>Trạng thái:</th>
+        <th>Placed By:</th>
+        <td>@(Model.Order.User?.Name ?? Model.Order.User?.Email ?? "Unknown User")</td>
+    </tr>
+
+    <tr><th>Order Date:</th><td>@Model.Order.Date.ToString("dd/MM/yyyy HH:mm")</td></tr>
+    <tr><th>Total Price:</th><td>@Model.Order.Price.ToString("n0") đ</td></tr>
+    <tr>
+        <th>Status:</th>
         <td>@Model.Order.Status?.Name</td>
     </tr>
 </table>
 
-<h4>Sản phẩm trong đơn hàng</h4>
+<h4>Products in Order</h4>
 @if (Model.Order.OrderItems.Any())
 {
-
     <table class="table">
         <thead>
             <tr>
                 <th>ID</th>
-                <th>Sản phẩm</th>
-                <th>Ảnh</th>
-                <th>Số lượng</th>
-                <th>Giá</th>
+                <th>Product</th>
+                <th>Image</th>
+                <th>Quantity</th>
+                <th>Price</th>
             </tr>
         </thead>
         <tbody>
@@ -37,11 +40,11 @@
                     <td>
                         @if (!string.IsNullOrEmpty(item.ProductItem?.Product?.Picture))
                         {
-                            <img src="@item.ProductItem.Product.Picture" alt="Ảnh sản phẩm" style="width: 100px;" />
+                            <img src="@item.ProductItem.Product.Picture" alt="Product image" style="width: 100px;" />
                         }
                         else
                         {
-                            <span>Không có ảnh</span>
+                            <span>No image available</span>
                         }
                     </td>
                     <td>@item.Quantity</td>
@@ -50,9 +53,8 @@
             }
         </tbody>
     </table>
-
 }
 else
 {
-    <p>Không có sản phẩm nào trong đơn hàng.</p>
+    <p>No products in this order.</p>
 }
