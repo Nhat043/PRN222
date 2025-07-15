@@ -62,7 +62,7 @@ public class OrderController : Controller
 
         int total = cart.Sum(item =>
             item.SellingPrice * item.Quantity - ((int)(item.Discount ?? 0) * item.Quantity)
-            ) ?? 0;
+        ) ?? 0;
 
         var order = new Order
         {
@@ -72,10 +72,21 @@ public class OrderController : Controller
             StatusId = 1
         };
 
-        await _orderService.AddOrderAsync(order);
+        await _orderService.AddOrderAsync(order); 
+
+        var orderItems = cart.Select(item => new OrderItem
+        {
+            OrderId = order.Id, 
+            ProductItemId = item.ProductItemId,
+            Quantity = item.Quantity,
+            Price = item.SellingPrice ?? 0
+        }).ToList();
+
+        await _orderService.AddOrderItemsAsync(orderItems);
 
         HttpContext.Session.Remove("Cart");
         TempData["Message"] = "Đặt hàng thành công!";
         return RedirectToAction("Index", "Home");
     }
+
 }

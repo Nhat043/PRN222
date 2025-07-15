@@ -85,5 +85,26 @@ namespace DAL.Repository
         {
             return await _demoContext.Categories.ToListAsync();
         }
+
+        public async Task<List<Product>> GetFeaturedProductsAsync(int take)
+        {
+            return await _demoContext.Products
+                .OrderByDescending(x => x.Id)
+                .Take(take)
+                .Include(x => x.ProductItems)
+                    .ThenInclude(x => x.VariationOptions)
+                        .ThenInclude(x => x.Variation)
+                .ToListAsync();
+        }
+
+        public async Task<Product?> GetNewestProductAsync()
+        {
+            return await _demoContext.Products
+                .OrderByDescending(x => x.Id)
+                .Include(x => x.ProductItems)
+                    .ThenInclude(x => x.VariationOptions)
+                        .ThenInclude(x => x.Variation)
+                .FirstOrDefaultAsync();
+        }
     }
 }

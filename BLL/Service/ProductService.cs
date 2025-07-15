@@ -84,5 +84,16 @@ namespace BLL.Service
         {
             return await _productRepo.GetAllCategoriesAsync();
         }
+
+        public async Task<List<Product>> GetFeaturedProductsAsync(int take)
+        {
+            return await _productRepo.GetFeaturedProductsAsync(take);
+        }
+
+        public async Task<Product?> GetNewestProductAsync()
+        {
+            return await _productRepo.GetNewestProductAsync();
+        }
+
     }
 }

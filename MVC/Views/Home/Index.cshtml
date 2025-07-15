@@ -1,64 +1,85 @@
-﻿@model IEnumerable<DAL.Models.Product>
-@{
-    ViewData["Title"] = "Home Page";
+﻿@model MVC.Models.Product.HomeIndexViewModel
+
+<!-- Navbar -->
+<nav class="navbar bg-light px-4">
+    <a href="/" class="navbar-brand fw-bold fs-3 text-primary">Shop Laptop</a>
+    <form class="d-flex" action="/Product/Search">
+        <input class="form-control me-2" type="search" name="q" placeholder="Search laptops..." />
+        <button class="btn btn-outline-primary" type="submit">Search</button>
+    </form>
+</nav>
+
+<!-- Banner Section -->
+@if (Model.NewestLaptop != null)
+{
+    <section class="d-flex align-items-center py-5" style="background:#eef5fd;">
+        <div class="col-6">
+            <span class="badge bg-primary mb-2">New Arrivals Available</span>
+            <h1 class="fw-bold">Premium Laptops <span class="text-primary">Redefined</span></h1>
+            <p class="mb-4">Discover cutting-edge technology with our curated collection of high-performance laptops for every need.</p>
+            <a asp-controller="Product" asp-action="Detail" asp-route-id="@Model.NewestLaptop.Id" class="btn btn-primary px-4">View Newest</a>
+        </div>
+        <div class="col-6 text-end">
+            <div class="position-relative d-inline-block" style="min-width:340px;">
+                <img src="@Model.NewestLaptop.Picture"
+                     alt="@Model.NewestLaptop.Name"
+                     class="img-fluid rounded shadow"
+                     style="max-height:320px; border-radius:24px;" />
+
+                <!-- Giá tiền góc phải trên -->
+                <div class="position-absolute top-0 end-0 m-3 bg-white rounded-4 px-4 py-3 shadow-sm text-end"
+                     style="font-weight:600; font-size:1.6rem;">
+                    <span class="d-block text-primary small" style="font-size:1rem;">Price:</span>
+                    @Model.NewestLaptop.Price?.ToString("N0") VND
+                </div>
+
+                <!-- RAM/ROM góc trái dưới -->
+                <div class="position-absolute bottom-0 start-0 m-3 bg-white bg-opacity-75 rounded-3 px-3 py-2 shadow-sm"
+                     style="font-size:1.1rem;">
+                    <b>RAM:</b> @Model.NewestLaptop.Ram &nbsp; | &nbsp; <b>ROM:</b> @Model.NewestLaptop.Rom
+                </div>
+            </div>
+        </div>
+    </section>
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-
-</div>
-<!--Example-->
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Name)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Picture)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Description)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Category)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Status)
-            </th>
-            <th>Action</th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model)
+<!-- Featured Laptops -->
+<div class="container py-5">
+    <h2 class="fw-bold mb-4 text-center">Featured Laptops</h2>
+    <div class="row g-4 justify-content-center">
+        @foreach (var item in Model.FeaturedLaptops)
         {
-            <tr>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Name)
-                </td>
-                <td>
-                    <img src="@item.Picture" alt="@item.Name" width="100" />
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Description)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Category.Name)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Status.Name)
-                </td>
-                <td>
-                    <a class="btn btn-primary btn-sm"
-                       asp-controller="Product"
-                       asp-action="Detail"
-                       asp-route-id="@item.Id">
-                        Detail
-                    </a>
-                </td>
-            </tr>
+            <div class="col-md-3">
+                <div class="card shadow-sm border-0 h-100">
+                    <img src="@item.Picture" alt="@item.Name" class="card-img-top" style="object-fit:cover;height:180px">
+                    <div class="card-body">
+                        <h5 class="card-title fw-bold">@item.Name</h5>
+                        <ul class="list-unstyled mb-3">
+                            <li><b>RAM:</b> @item.Ram</li>
+                            <li><b>ROM:</b> @item.Rom</li>
+                        </ul>
+                        <div class="mb-2 fw-bold text-primary fs-5">@item.Price?.ToString("N0") VND</div>
+                        <a asp-controller="Product" asp-action="Detail" asp-route-id="@item.Id" class="btn btn-outline-primary w-100 mb-2">View</a>
+                        @{
+                            
+                            var productItemId = item.ProductItemId;                                                                     
+                        }
+                        <form asp-controller="Cart" asp-action="AddToCart" method="post">
+                            <input type="hidden" name="productItemId" value="@productItemId" />
+                            <button type="submit" class="btn btn-primary w-100">Add to Cart</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
         }
-    </tbody>
-</table>
+    </div>
+
+    <div class="text-center my-5">
+        <a asp-controller="Product" asp-action="Index"
+           class="btn btn-outline-secondary px-5 py-3 rounded-3 fw-bold fs-5"
+           style="box-shadow:0 4px 32px #eaf1ff;">
+            View All Laptops
+            <span class="ms-2">&#8250;</span>
+        </a>
+    </div>
+</div>

@@ -12,5 +12,6 @@ namespace DAL.Repository.Interface
         Task<List<Order>> GetAllAsync();
         Task AddOrderAsync(Order order);
 
+        Task AddOrderItemsAsync(List<OrderItem> orderItems);
     }
 }

@@ -20,5 +20,8 @@ namespace DAL.Repository.Interface
         Task<IEnumerable<ProductStatus>> GetAllProductStatusAsync();
 
         Task<IEnumerable<Category>> GetAllCategoriesAsync();
+
+        Task<List<Product>> GetFeaturedProductsAsync(int take);
+        Task<Product?> GetNewestProductAsync();
     }
 }

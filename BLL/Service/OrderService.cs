@@ -27,6 +27,11 @@ namespace BLL.Service
         {
             await _orderRepository.AddOrderAsync(order);
         }
+
+        public async Task AddOrderItemsAsync(List<OrderItem> orderItems) 
+        {
+            await _orderRepository.AddOrderItemsAsync(orderItems);
+        }
     }
 
 }

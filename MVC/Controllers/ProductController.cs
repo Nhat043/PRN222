@@ -23,7 +23,9 @@ namespace MVC.Controllers
         public async Task<IActionResult> Detail(int id)
         {
             var product = await _productService.GetProductByIdAsync(id);
-            if (product == null) return NotFound();
+            if (product == null) {
+                return NotFound();
+            } 
 
             var userId = HttpContext.Session.GetInt32("AccountIdSession");
 

@@ -29,6 +29,12 @@ namespace DAL.Repository
             _dbContext.Orders.Add(order);
             await _dbContext.SaveChangesAsync();
         }
+
+        public async Task AddOrderItemsAsync(List<OrderItem> orderItems)  
+        {
+            _dbContext.OrderItems.AddRange(orderItems);
+            await _dbContext.SaveChangesAsync();
+        }
     }
 
 }
