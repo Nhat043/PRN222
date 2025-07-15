@@ -96,39 +96,16 @@ namespace BLL.Service
             return await _productRepo.GetNewestProductAsync();
         }
 
-        public async Task<IEnumerable<Product>> SearchProductsByNameAsync(string name)
-        {
-            var allProducts = await _productRepo.GetAllProductsAsync();
+        public async Task<List<Product>> GetFilteredProductsAsync(string search, string ram, string rom, string price, int? category)
+            => await _productRepo.GetFilteredProductsAsync(search, ram, rom, price, category);
 
-            if (string.IsNullOrWhiteSpace(name))
-                return allProducts;
+        public async Task<List<Product>> GetAllProductsFullAsync()
+            => await _productRepo.GetAllProductsFullAsync();
 
-            string keyword = RemoveDiacritics(name).ToLower();
+        public async Task<List<string>> GetAllRamOptionsAsync()
+            => await _productRepo.GetAllRamOptionsAsync();
 
-            return allProducts.Where(p =>
-                !string.IsNullOrEmpty(p.Name) &&
-                RemoveDiacritics(p.Name).ToLower().Contains(keyword)).ToList();
-        }
-
-        private static string RemoveDiacritics(string text)
-        {
-            if (string.IsNullOrEmpty(text))
-                return text;
-
-            var normalizedString = text.Normalize(NormalizationForm.FormD);
-            var stringBuilder = new StringBuilder();
-
-            foreach (var c in normalizedString)
-            {
-                var unicodeCategory = CharUnicodeInfo.GetUnicodeCategory(c);
-                if (unicodeCategory != UnicodeCategory.NonSpacingMark)
-                {
-                    stringBuilder.Append(c);
-                }
-            }
-
-            return stringBuilder.ToString().Normalize(NormalizationForm.FormC);
-        }
-
+        public async Task<List<string>> GetAllRomOptionsAsync()
+            => await _productRepo.GetAllRomOptionsAsync();
     }
 }

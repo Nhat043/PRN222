@@ -68,7 +68,6 @@ namespace MVC.Controllers
             return View(model);
         }
 
-
         public IActionResult Privacy()
         {
             return View();
@@ -78,27 +77,6 @@ namespace MVC.Controllers
         public IActionResult Error()
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
-        }
-        // Trong HomeController
-
-        private static string RemoveDiacritics(string text)
-        {
-            if (string.IsNullOrEmpty(text))
-                return text;
-
-            var normalized = text.Normalize(System.Text.NormalizationForm.FormD);
-            var builder = new System.Text.StringBuilder();
-
-            foreach (var c in normalized)
-            {
-                var unicodeCategory = System.Globalization.CharUnicodeInfo.GetUnicodeCategory(c);
-                if (unicodeCategory != System.Globalization.UnicodeCategory.NonSpacingMark)
-                {
-                    builder.Append(c);
-                }
-            }
-
-            return builder.ToString().Normalize(System.Text.NormalizationForm.FormC);
         }
 
     }

@@ -1,0 +1,91 @@
+﻿<form method="get" class="border rounded-3 p-4 mb-4 bg-white">
+    <div class="row g-3 align-items-end">
+        <div class="col-md-3">
+            <label class="form-label fw-semibold">Search</label>
+            <input type="text" class="form-control" name="search" placeholder="Search laptops..." value="@Model.SearchText" />
+        </div>
+        <div class="col-md-2">
+            <label class="form-label fw-semibold">RAM</label>
+            <select name="ram" class="form-select">
+                <option value="">All RAM</option>
+                @foreach (var r in Model.RamOptions)
+                {
+                    if (Model.SelectedRam == r)
+                    {
+                        <option value="@r" selected="selected">@r</option>
+                    }
+                    else
+                    {
+                        <option value="@r">@r</option>
+                    }
+                }
+            </select>
+        </div>
+        <div class="col-md-2">
+            <label class="form-label fw-semibold">ROM</label>
+            <select name="rom" class="form-select">
+                <option value="">All ROM</option>
+                @foreach (var r in Model.RomOptions)
+                {
+                    if (Model.SelectedRom == r)
+                    {
+                        <option value="@r" selected="selected">@r</option>
+                    }
+                    else
+                    {
+                        <option value="@r">@r</option>
+                    }
+                }
+            </select>
+        </div>
+        <div class="col-md-2">
+            <label class="form-label fw-semibold">Price</label>
+            <select name="price" class="form-select">
+                <option value="">All Prices</option>
+                @{
+                    var priceOpts = new List<(string v, string t)>
+                    {
+                        ("0-15000000", "Dưới 15 triệu"),
+                        ("15000000-25000000", "15 - 25 triệu"),
+                        ("25000000-40000000", "25 - 40 triệu"),
+                        ("40000000-100000000", "Trên 40 triệu")
+                    };
+                }
+                @foreach (var op in priceOpts)
+                {
+                    if (Model.SelectedPrice == op.v)
+                    {
+                        <option value="@op.v" selected="selected">@op.t</option>
+                    }
+                    else
+                    {
+                        <option value="@op.v">@op.t</option>
+                    }
+                }
+
+            </select>
+        </div>
+        <div class="col-md-3">
+            <label class="form-label fw-semibold">Category</label>
+            <select name="category" class="form-select">
+                <option value="">All Categories</option>
+                @foreach (var cate in Model.Categories)
+                {
+                    if (Model.SelectedCategory == cate.Id)
+                    {
+                        <option value="@cate.Id" selected="selected">@cate.Name</option>
+                    }
+                    else
+                    {
+                        <option value="@cate.Id">@cate.Name</option>
+                    }
+                }
+
+            </select>
+        </div>
+    </div>
+    <div class="mt-3 d-flex gap-2">
+        <button type="submit" class="btn btn-primary px-4 fw-bold">Filter</button>
+        <a href="@Url.Action("Index", "Product")" class="btn btn-outline-secondary px-4">Clear Filters</a>
+    </div>
+</form>

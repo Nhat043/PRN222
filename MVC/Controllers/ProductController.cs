@@ -1,8 +1,10 @@
 ﻿using BLL.Service.Interface;
 using DAL.Models;
-using MVC.Models.Product;
-using MVC.Models;
+using Microsoft.AspNetCore.Builder.Extensions;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Mvc;
+using MVC.Models;
+using MVC.Models.Product;
 using System.Threading.Tasks;
 
 namespace MVC.Controllers
@@ -18,14 +20,6 @@ namespace MVC.Controllers
             _ratingService = ratingService;
             _comService = comService;
         }
-        public async Task<IActionResult> Index(string searchString)
-        {
-            ViewData["CurrentFilter"] = searchString;
-
-            var products = await _productService.SearchProductsByNameAsync(searchString);
-            return View(products);
-        }
-
 
         // /Product/Detail/5
         public async Task<IActionResult> Detail(int id)
@@ -120,6 +114,81 @@ namespace MVC.Controllers
             var comment = _comService.GetById(commentId);
             return RedirectToAction("Detail", new { id = comment?.ProductId ?? 0 });
         }
+
+        public async Task<IActionResult> Index(string search, string ram, string rom, string price, int? category)
+        {
+            var ramOptions = await _productService.GetAllRamOptionsAsync();
+            var romOptions = await _productService.GetAllRomOptionsAsync();
+            var categories = await _productService.GetAllCategoriesAsync();
+
+            List<Product> products;
+            if (string.IsNullOrWhiteSpace(search) && string.IsNullOrWhiteSpace(ram) && string.IsNullOrWhiteSpace(rom)
+                && string.IsNullOrWhiteSpace(price) && (!category.HasValue || category == 0))
+            {
+                products = await _productService.GetAllProductsFullAsync();
+            }
+            else
+            {
+                products = await _productService.GetFilteredProductsAsync(search, ram, rom, price, category);
+            }
+
+            var productVms = products.Select(p =>
+            {
+                ProductItem item = null;
+                if (!string.IsNullOrEmpty(ram) && !string.IsNullOrEmpty(rom))
+                    item = p.ProductItems.FirstOrDefault(i =>
+                        i.VariationOptions.Any(v => v.Variation.Name == "RAM" && v.Value == ram) &&
+                        i.VariationOptions.Any(v => v.Variation.Name == "STORAGE" && v.Value == rom));
+                else if (!string.IsNullOrEmpty(ram))
+                    item = p.ProductItems.FirstOrDefault(i =>
+                        i.VariationOptions.Any(v => v.Variation.Name == "RAM" && v.Value == ram));
+                else if (!string.IsNullOrEmpty(rom))
+                    item = p.ProductItems.FirstOrDefault(i =>
+                        i.VariationOptions.Any(v => v.Variation.Name == "STORAGE" && v.Value == rom));
+                else
+                    item = p.ProductItems.FirstOrDefault();
+
+                var ramOpt = item?.VariationOptions.FirstOrDefault(x => x.Variation.Name == "RAM")?.Value;
+                var romOpt = item?.VariationOptions.FirstOrDefault(x => x.Variation.Name == "STORAGE")?.Value;
+                var ratings = p.Ratings?.ToList() ?? new List<Rating>();
+                double? avgRating = null;
+                int? reviewCount = null;
+                if (ratings.Any())
+                {
+                    avgRating = ratings.Average(r => r.RatingValue);
+                    reviewCount = ratings.Count;
+                }
+                return new ProductListVm
+                {
+                    Id = p.Id,
+                    Name = p.Name,
+                    Picture = p.Picture,
+                    CategoryName = p.Category?.Name,
+                    AvgRating = avgRating,
+                    ReviewCount = reviewCount,
+                    Price = item?.SellingPrice,
+                    Ram = ramOpt,
+                    Rom = romOpt,
+                    ProductItemId = item?.Id
+                };
+            }).ToList();
+
+            var model = new ProductIndexViewModel
+            {
+                Products = productVms,
+                Categories = categories.Select(c => new CategoryVm { Id = c.Id, Name = c.Name }).ToList(),
+                RamOptions = ramOptions,
+                RomOptions = romOptions,
+                SelectedRam = ram,
+                SelectedRom = rom,
+                SelectedPrice = price,
+                SelectedCategory = category,
+                SearchText = search
+            };
+
+            return View(model);
+        }
+
 
     }
 }
