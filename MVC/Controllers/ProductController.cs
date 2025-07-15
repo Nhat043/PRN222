@@ -18,6 +18,14 @@ namespace MVC.Controllers
             _ratingService = ratingService;
             _comService = comService;
         }
+        public async Task<IActionResult> Index(string searchString)
+        {
+            ViewData["CurrentFilter"] = searchString;
+
+            var products = await _productService.SearchProductsByNameAsync(searchString);
+            return View(products);
+        }
+
 
         // /Product/Detail/5
         public async Task<IActionResult> Detail(int id)

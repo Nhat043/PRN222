@@ -23,6 +23,7 @@ namespace BLL.Service.Interface
 
         Task<List<Product>> GetFeaturedProductsAsync(int take);
         Task<Product?> GetNewestProductAsync();
+        Task<IEnumerable<Product>> SearchProductsByNameAsync(string name);
 
     }
 }
