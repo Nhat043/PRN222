@@ -3,7 +3,8 @@ using DAL.Models; // Cho Order, Account
 using Microsoft.AspNetCore.Mvc;
 using MVC.Helpers;
 using MVC.Models;
-using MVC.Models.Order;
+
+using MVC.Models.Orders;
 using Org.BouncyCastle.Utilities;
 using System.Linq;
 using System.Threading.Tasks;
@@ -88,5 +89,23 @@ public class OrderController : Controller
         TempData["Message"] = "Đặt hàng thành công!";
         return RedirectToAction("Index", "Home");
     }
+    public async Task<IActionResult> Detail(int id)
+    {
+        var order = await _orderService.GetOrderByIdAsync(id);
+        if (order == null)
+            return NotFound();
+
+        var model = new OrderDetailViewModel
+        {
+            Id = order.Id,
+            Date = order.Date,
+            Price = order.Price,
+            StatusName = order.Status?.Name,
+            OrderItems = order.OrderItems.ToList()
+        };
+
+        return View(model);
+    }
+
 
 }

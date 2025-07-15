@@ -3,6 +3,7 @@ using DAL.Models;
 using BLL.Service.Interface;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Razor.Pages.OrderPage
 {
@@ -21,5 +22,16 @@ namespace Razor.Pages.OrderPage
         {
             Orders = await _orderService.GetAllOrdersAsync();
         }
+        public async Task<IActionResult> OnPostUpdateStatusAsync(int orderId, int statusId)
+        {
+            var order = await _orderService.GetOrderByIdAsync(orderId);
+            if (order != null)
+            {
+                order.StatusId = statusId;
+                await _orderService.UpdateOrderAsync(order); // Create this method
+            }
+            return RedirectToPage();
+        }
+
     }
 }

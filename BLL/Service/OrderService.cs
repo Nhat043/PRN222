@@ -32,6 +32,19 @@ namespace BLL.Service
         {
             await _orderRepository.AddOrderItemsAsync(orderItems);
         }
+        public async Task<Order> GetOrderByIdAsync(int id)
+        {
+            return await _orderRepository.GetOrderByIdAsync(id);
+        }
+        public async Task UpdateOrderAsync(Order order)
+        {
+            await _orderRepository.UpdateOrderAsync(order);
+        }
+        public async Task<List<Order>> GetOrdersByUserIdAsync(int userId)
+        {
+            return await _orderRepository.GetOrdersByUserIdAsync(userId);
+        }
+
     }
 
 }

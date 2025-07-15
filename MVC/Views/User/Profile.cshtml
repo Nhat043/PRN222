@@ -25,16 +25,53 @@
             <dd class="col-sm-9">@Html.DisplayFor(model => model.Address)</dd>
         </dl>
     </div>
-    <a asp-controller="User" asp-action="EditProfile" class="btn btn-outline-primary">Edit Profile</a>
-    <a href="javascript:void(0);" class="btn btn-outline-danger ml-2" onclick="confirmChangePassword()">Change Password</a>
-    @section Scripts {
-        <script>
-            function confirmChangePassword() {
-                if (confirm("Are you sure you want to change your password? An OTP will be sent to your email.")) {
-                    window.location.href = '@Url.Action("ChangePassword", "Auth")';
-                }
-            }
-        </script>
-    }
-
+    <div class="card-footer">
+        <a asp-controller="User" asp-action="EditProfile" class="btn btn-outline-primary">Edit Profile</a>
+        <a href="javascript:void(0);" class="btn btn-outline-danger ml-2" onclick="confirmChangePassword()">Change Password</a>
+    </div>
 </div>
+
+@section Scripts {
+    <script>
+        function confirmChangePassword() {
+            if (confirm("Are you sure you want to change your password? An OTP will be sent to your email.")) {
+                window.location.href = '@Url.Action("ChangePassword", "Auth")';
+            }
+        }
+    </script>
+}
+
+@if (Model.Orders != null && Model.Orders.Any())
+{
+    <hr />
+    <h4 class="mt-4">Đơn hàng của bạn</h4>
+    <table class="table table-bordered table-striped mt-2">
+        <thead class="thead-dark">
+            <tr>
+                <th>Mã đơn</th>
+                <th>Ngày đặt</th>
+                <th>Tổng tiền</th>
+                <th>Trạng thái</th>
+                <th>Chi tiết</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var order in Model.Orders)
+            {
+                <tr>
+                    <td>@order.Id</td>
+                    <td>@order.Date.ToString("dd/MM/yyyy HH:mm")</td>
+                    <td>@order.Price.ToString("n0") đ</td>
+                    <td>@order.Status.Name</td>
+                    <td>
+                        <a asp-controller="Order" asp-action="Detail" asp-route-id="@order.Id" class="btn btn-sm btn-outline-info">Xem</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <p class="mt-4">Bạn chưa có đơn hàng nào.</p>
+}

@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using DAL.Models;
 
 namespace MVC.Models.User
 {
@@ -21,6 +22,6 @@ namespace MVC.Models.User
         [StringLength(100, ErrorMessage = "Address cannot exceed 100 characters")]
         public string? Address { get; set; }
 
-        
+        public List<Order> Orders { get; set; } = new();
     }
 }

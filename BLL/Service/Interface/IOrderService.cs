@@ -14,6 +14,10 @@ namespace BLL.Service.Interface
         Task AddOrderAsync(Order order);
 
         Task AddOrderItemsAsync(List<OrderItem> orderItems);
+        Task<Order> GetOrderByIdAsync(int id);
+        Task UpdateOrderAsync(Order order);
+        Task<List<Order>> GetOrdersByUserIdAsync(int userId);
+
 
     }
 }
