@@ -96,16 +96,10 @@ namespace BLL.Service
             return await _productRepo.GetNewestProductAsync();
         }
 
-        public async Task<List<Product>> GetFilteredProductsAsync(string search, string ram, string rom, string price, int? category)
-            => await _productRepo.GetFilteredProductsAsync(search, ram, rom, price, category);
-
-        public async Task<List<Product>> GetAllProductsFullAsync()
-            => await _productRepo.GetAllProductsFullAsync();
-
-        public async Task<List<string>> GetAllRamOptionsAsync()
-            => await _productRepo.GetAllRamOptionsAsync();
-
-        public async Task<List<string>> GetAllRomOptionsAsync()
-            => await _productRepo.GetAllRomOptionsAsync();
+        public Task<List<Product>> GetAllProductsFullAsync() => _productRepo.GetAllProductsFullAsync();
+        public Task<List<string>> GetAllRamOptionsAsync() => _productRepo.GetAllRamOptionsAsync();
+        public Task<List<string>> GetAllRomOptionsAsync() => _productRepo.GetAllRomOptionsAsync();
+        public Task<List<Product>> GetFilteredProductsAsync(string ram, string rom, string price, int? categoryId) =>
+            _productRepo.GetFilteredProductsAsync(ram, rom, price, categoryId);
     }
 }

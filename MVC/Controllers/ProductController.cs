@@ -115,25 +115,21 @@ namespace MVC.Controllers
             return RedirectToAction("Detail", new { id = comment?.ProductId ?? 0 });
         }
 
-        public async Task<IActionResult> Index(string search, string ram, string rom, string price, int? category)
+        public async Task<IActionResult> Index(string ram, string rom, string price, int? category)
         {
+            // Lấy options cho filter dropdown
             var ramOptions = await _productService.GetAllRamOptionsAsync();
             var romOptions = await _productService.GetAllRomOptionsAsync();
             var categories = await _productService.GetAllCategoriesAsync();
 
-            List<Product> products;
-            if (string.IsNullOrWhiteSpace(search) && string.IsNullOrWhiteSpace(ram) && string.IsNullOrWhiteSpace(rom)
-                && string.IsNullOrWhiteSpace(price) && (!category.HasValue || category == 0))
-            {
-                products = await _productService.GetAllProductsFullAsync();
-            }
-            else
-            {
-                products = await _productService.GetFilteredProductsAsync(search, ram, rom, price, category);
-            }
+            // Nếu tất cả filter đều null/rỗng thì show all products, ngược lại thì filter
+            var products = string.IsNullOrEmpty(ram) && string.IsNullOrEmpty(rom) && string.IsNullOrEmpty(price) && (!category.HasValue || category == 0)
+                ? await _productService.GetAllProductsFullAsync()
+                : await _productService.GetFilteredProductsAsync(ram, rom, price, category);
 
             var productVms = products.Select(p =>
             {
+                // Ưu tiên lấy ProductItem đúng với filter (nếu có), còn không thì lấy option đầu tiên
                 ProductItem item = null;
                 if (!string.IsNullOrEmpty(ram) && !string.IsNullOrEmpty(rom))
                     item = p.ProductItems.FirstOrDefault(i =>
@@ -145,19 +141,15 @@ namespace MVC.Controllers
                 else if (!string.IsNullOrEmpty(rom))
                     item = p.ProductItems.FirstOrDefault(i =>
                         i.VariationOptions.Any(v => v.Variation.Name == "STORAGE" && v.Value == rom));
-                else
+                if (item == null)
                     item = p.ProductItems.FirstOrDefault();
 
                 var ramOpt = item?.VariationOptions.FirstOrDefault(x => x.Variation.Name == "RAM")?.Value;
                 var romOpt = item?.VariationOptions.FirstOrDefault(x => x.Variation.Name == "STORAGE")?.Value;
-                var ratings = p.Ratings?.ToList() ?? new List<Rating>();
-                double? avgRating = null;
-                int? reviewCount = null;
-                if (ratings.Any())
-                {
-                    avgRating = ratings.Average(r => r.RatingValue);
-                    reviewCount = ratings.Count;
-                }
+                var ratings = p.Ratings?.ToList() ?? new List<DAL.Models.Rating>();
+                double? avgRating = ratings.Any() ? (double?)ratings.Average(r => r.RatingValue) : null;
+                int? reviewCount = ratings.Any() ? ratings.Count : null;
+
                 return new ProductListVm
                 {
                     Id = p.Id,
@@ -182,13 +174,11 @@ namespace MVC.Controllers
                 SelectedRam = ram,
                 SelectedRom = rom,
                 SelectedPrice = price,
-                SelectedCategory = category,
-                SearchText = search
+                SelectedCategory = category
             };
 
             return View(model);
         }
-
 
     }
 }
