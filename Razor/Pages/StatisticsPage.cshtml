@@ -1,0 +1,67 @@
+@page
+@model Razor.Pages.StatisticsPageModel
+@{
+    ViewData["Title"] = "Statistics";
+}
+<div class="card mb-4">
+    <div class="card-header bg-primary text-white">
+        <i class="fas fa-chart-bar me-2"></i> Statistics Dashboard
+    </div>
+    <div class="card-body">
+        <div class="row g-4">
+            <div class="col-lg-6">
+                <div class="card h-100">
+                    <div class="card-header">Revenue Over Time</div>
+                    <div class="card-body">
+                        <canvas id="revenueChart"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="card h-100">
+                    <div class="card-header">Orders Per Month</div>
+                    <div class="card-body">
+                        <canvas id="ordersChart"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="card h-100">
+                    <div class="card-header">Best-Selling Products</div>
+                    <div class="card-body">
+                        <canvas id="bestProductsChart"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="card h-100">
+                    <div class="card-header">Average Order Value</div>
+                    <div class="card-body">
+                        <canvas id="aovChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Chart data will be injected here from the backend
+        // Placeholders for now
+        const revenueData = @Html.Raw(Model.RevenueChartJson);
+        const ordersData = @Html.Raw(Model.OrdersChartJson);
+        const bestProductsData = @Html.Raw(Model.BestProductsChartJson);
+        const aovData = @Html.Raw(Model.AovChartJson);
+
+        // Revenue Chart
+        new Chart(document.getElementById('revenueChart'), revenueData);
+        // Orders Per Month Chart
+        new Chart(document.getElementById('ordersChart'), ordersData);
+        // Best-Selling Products Chart
+        new Chart(document.getElementById('bestProductsChart'), bestProductsData);
+        // Average Order Value Chart
+        new Chart(document.getElementById('aovChart'), aovData);
+    </script>
+} 
