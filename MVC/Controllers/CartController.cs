@@ -52,7 +52,9 @@ public class CartController : Controller
                 Picture = productItem.Product?.Picture,
                 SellingPrice = productItem.SellingPrice,
                 Discount = productItem.Discount,
-                Quantity = 1
+                Quantity = 1,
+                Ram = productItem.VariationOptions?.FirstOrDefault(x => x.Variation?.Name == "RAM")?.Value,
+                Rom = productItem.VariationOptions?.FirstOrDefault(x => x.Variation?.Name == "STORAGE")?.Value
             });
         }
 
