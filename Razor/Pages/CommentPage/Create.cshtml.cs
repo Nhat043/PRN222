@@ -1,5 +1,4 @@
-﻿using BLL.Service.Interface;
-using DAL.Datas;
+﻿using DAL.Datas;
 using DAL.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -14,12 +13,10 @@ namespace Razor.Pages.CommentPage
     public class CreateModel : PageModel
     {
         private readonly DemoContext _context;
-        private readonly ICommentStatusService _statusService;
 
-        public CreateModel(DemoContext context, ICommentStatusService statusService)
+        public CreateModel(DemoContext context)
         {
             _context = context;
-            _statusService = statusService;
         }
 
         [BindProperty]
@@ -36,6 +33,11 @@ namespace Razor.Pages.CommentPage
 
         public async Task<IActionResult> OnGetAsync()
         {
+            int visibleStatusId = await _context.CommentStatuses
+                .Where(s => s.Name == "Visible")
+                .Select(s => s.Id)
+                .FirstOrDefaultAsync();
+
             if (ParentId.HasValue)
             {
                 var parent = await _context.Comments
@@ -49,7 +51,7 @@ namespace Razor.Pages.CommentPage
                 {
                     ParentId = parent.Id,
                     ProductId = parent.ProductId,
-                    StatusId = _statusService.GetIdByName("Visible") ?? 1
+                    StatusId = visibleStatusId
                 };
 
                 ReplyingToUserName = parent.User?.Name;
@@ -59,7 +61,7 @@ namespace Razor.Pages.CommentPage
             {
                 Comment = new Comment
                 {
-                    StatusId = _statusService.GetIdByName("Visible") ?? 1
+                    StatusId = visibleStatusId
                 };
             }
 
@@ -77,7 +79,7 @@ namespace Razor.Pages.CommentPage
 
             var accountId = HttpContext.Session.GetInt32("AccountIdSession");
             if (accountId == null)
-                return RedirectToPage("/Auth/Login");
+                return RedirectToPage("/Account/Login"); // đổi đúng route nếu cần
 
             Comment.CreatedAt = DateTime.Now;
             Comment.UserId = accountId.Value;
@@ -92,7 +94,7 @@ namespace Razor.Pages.CommentPage
         {
             ViewData["ParentId"] = new SelectList(await _context.Comments.ToListAsync(), "Id", "Content");
             ViewData["ProductId"] = new SelectList(await _context.Products.ToListAsync(), "Id", "Name");
-            ViewData["StatusId"] = new SelectList(_statusService.GetAll(), "Id", "Name");
+            ViewData["StatusId"] = new SelectList(await _context.CommentStatuses.ToListAsync(), "Id", "Name");
             ViewData["UserId"] = new SelectList(await _context.Accounts.ToListAsync(), "Id", "Email");
         }
     }
