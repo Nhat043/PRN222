@@ -29,6 +29,12 @@ namespace Razor
             builder.Services.AddScoped<IOrderRepository, OrderRepository>();
             builder.Services.AddScoped<IOrderService, OrderService>();
 
+            builder.Services.AddScoped<IComRepo, ComRepo>();
+
+            builder.Services.AddScoped<IComService, ComService>();
+
+            builder.Services.AddScoped<ICommentStatusService, CommentStatusService>();
+
             var app = builder.Build();
 
 

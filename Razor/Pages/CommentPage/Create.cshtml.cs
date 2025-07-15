@@ -1,23 +1,25 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using BLL.Service.Interface;
+using DAL.Datas;
+using DAL.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using DAL.Datas;
-using DAL.Models;
+using System;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Razor.Pages.CommentPage
 {
     public class CreateModel : PageModel
     {
         private readonly DemoContext _context;
+        private readonly ICommentStatusService _statusService;
 
-        public CreateModel(DemoContext context)
+        public CreateModel(DemoContext context, ICommentStatusService statusService)
         {
             _context = context;
+            _statusService = statusService;
         }
 
         [BindProperty]
@@ -47,10 +49,7 @@ namespace Razor.Pages.CommentPage
                 {
                     ParentId = parent.Id,
                     ProductId = parent.ProductId,
-                    StatusId = await _context.CommentStatuses
-                                .Where(s => s.Name == "Visible")
-                                .Select(s => s.Id)
-                                .FirstOrDefaultAsync()
+                    StatusId = _statusService.GetIdByName("Visible") ?? 1
                 };
 
                 ReplyingToUserName = parent.User?.Name;
@@ -58,20 +57,15 @@ namespace Razor.Pages.CommentPage
             }
             else
             {
-                // Nếu không phải reply, cũng nên set Status mặc định
                 Comment = new Comment
                 {
-                    StatusId = await _context.CommentStatuses
-                                .Where(s => s.Name == "Visible")
-                                .Select(s => s.Id)
-                                .FirstOrDefaultAsync()
+                    StatusId = _statusService.GetIdByName("Visible") ?? 1
                 };
             }
 
             await LoadSelectListsAsync();
             return Page();
         }
-
 
         public async Task<IActionResult> OnPostAsync()
         {
@@ -81,8 +75,13 @@ namespace Razor.Pages.CommentPage
                 return Page();
             }
 
+            var accountId = HttpContext.Session.GetInt32("AccountIdSession");
+            if (accountId == null)
+                return RedirectToPage("/Auth/Login");
+
             Comment.CreatedAt = DateTime.Now;
-            Comment.UserId = 1; // Admin ID (tạm hardcode, có thể lấy từ session)
+            Comment.UserId = accountId.Value;
+
             _context.Comments.Add(Comment);
             await _context.SaveChangesAsync();
 
@@ -93,7 +92,7 @@ namespace Razor.Pages.CommentPage
         {
             ViewData["ParentId"] = new SelectList(await _context.Comments.ToListAsync(), "Id", "Content");
             ViewData["ProductId"] = new SelectList(await _context.Products.ToListAsync(), "Id", "Name");
-            ViewData["StatusId"] = new SelectList(await _context.CommentStatuses.ToListAsync(), "Id", "Name");
+            ViewData["StatusId"] = new SelectList(_statusService.GetAll(), "Id", "Name");
             ViewData["UserId"] = new SelectList(await _context.Accounts.ToListAsync(), "Id", "Email");
         }
     }
