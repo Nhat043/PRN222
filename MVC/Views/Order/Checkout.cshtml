@@ -1,7 +1,8 @@
 ﻿@model MVC.Models.Order.CheckoutViewModel
 @{
     var subtotal = Model.CartItems.Sum(item => (item.SellingPrice ?? 0) * item.Quantity);
-    var totalDiscount = Model.CartItems.Sum(item => (decimal)(item.Discount ?? 0) * item.Quantity);
+    var totalDiscount = Model.CartItems.Sum(item =>
+    ((item.SellingPrice ?? 0) * (decimal)(item.Discount ?? 0) / 100) * item.Quantity);
     var total = subtotal - totalDiscount;
 }
 
@@ -49,7 +50,7 @@
                                 <div class="text-danger small">
                                     @if (item.Discount > 0)
                                     {
-                                        <span>Discount: @item.Discount?.ToString("N0") đ</span>
+                                        <span>Discount: @item.Discount?.ToString("N0") %</span>
                                     }
                                 </div>
                                 <div class="fw-semibold mt-1">Total: @item.TotalPrice.ToString("N0") đ</div>
