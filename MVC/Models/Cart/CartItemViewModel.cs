@@ -12,5 +12,5 @@ public class CartItemViewModel
     public decimal? Discount { get; set; }
     public string? Ram { get; set; }   
     public string? Rom { get; set; }
-    public int TotalPrice => Math.Max(0, ((SellingPrice ?? 0) - (int)(Discount ?? 0)) * Quantity);
+    public decimal TotalPrice =>((SellingPrice ?? 0) - (SellingPrice ?? 0) * (Discount ?? 0) / 100) * Quantity;
 }
