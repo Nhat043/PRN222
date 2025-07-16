@@ -91,9 +91,9 @@ namespace BLL.Service
             return await _productRepo.GetFeaturedProductsAsync(take);
         }
 
-        public async Task<Product?> GetNewestProductAsync()
+        public async Task<Product?> GetNewestProductInStockAsync()
         {
-            return await _productRepo.GetNewestProductAsync();
+            return await _productRepo.GetNewestProductInStockAsync();
         }
 
         public Task<List<Product>> GetAllProductsFullAsync() => _productRepo.GetAllProductsFullAsync();

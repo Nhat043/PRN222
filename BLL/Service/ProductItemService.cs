@@ -22,5 +22,10 @@ namespace BLL.Service
         {
             return await _productItemRepo.GetAllProductItemsAsync();
         }
+
+        public async Task UpdateProductItemAsync(ProductItem productItem)
+        {
+            await _productItemRepo.UpdateProductItemAsync(productItem);
+        }
     }
 }

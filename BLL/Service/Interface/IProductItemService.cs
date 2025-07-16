@@ -6,5 +6,7 @@ namespace BLL.Service.Interface
     {
         Task<ProductItem?> GetProductItemByIdAsync(int id);
         Task<IEnumerable<ProductItem>> GetAllProductItemsAsync();
+
+        Task UpdateProductItemAsync(ProductItem productItem);
     }
 }

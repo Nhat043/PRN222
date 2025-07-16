@@ -21,43 +21,58 @@ namespace MVC.Controllers
 
         public async Task<IActionResult> Index(string searchString)
         {
-            var newestProduct = await _productService.GetNewestProductAsync();
+            var newestProduct = await _productService.GetNewestProductInStockAsync();
             LaptopFeatureVm? newestLaptopVm = null;
             if (newestProduct != null)
             {
-                var productItem = newestProduct.ProductItems.FirstOrDefault();
-                var ram = productItem?.VariationOptions.FirstOrDefault(x => x.Variation.Name == "RAM")?.Value;
-                var rom = productItem?.VariationOptions.FirstOrDefault(x => x.Variation.Name == "STORAGE")?.Value;
+                var productItem = newestProduct.ProductItems
+                    .Where(i => i.Quantity > 0)
+                    .FirstOrDefault();
 
-                newestLaptopVm = new LaptopFeatureVm
+                if (productItem != null)
                 {
-                    Id = newestProduct.Id,
-                    Name = newestProduct.Name,
-                    Picture = newestProduct.Picture,
-                    Price = productItem?.SellingPrice,
-                    Ram = ram,
-                    Rom = rom
-                };
+                    var ram = productItem.VariationOptions.FirstOrDefault(x => x.Variation.Name == "RAM")?.Value;
+                    var rom = productItem.VariationOptions.FirstOrDefault(x => x.Variation.Name == "STORAGE")?.Value;
+
+                    newestLaptopVm = new LaptopFeatureVm
+                    {
+                        Id = newestProduct.Id,
+                        Name = newestProduct.Name,
+                        Picture = newestProduct.Picture,
+                        Price = productItem.SellingPrice,
+                        Ram = ram,
+                        Rom = rom
+                    };
+                }
             }
 
             var featuredProducts = await _productService.GetFeaturedProductsAsync(4);
-            var featuredLaptops = featuredProducts.Select(p =>
-            {
-                var productItem = p.ProductItems.FirstOrDefault();
-                var ram = productItem?.VariationOptions.FirstOrDefault(x => x.Variation.Name == "RAM")?.Value;
-                var rom = productItem?.VariationOptions.FirstOrDefault(x => x.Variation.Name == "STORAGE")?.Value;
-
-                return new LaptopFeatureVm
+            var featuredLaptops = featuredProducts
+                .Select(p =>
                 {
-                    Id = p.Id,
-                    Name = p.Name,
-                    Picture = p.Picture,
-                    Price = productItem?.SellingPrice,
-                    Ram = ram,
-                    Rom = rom,
-                    ProductItemId = productItem?.Id
-                };
-            }).ToList();
+                    var productItem = p.ProductItems
+                        .Where(i => i.Quantity > 0)
+                        .OrderBy(i => i.SellingPrice)
+                        .FirstOrDefault();
+
+                    if (productItem == null) return null; 
+
+                    var ram = productItem.VariationOptions.FirstOrDefault(x => x.Variation.Name == "RAM")?.Value;
+                    var rom = productItem.VariationOptions.FirstOrDefault(x => x.Variation.Name == "STORAGE")?.Value;
+
+                    return new LaptopFeatureVm
+                    {
+                        Id = p.Id,
+                        Name = p.Name,
+                        Picture = p.Picture,
+                        Price = productItem.SellingPrice,
+                        Ram = ram,
+                        Rom = rom,
+                        ProductItemId = productItem.Id
+                    };
+                })
+                .Where(x => x != null)
+                .ToList()!;
 
             var model = new HomeIndexViewModel
             {

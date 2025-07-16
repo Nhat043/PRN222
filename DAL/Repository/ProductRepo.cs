@@ -89,22 +89,27 @@ namespace DAL.Repository
         public async Task<List<Product>> GetFeaturedProductsAsync(int take)
         {
             return await _demoContext.Products
+                .Where(x => x.ProductItems.Any(i => i.Quantity > 0)) 
                 .OrderByDescending(x => x.Id)
                 .Take(take)
                 .Include(x => x.ProductItems)
                     .ThenInclude(x => x.VariationOptions)
                         .ThenInclude(x => x.Variation)
+                            .Include(x => x.Category)
+                                .Include(x => x.Ratings)
                 .ToListAsync();
         }
 
-        public async Task<Product?> GetNewestProductAsync()
+        public async Task<Product?> GetNewestProductInStockAsync()
         {
             return await _demoContext.Products
                 .OrderByDescending(x => x.Id)
                 .Include(x => x.ProductItems)
                     .ThenInclude(x => x.VariationOptions)
                         .ThenInclude(x => x.Variation)
-                .FirstOrDefaultAsync();
+                .Include(x => x.Category)
+                .Include(x => x.Ratings)
+                .FirstOrDefaultAsync(x => x.ProductItems.Any(i => i.Quantity > 0));
         }
 
         public async Task<List<Product>> GetAllProductsFullAsync()
@@ -170,6 +175,8 @@ namespace DAL.Repository
 
             if (categoryId.HasValue && categoryId > 0)
                 query = query.Where(p => p.CategoryId == categoryId);
+
+            query = query.Where(p => p.ProductItems.Any(i => i.Quantity > 0));
 
             return await query.ToListAsync();
         }

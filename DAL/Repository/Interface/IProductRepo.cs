@@ -22,7 +22,7 @@ namespace DAL.Repository.Interface
         Task<IEnumerable<Category>> GetAllCategoriesAsync();
 
         Task<List<Product>> GetFeaturedProductsAsync(int take);
-        Task<Product?> GetNewestProductAsync();
+        Task<Product?> GetNewestProductInStockAsync();
 
         Task<List<Product>> GetAllProductsFullAsync();
         Task<List<string>> GetAllRamOptionsAsync();

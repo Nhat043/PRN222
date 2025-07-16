@@ -13,11 +13,13 @@ public class OrderController : Controller
 {
     private readonly IAccountService _accountService;
     private readonly IOrderService _orderService;
+    private readonly IProductItemService _productItemService;
 
-    public OrderController(IAccountService accountService, IOrderService orderService)
+    public OrderController(IAccountService accountService, IOrderService orderService, IProductItemService productItemService)
     {
         _accountService = accountService;
         _orderService = orderService;
+        _productItemService = productItemService;
     }
 
     // GET: /Order/Checkout
@@ -65,6 +67,7 @@ public class OrderController : Controller
             item.SellingPrice * item.Quantity - ((int)(item.Discount ?? 0) * item.Quantity)
         ) ?? 0;
 
+        // 1. Tạo Order và lưu
         var order = new Order
         {
             UserId = accountId.Value,
@@ -72,23 +75,36 @@ public class OrderController : Controller
             Price = total,
             StatusId = 1
         };
+        await _orderService.AddOrderAsync(order); // order.Id sẽ có giá trị sau khi lưu
 
-        await _orderService.AddOrderAsync(order); 
-
+        // 2. Tạo OrderItem và lưu
         var orderItems = cart.Select(item => new OrderItem
         {
-            OrderId = order.Id, 
+            OrderId = order.Id,
             ProductItemId = item.ProductItemId,
             Quantity = item.Quantity,
             Price = item.SellingPrice ?? 0
         }).ToList();
-
         await _orderService.AddOrderItemsAsync(orderItems);
 
+        // 3. Trừ tồn kho ProductItem
+        foreach (var item in cart)
+        {
+            var productItem = await _productItemService.GetProductItemByIdAsync(item.ProductItemId);
+            if (productItem != null)
+            {
+                productItem.Quantity -= item.Quantity;
+                if (productItem.Quantity < 0) productItem.Quantity = 0; // Không để số âm
+                await _productItemService.UpdateProductItemAsync(productItem);
+            }
+        }
+
+        // 4. Xoá giỏ hàng và thông báo
         HttpContext.Session.Remove("Cart");
         TempData["Message"] = "Đặt hàng thành công!";
         return RedirectToAction("Index", "Home");
     }
+
     public async Task<IActionResult> Detail(int id)
     {
         var order = await _orderService.GetOrderByIdAsync(id);
