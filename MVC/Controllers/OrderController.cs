@@ -99,7 +99,8 @@ public class OrderController : Controller
 
         // 4. Xoá giỏ hàng và thông báo
         HttpContext.Session.Remove("Cart");
-        TempData["Message"] = "Đặt hàng thành công!";
+        TempData["Message"] = "Order successfully!";
+        await _orderService.NotifyAdminNewOrder();
         return RedirectToAction("Index", "Home");
     }
 

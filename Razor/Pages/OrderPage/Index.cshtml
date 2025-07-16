@@ -44,3 +44,19 @@
         }
     </tbody>
 </table>
+<script src="~/microsoft/signalr/dist/browser/signalr.js"></script>
+<script>
+    var connection = new signalR.HubConnectionBuilder()
+        .withUrl("/DataSignalRChanel")
+        .build();
+    connection.start().then(function() {
+        console.log("Connected to SignalR");
+    }).catch(function(err) {
+        console.error("Error connecting to SignalR: " + err);
+    });
+
+    connection.on("NewOrderReceived", function() {
+        console.log("New order received");
+        location.reload();
+    });
+</script>
