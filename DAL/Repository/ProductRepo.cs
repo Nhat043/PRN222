@@ -55,6 +55,13 @@ namespace DAL.Repository
             return product;
         }
 
+        public async Task<Product> GetProductByIdWithCategoryAndStatusAsync(int productId)
+        {
+            return await _demoContext.Products
+                .Include(p => p.Category)
+                .Include(p => p.Status)
+                .FirstOrDefaultAsync(p => p.Id == productId);
+        }
 
 
         public async Task AddProductAsync(Product product)

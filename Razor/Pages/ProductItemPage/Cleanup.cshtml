@@ -1,0 +1,82 @@
+@page
+@model Razor.Pages.ProductItemPage.CleanupModel
+
+@{
+    ViewData["Title"] = "Cleanup Duplicate Product Items";
+}
+
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header bg-warning text-dark">
+            <h4><i class="fas fa-exclamation-triangle"></i> Cleanup Duplicate Product Items</h4>
+        </div>
+        <div class="card-body">
+            @if (Model.DuplicateGroups.Any())
+            {
+                <div class="alert alert-warning">
+                    <i class="fas fa-info-circle"></i>
+                    <strong>Found @Model.DuplicateGroups.Count duplicate groups.</strong> 
+                    Review the items below and select which ones to keep.
+                </div>
+
+                <form method="post">
+                    @for (int i = 0; i < Model.DuplicateGroups.Count; i++)
+                    {
+                        var group = Model.DuplicateGroups[i];
+                        <div class="card mb-3 border-warning">
+                            <div class="card-header bg-light">
+                                <h6 class="mb-0">
+                                    <i class="fas fa-layer-group"></i>
+                                    Group @(i + 1): @group.First().Product?.Name - 
+                                    @string.Join(", ", group.First().VariationOptions.Select(vo => $"{vo.Variation?.Name}: {vo.Value}"))
+                                </h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    @for (int j = 0; j < group.Count; j++)
+                                    {
+                                        var item = group[j];
+                                        <div class="col-md-6 mb-2">
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" 
+                                                       name="KeepItemIds[@i]" value="@item.Id" 
+                                                       @(j == 0 ? "checked" : "") id="item_@item.Id">
+                                                <label class="form-check-label" for="item_@item.Id">
+                                                    <strong>ID: @item.Id</strong><br>
+                                                    <small class="text-muted">
+                                                        Quantity: @item.Quantity | 
+                                                        Price: $@item.SellingPrice | 
+                                                        Status: @item.Status?.Name
+                                                    </small>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    }
+
+                    <div class="d-flex justify-content-between">
+                        <a asp-page="./Index" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left"></i> Back to List
+                        </a>
+                        <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure you want to remove the selected duplicate items?')">
+                            <i class="fas fa-trash"></i> Remove Duplicates
+                        </button>
+                    </div>
+                </form>
+            }
+            else
+            {
+                <div class="alert alert-success">
+                    <i class="fas fa-check-circle"></i>
+                    <strong>No duplicate product items found!</strong> Your database is clean.
+                </div>
+                <a asp-page="./Index" class="btn btn-primary">
+                    <i class="fas fa-arrow-left"></i> Back to List
+                </a>
+            }
+        </div>
+    </div>
+</div> 

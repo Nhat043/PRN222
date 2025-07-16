@@ -43,7 +43,7 @@ namespace Razor.Pages.ProductPage
                 return NotFound();
             }
 
-            var product = await _productService.GetProductByIdAsync(id.Value);
+            var product = await _productService.GetProductByIdWithCategoryAndStatusAsync(id.Value);
             if (product == null)
             {
                 return NotFound();

@@ -36,8 +36,23 @@ namespace Razor.Pages.CategoryPage
                 return Page();
             }
 
-            await _categoryService.AddCategoryAsync(Category);
-            return RedirectToPage("./Index");
+            try
+            {
+                await _categoryService.AddCategoryAsync(Category);
+                return RedirectToPage("./Index");
+            }
+            catch (InvalidOperationException ex)
+            {
+                // Handle duplicate category name error
+                ModelState.AddModelError("Category.Name", ex.Message);
+                return Page();
+            }
+            catch (Exception ex)
+            {
+                // Handle other errors
+                ModelState.AddModelError("", "An error occurred while creating the category. Please try again.");
+                return Page();
+            }
         }
     }
 }
