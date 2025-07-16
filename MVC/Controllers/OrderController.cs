@@ -32,10 +32,8 @@ public class OrderController : Controller
 
         var cart = HttpContext.Session.GetObject<List<CartItemViewModel>>("Cart") ?? new List<CartItemViewModel>();
 
-        // Ép kiểu SellingPrice & Discount chuẩn decimal (tránh lỗi nullable hoặc kiểu int)
         decimal total = cart.Sum(item =>
-            (Convert.ToDecimal(item.SellingPrice) * item.Quantity) -
-            ((item.Discount ?? 0) * item.Quantity)
+        (item.SellingPrice ?? 0) * item.Quantity * (1 - (decimal)(item.Discount ?? 0) / 100)
         );
 
         var model = new CheckoutViewModel

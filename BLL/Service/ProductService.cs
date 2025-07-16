@@ -103,5 +103,10 @@ namespace BLL.Service
         {
             return await _productRepo.GetFilteredProductsAsync(search, ram, rom, price, categoryId);
         }
+
+        public async Task<Product?> GetProductByIdWithAvailableItemsAsync(int id)
+        {
+            return await _productRepo.GetProductByIdWithAvailableItemsAsync(id);
+        }
     }
 }

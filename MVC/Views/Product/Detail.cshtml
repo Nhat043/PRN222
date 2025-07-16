@@ -44,11 +44,11 @@
             <h2 class="fw-bold">@Model.Name</h2>
             <h4 id="displayPrice" class="text-secondary mb-3">@price.ToString("N0") VND</h4>
 
-            <form asp-controller="Cart" asp-action="AddToCart" method="post">
+            <form id="addToCartForm" method="post" autocomplete="off">
                 <input type="hidden" name="productId" value="@Model.Id" />
                 <p class="fw-semibold">Select Option:</p>
                 <div class="d-flex flex-wrap gap-3 mb-4">
-                    @foreach (var item in Model.ProductItems)
+                    @foreach (var item in Model.ProductItems.Where(x => x.StatusId == 1 && x.Quantity > 0))
                     {
                         var optionText = string.Join("<br/>", item.VariationOptions.Select(v => $"{v.Variation?.Name}: {v.Value}"));
                         <div class="form-check form-check-inline">
@@ -59,8 +59,9 @@
                         </div>
                     }
                 </div>
-                <button type="submit" class="btn btn-danger me-2" id="addToCartBtn" disabled>AddToCart</button>
+                <button type="submit" class="btn btn-danger me-2" id="addToCartBtn" disabled>Add to Cart</button>
             </form>
+            <div id="addToCartMessage" class="mt-2"></div>
         </div>
     </div>
 
@@ -216,28 +217,39 @@
 
 @section Scripts {
     <script>
-        function toggleReplyForm(commentId) {
-            const form = document.getElementById('reply-form-' + commentId);
-            if (form) {
-                form.classList.toggle('d-none');
-            }
-        }
-
-        function toggleEdit(commentId) {
-            document.getElementById('comment-content-' + commentId)?.classList.add('d-none');
-            document.getElementById('edit-form-' + commentId)?.classList.remove('d-none');
-        }
-
-        function cancelEdit(commentId) {
-            document.getElementById('comment-content-' + commentId)?.classList.remove('d-none');
-            document.getElementById('edit-form-' + commentId)?.classList.add('d-none');
-        }
-
         document.querySelectorAll('input[name="productItemId"]').forEach(radio => {
             radio.addEventListener('change', function () {
                 const selectedPrice = this.getAttribute('data-price');
                 document.getElementById('displayPrice').innerText = parseInt(selectedPrice).toLocaleString() + ' VND';
                 document.getElementById('addToCartBtn').disabled = false;
+            });
+        });
+
+        document.getElementById('addToCartForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+            const form = this;
+            const productItemId = form.querySelector('input[name="productItemId"]:checked')?.value;
+            if (!productItemId) return;
+
+            fetch('@Url.Action("AddToCart", "Cart")', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: 'productItemId=' + encodeURIComponent(productItemId)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    let badge = document.getElementById('cartCount');
+                    if (badge) badge.innerText = data.cartCount;
+                    document.getElementById('addToCartMessage').innerHTML = '<span class="text-success">Added to cart!</span>';
+                } else {
+                    document.getElementById('addToCartMessage').innerHTML = '<span class="text-danger">' + (data.message || 'Cannot add to cart!') + '</span>';
+                }
+            })
+            .catch(() => {
+                document.getElementById('addToCartMessage').innerHTML = '<span class="text-danger">Error adding to cart!</span>';
             });
         });
     </script>

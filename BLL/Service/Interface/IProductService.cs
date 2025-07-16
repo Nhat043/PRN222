@@ -28,5 +28,7 @@ namespace BLL.Service.Interface
         Task<List<string>> GetAllRamOptionsAsync();
         Task<List<string>> GetAllRomOptionsAsync();
         Task<List<Product>> GetFilteredProductsAsync(string search, string ram, string rom, string price, int? categoryId);
+
+        Task<Product?> GetProductByIdWithAvailableItemsAsync(int id);
     }
 }

@@ -24,6 +24,8 @@ namespace DAL.Repository.Interface
         Task<List<Product>> GetFeaturedProductsAsync(int take);
         Task<Product?> GetNewestProductInStockAsync();
 
+        Task<Product?> GetProductByIdWithAvailableItemsAsync(int id);
+
         Task<List<Product>> GetAllProductsFullAsync();
         Task<List<string>> GetAllRamOptionsAsync();
         Task<List<string>> GetAllRomOptionsAsync();

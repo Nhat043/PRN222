@@ -24,25 +24,24 @@ namespace MVC.Controllers
         // /Product/Detail/5
         public async Task<IActionResult> Detail(int id)
         {
-            var product = await _productService.GetProductByIdAsync(id);
-            if (product == null) {
+            var product = await _productService.GetProductByIdWithAvailableItemsAsync(id);
+            if (product == null)
+            {
                 return NotFound();
-            } 
+            }
 
             var userId = HttpContext.Session.GetInt32("AccountIdSession");
 
-            // Comments section only
             var commentVM = new CommentViewModel
             {
                 Comments = _comService.GetProductComments(id),
                 CurrentUserId = userId
             };
 
-            ViewBag.AvgRating = _ratingService.GetAverageRating(id); // For rating
-            
+            ViewBag.AvgRating = _ratingService.GetAverageRating(id);
             ViewBag.CommentVM = commentVM;
 
-            return View(product); // Still using Product as main model
+            return View(product);
         }
 
         [HttpPost]
