@@ -11,6 +11,7 @@ namespace BLL.Service.Interface
     {
         Task<IEnumerable<Category>> GetAllCategoriesAsync();
         Task<Category> GetCategoryByIdAsync(int id);
+        Task<bool> IsCategoryNameExistsAsync(string name, int? excludeId = null);
 
         Task AddCategoryAsync(Category category);
 

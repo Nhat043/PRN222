@@ -30,10 +30,12 @@ namespace Razor
             builder.Services.AddScoped<IOrderService, OrderService>();
 
             builder.Services.AddScoped<IComRepo, ComRepo>();
-
             builder.Services.AddScoped<IComService, ComService>();
 
             builder.Services.AddScoped<ICommentStatusService, CommentStatusService>();
+
+            builder.Services.AddScoped<IVariationOptionRepo, VariationOptionRepo>();
+            builder.Services.AddScoped<IVariationOptionService, VariationOptionService>();
 
 
             builder.Services.AddDistributedMemoryCache(); // Cho phép lưu session trong RAM

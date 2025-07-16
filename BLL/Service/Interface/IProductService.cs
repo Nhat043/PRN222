@@ -11,6 +11,7 @@ namespace BLL.Service.Interface
     {
         Task<IEnumerable<Product>> GetAllProductsAsync();
         Task<Product> GetProductByIdAsync(int id);
+        Task<Product> GetProductByIdWithCategoryAndStatusAsync(int id);
 
         Task AddProductAsync(Product product);
 

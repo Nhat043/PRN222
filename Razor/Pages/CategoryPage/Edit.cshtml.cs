@@ -52,13 +52,20 @@ namespace Razor.Pages.CategoryPage
             try
             {
                 await _categoryService.UpdateCategoryAsync(Category);
+                return RedirectToPage("./Index");
             }
-            catch (InvalidOperationException)
+            catch (InvalidOperationException ex)
             {
-                return NotFound();
+                // Handle duplicate category name error
+                ModelState.AddModelError("Category.Name", ex.Message);
+                return Page();
             }
-
-            return RedirectToPage("./Index");
+            catch (Exception ex)
+            {
+                // Handle other errors
+                ModelState.AddModelError("", "An error occurred while updating the category. Please try again.");
+                return Page();
+            }
         }
 
         private async Task<bool> CategoryExists(int id)

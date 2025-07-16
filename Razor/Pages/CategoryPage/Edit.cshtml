@@ -37,10 +37,10 @@
                         
                         <div class="mb-4">
                             <label asp-for="Category.Name" class="form-label fw-semibold">
-                                <i class="fas fa-tag me-2"></i>Category Name
+                                <i class="fas fa-tag me-2"></i>Category Name <span class="text-danger">*</span>
                             </label>
                             <input asp-for="Category.Name" class="form-control form-control-lg" 
-                                   placeholder="Enter category name..." />
+                                   placeholder="Enter category name..." required />
                             <span asp-validation-for="Category.Name" class="text-danger small"></span>
                         </div>
 

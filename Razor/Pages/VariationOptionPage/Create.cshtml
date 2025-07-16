@@ -5,32 +5,117 @@
     ViewData["Title"] = "Create Variation Option";
 }
 
-<div class="d-flex justify-content-center align-items-center" style="min-height: 70vh;">
-    <div class="card shadow-sm p-4" style="max-width: 420px; width: 100%; border-radius: 18px;">
-        <h2 class="mb-2 text-center">Create</h2>
-        <h4 class="mb-4 text-center text-muted">Variation Option</h4>
-        <hr />
-        <form method="post">
-            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
-            <div class="mb-3">
-                <label asp-for="VariationOption.VariationId" class="form-label fw-semibold">Variation</label>
-                <select asp-for="VariationOption.VariationId" class="form-control" asp-items="ViewBag.VariationId"></select>
-                <span asp-validation-for="VariationOption.VariationId" class="text-danger small"></span>
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item">
+                        <a asp-page="/Index">Home</a>
+                    </li>
+                    <li class="breadcrumb-item">
+                        <a asp-page="/VariationOptionPage/Index">Variation Options</a>
+                    </li>
+                    <li class="breadcrumb-item active" aria-current="page">Create</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-6 col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-plus me-2"></i>Create New Variation Option
+                    </h5>
+                </div>
+                <div class="card-body p-4">
+                    <form method="post">
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+                        
+                        <div class="mb-4">
+                            <label asp-for="VariationOption.VariationId" class="form-label fw-semibold">
+                                <i class="fas fa-tag me-2"></i>Variation <span class="text-danger">*</span>
+                            </label>
+                            <select asp-for="VariationOption.VariationId" class="form-select form-select-lg" asp-items="ViewBag.VariationId" required>
+                                <option value="">Select a variation...</option>
+                            </select>
+                            <span asp-validation-for="VariationOption.VariationId" class="text-danger small"></span>
+                        </div>
+
+                        <div class="mb-4">
+                            <label asp-for="VariationOption.Value" class="form-label fw-semibold">
+                                <i class="fas fa-cog me-2"></i>Value <span class="text-danger">*</span>
+                            </label>
+                            <input asp-for="VariationOption.Value" class="form-control form-control-lg" 
+                                   placeholder="Enter variation option value..." required />
+                            <span asp-validation-for="VariationOption.Value" class="text-danger small"></span>
+                        </div>
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a asp-page="Index" class="btn btn-outline-secondary me-md-2">
+                                <i class="fas fa-arrow-left me-2"></i>Back to List
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-2"></i>Create Variation Option
+                            </button>
+                        </div>
+                    </form>
+                </div>
             </div>
-            <div class="mb-4">
-                <label asp-for="VariationOption.Value" class="form-label fw-semibold">Value</label>
-                <input asp-for="VariationOption.Value" class="form-control" />
-                <span asp-validation-for="VariationOption.Value" class="text-danger small"></span>
-            </div>
-            <div class="d-grid mb-2">
-                <button type="submit" class="btn btn-primary btn-lg">Create</button>
-            </div>
-            <div class="text-center">
-                <a asp-page="Index" class="text-decoration-underline">Back to List</a>
-            </div>
-        </form>
+        </div>
     </div>
 </div>
+
+<style>
+    .card {
+        border: none;
+        border-radius: 15px;
+    }
+    
+    .card-header {
+        border-radius: 15px 15px 0 0 !important;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+    }
+    
+    .form-control, .form-select {
+        border-radius: 8px;
+        border: 2px solid #e3e6f0;
+        transition: all 0.3s ease;
+    }
+    
+    .form-control:focus, .form-select:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+    }
+    
+    .btn {
+        border-radius: 8px;
+        padding: 0.75rem 1.5rem;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+    
+    .btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    
+    .breadcrumb {
+        background: none;
+        padding: 0;
+    }
+    
+    .breadcrumb-item a {
+        color: #667eea;
+        text-decoration: none;
+    }
+    
+    .breadcrumb-item.active {
+        color: #6c757d;
+    }
+</style>
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}

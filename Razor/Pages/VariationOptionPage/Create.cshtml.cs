@@ -7,21 +7,24 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using DAL.Datas;
 using DAL.Models;
+using BLL.Service.Interface;
 
 namespace Razor.Pages.VariationOptionPage
 {
     public class CreateModel : PageModel
     {
+        private readonly IVariationOptionService _variationOptionService;
         private readonly DAL.Datas.DemoContext _context;
 
-        public CreateModel(DAL.Datas.DemoContext context)
+        public CreateModel(IVariationOptionService variationOptionService, DAL.Datas.DemoContext context)
         {
+            _variationOptionService = variationOptionService;
             _context = context;
         }
 
         public IActionResult OnGet()
         {
-        ViewData["VariationId"] = new SelectList(_context.Variations, "Id", "Name");
+            ViewData["VariationId"] = new SelectList(_context.Variations, "Id", "Name");
             return Page();
         }
 
@@ -33,13 +36,29 @@ namespace Razor.Pages.VariationOptionPage
         {
             if (!ModelState.IsValid)
             {
+                ViewData["VariationId"] = new SelectList(_context.Variations, "Id", "Name");
                 return Page();
             }
 
-            _context.VariationOptions.Add(VariationOption);
-            await _context.SaveChangesAsync();
-
-            return RedirectToPage("./Index");
+            try
+            {
+                await _variationOptionService.AddVariationOptionAsync(VariationOption);
+                return RedirectToPage("./Index");
+            }
+            catch (InvalidOperationException ex)
+            {
+                // Handle duplicate variation option value error
+                ModelState.AddModelError("VariationOption.Value", ex.Message);
+                ViewData["VariationId"] = new SelectList(_context.Variations, "Id", "Name");
+                return Page();
+            }
+            catch (Exception ex)
+            {
+                // Handle other errors
+                ModelState.AddModelError("", "An error occurred while creating the variation option. Please try again.");
+                ViewData["VariationId"] = new SelectList(_context.Variations, "Id", "Name");
+                return Page();
+            }
         }
     }
 }
