@@ -103,6 +103,58 @@ namespace Razor.Pages.ProductItemPage
                 return Page();
             }
 
+            // Check for duplicate Product Item with same variation options (by VariationName+Value, excluding self)
+            if (SelectedVariationOptionIds != null && SelectedVariationOptionIds.Any())
+            {
+                var selectedIds = SelectedVariationOptionIds.Values.ToList();
+                var selectedOptions = await _context.VariationOptions
+                    .Include(vo => vo.Variation)
+                    .Where(vo => selectedIds.Contains(vo.Id))
+                    .ToListAsync();
+
+                var newCombo = string.Join("|", selectedOptions
+                    .OrderBy(vo => vo.Variation.Name)
+                    .ThenBy(vo => vo.Value)
+                    .Select(vo => $"{vo.Variation.Name}:{vo.Value}"));
+
+                // Get all existing product items for this product (excluding self)
+                var existingProductItems = await _context.ProductItems
+                    .Include(pi => pi.VariationOptions)
+                        .ThenInclude(vo => vo.Variation)
+                    .Where(pi => pi.ProductId == ProductItem.ProductId && pi.Id != ProductItem.Id)
+                    .ToListAsync();
+
+                foreach (var existingItem in existingProductItems)
+                {
+                    var combo = string.Join("|", existingItem.VariationOptions
+                        .OrderBy(vo => vo.Variation.Name)
+                        .ThenBy(vo => vo.Value)
+                        .Select(vo => $"{vo.Variation.Name}:{vo.Value}"));
+
+                    if (combo == newCombo)
+                    {
+                        ModelState.AddModelError("", $"A product item with the same configuration ({newCombo}) already exists for this product.");
+                        // Repopulate ViewData for validation errors
+                        ViewData["ProductId"] = new SelectList(_context.Products, "Id", "Name");
+                        ViewData["StatusId"] = new SelectList(_context.ProductItemStatuses, "Id", "Name");
+                        var variationsWithOptions = _context.Variations
+                            .Select(v => new
+                            {
+                                VariationName = v.Name,
+                                Options = v.VariationOptions.Select(vo => new
+                                {
+                                    Id = vo.Id,
+                                    Value = vo.Value,
+                                    DisplayText = $"{v.Name}: {vo.Value}"
+                                }).ToList()
+                            })
+                            .ToList();
+                        ViewData["VariationsWithOptions"] = variationsWithOptions;
+                        return Page();
+                    }
+                }
+            }
+
             // Get the existing ProductItem with its VariationOptions
             var existingProductItem = await _context.ProductItems
                 .Include(pi => pi.VariationOptions)

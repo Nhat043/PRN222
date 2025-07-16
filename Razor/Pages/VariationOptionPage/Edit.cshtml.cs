@@ -8,15 +8,18 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using DAL.Datas;
 using DAL.Models;
+using BLL.Service.Interface;
 
 namespace Razor.Pages.VariationOptionPage
 {
     public class EditModel : PageModel
     {
+        private readonly IVariationOptionService _variationOptionService;
         private readonly DAL.Datas.DemoContext _context;
 
-        public EditModel(DAL.Datas.DemoContext context)
+        public EditModel(IVariationOptionService variationOptionService, DAL.Datas.DemoContext context)
         {
+            _variationOptionService = variationOptionService;
             _context = context;
         }
 
@@ -30,14 +33,16 @@ namespace Razor.Pages.VariationOptionPage
                 return NotFound();
             }
 
-            var variationoption =  await _context.VariationOptions.FirstOrDefaultAsync(m => m.Id == id);
-            if (variationoption == null)
+            try
+            {
+                VariationOption = await _variationOptionService.GetVariationOptionByIdAsync(id.Value);
+                ViewData["VariationId"] = new SelectList(_context.Variations, "Id", "Name");
+                return Page();
+            }
+            catch (InvalidOperationException)
             {
                 return NotFound();
             }
-            VariationOption = variationoption;
-           ViewData["VariationId"] = new SelectList(_context.Variations, "Id", "Name");
-            return Page();
         }
 
         // To protect from overposting attacks, enable the specific properties you want to bind to.
@@ -46,33 +51,29 @@ namespace Razor.Pages.VariationOptionPage
         {
             if (!ModelState.IsValid)
             {
+                ViewData["VariationId"] = new SelectList(_context.Variations, "Id", "Name");
                 return Page();
             }
 
-            _context.Attach(VariationOption).State = EntityState.Modified;
-
             try
             {
-                await _context.SaveChangesAsync();
+                await _variationOptionService.UpdateVariationOptionAsync(VariationOption);
+                return RedirectToPage("./Index");
             }
-            catch (DbUpdateConcurrencyException)
+            catch (InvalidOperationException ex)
             {
-                if (!VariationOptionExists(VariationOption.Id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
+                // Handle duplicate variation option value error
+                ModelState.AddModelError("VariationOption.Value", ex.Message);
+                ViewData["VariationId"] = new SelectList(_context.Variations, "Id", "Name");
+                return Page();
             }
-
-            return RedirectToPage("./Index");
-        }
-
-        private bool VariationOptionExists(int id)
-        {
-            return _context.VariationOptions.Any(e => e.Id == id);
+            catch (Exception ex)
+            {
+                // Handle other errors
+                ModelState.AddModelError("", "An error occurred while updating the variation option. Please try again.");
+                ViewData["VariationId"] = new SelectList(_context.Variations, "Id", "Name");
+                return Page();
+            }
         }
     }
 }

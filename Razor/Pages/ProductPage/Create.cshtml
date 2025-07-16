@@ -38,57 +38,47 @@
                             <div class="col-md-8">
                                 <div class="mb-4">
                                     <label asp-for="Product.Name" class="form-label fw-semibold">
-                                        <i class="fas fa-box me-2"></i>Product Name
+                                        <i class="fas fa-box me-2"></i>Product Name <span class="text-danger">*</span>
                                     </label>
                                     <input asp-for="Product.Name" class="form-control form-control-lg" 
-                                           placeholder="Enter product name..." />
+                                           placeholder="Enter product name..." required />
                                     <span asp-validation-for="Product.Name" class="text-danger small"></span>
                                 </div>
 
                                 <div class="mb-4">
                                     <label asp-for="Product.Description" class="form-label fw-semibold">
-                                        <i class="fas fa-align-left me-2"></i>Description
+                                        <i class="fas fa-align-left me-2"></i>Description <span class="text-danger">*</span>
                                     </label>
                                     <textarea asp-for="Product.Description" class="form-control" rows="4" 
-                                              placeholder="Enter product description..."></textarea>
+                                              placeholder="Enter product description..." required></textarea>
                                     <span asp-validation-for="Product.Description" class="text-danger small"></span>
                                 </div>
 
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <div class="mb-4">
-                                            <label class="form-label fw-semibold">
-                                                <i class="fas fa-tag me-2"></i>Category
-                                            </label>
-                                            <select asp-for="Product.CategoryId" class="form-select form-select-lg" asp-items="ViewBag.CategoryId">
-                                                <option value="">Select a category...</option>
-                                            </select>
-                                            <span asp-validation-for="Product.CategoryId" class="text-danger small"></span>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="mb-4">
-                                            <label class="form-label fw-semibold">
-                                                <i class="fas fa-circle me-2"></i>Status
-                                            </label>
-                                            <select asp-for="Product.StatusId" class="form-select form-select-lg" asp-items="ViewBag.StatusId">
-                                                <option value="">Select a status...</option>
-                                            </select>
-                                            <span asp-validation-for="Product.StatusId" class="text-danger small"></span>
-                                        </div>
-                                    </div>
+                                <div class="mb-4">
+                                    <label class="form-label fw-semibold">
+                                        <i class="fas fa-tag me-2"></i>Category <span class="text-danger">*</span>
+                                    </label>
+                                    <select asp-for="Product.CategoryId" class="form-select form-select-lg" asp-items="ViewBag.CategoryId" required>
+                                        <option value="">Select a category...</option>
+                                    </select>
+                                    <span asp-validation-for="Product.CategoryId" class="text-danger small"></span>
+                                </div>
+
+                                <div class="alert alert-info">
+                                    <i class="fas fa-info-circle me-2"></i>
+                                    <strong>Note:</strong> New products will be set to "Available" status by default.
                                 </div>
                             </div>
                             
                             <div class="col-md-4">
                                 <div class="mb-4">
                                     <label class="form-label fw-semibold">
-                                        <i class="fas fa-image me-2"></i>Product Image
+                                        <i class="fas fa-image me-2"></i>Product Image <span class="text-danger">*</span>
                                     </label>
                                     <div class="border-2 border-dashed border-secondary rounded p-3 text-center" 
                                          style="border-style: dashed !important;">
                                         <input type="file" name="UploadFile" class="form-control" 
-                                               accept="image/*" onchange="previewImage(this)" />
+                                               accept="image/*" onchange="previewImage(this)" required />
                                         <div class="mt-2">
                                             <small class="text-muted">Upload a product image (JPG, PNG, GIF)</small>
                                         </div>

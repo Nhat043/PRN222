@@ -23,13 +23,24 @@ namespace BLL.Service
             if (category == null)
                 throw new ArgumentNullException(nameof(category));
         }
+        public async Task<bool> IsCategoryNameExistsAsync(string name, int? excludeId = null)
+        {
+            if (string.IsNullOrWhiteSpace(name))
+                return false;
+
+            return await _categoryRepo.IsCategoryNameExistsAsync(name, excludeId);
+        }
+
         public async Task AddCategoryAsync(Category category)
         {
             // Business logic validation
             ValidateCategory(category);
 
-            // Additional business rules can be added here
-            // For example: Check for duplicate product names, validate price ranges, etc.
+            // Check for duplicate category name
+            if (await IsCategoryNameExistsAsync(category.Name))
+            {
+                throw new InvalidOperationException($"A category with the name '{category.Name}' already exists.");
+            }
 
             await _categoryRepo.AddCategoryAsync(category);
         }
@@ -42,7 +53,11 @@ namespace BLL.Service
             if (category.Id <= 0)
                 throw new ArgumentException("Category ID must be greater than zero.", nameof(category.Id));
 
-            // Additional business rules for updates can be added here
+            // Check for duplicate category name (excluding current category)
+            if (await IsCategoryNameExistsAsync(category.Name, category.Id))
+            {
+                throw new InvalidOperationException($"A category with the name '{category.Name}' already exists.");
+            }
 
             await _categoryRepo.UpdateCategoryAsync(category);
         }

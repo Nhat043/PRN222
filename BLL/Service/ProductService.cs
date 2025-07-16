@@ -31,11 +31,16 @@ namespace BLL.Service
             if (id <= 0)
                 throw new ArgumentException("User ID must be greater than zero.", nameof(id));
 
-            var product = await _productRepo.GetProductByIdAsync(id);
+            // Updated: include Category and Status
+            var product = await _productRepo.GetProductByIdWithCategoryAndStatusAsync(id);
             if (product == null)
                 throw new InvalidOperationException($"User with ID {id} not found.");
 
             return product;
+        }
+        public async Task<Product> GetProductByIdWithCategoryAndStatusAsync(int id)
+        {
+            return await _productRepo.GetProductByIdWithCategoryAndStatusAsync(id);
         }
         private void ValidateProduct(Product product)
         {
