@@ -120,6 +120,14 @@
                                                        class="btn btn-sm btn-outline-danger" title="Delete">
                                                         <i class="fas fa-trash"></i>
                                                     </a>
+                                                    @if (item.UserId == 1)
+                                                    {
+                                                        <a asp-page="./Edit" asp-route-id="@item.Id"
+                                                           class="btn btn-sm btn-outline-primary" title="Edit">
+                                                            <i class="fas fa-pen"></i>
+                                                        </a>
+                                                    }
+
                                                     <!-- ✅ Nút Reply mới thêm -->
                                                     <a asp-page="./Create"
                                                        asp-route-parentId="@item.Id"

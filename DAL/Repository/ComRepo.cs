@@ -52,10 +52,11 @@ namespace DAL.Repository
             }
         }
 
-        public Comment GetCommentById(int id)
+        public Comment? GetCommentById(int id)
         {
-            return _context.Comments.FirstOrDefault(c => c.Id == id);
+            return _context.Comments.Include(c => c.User).FirstOrDefault(c => c.Id == id);
         }
+
     }
 
 }

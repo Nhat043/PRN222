@@ -13,7 +13,8 @@ namespace DAL.Repository.Interface
         void AddComment(Comment comment);
         void UpdateComment(Comment comment);
         void SoftDeleteComment(int commentId);
-        Comment GetCommentById(int id);
+        Comment? GetCommentById(int id);
+
     }
 
 }

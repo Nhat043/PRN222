@@ -1,33 +1,33 @@
 ﻿using BLL.Service.Interface;
-using DAL.Datas;
 using DAL.Models;
+using DAL.Repository.Interface;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace BLL.Service
 {
     public class CommentStatusService : ICommentStatusService
     {
-        private readonly DemoContext _context;
+        private readonly ICommentStatusRepo _repo;
 
-        public CommentStatusService(DemoContext context)
+        public CommentStatusService(ICommentStatusRepo repo)
         {
-            _context = context;
+            _repo = repo;
         }
 
         public List<CommentStatus> GetAll()
         {
-            return _context.CommentStatuses.ToList();
+            return _repo.GetAll();
         }
 
         public CommentStatus? GetById(int id)
         {
-            return _context.CommentStatuses.FirstOrDefault(x => x.Id == id);
+            return _repo.GetById(id);
         }
 
         public int? GetIdByName(string name)
         {
-            return _context.CommentStatuses.FirstOrDefault(s => s.Name == name)?.Id;
+            return _repo.GetIdByName(name);
         }
     }
 }
+
