@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using DAL.Datas;
 using DAL.Models;
 using BLL.Service.Interface;
 
@@ -14,29 +13,30 @@ namespace Razor.Pages.VariationOptionPage
     public class CreateModel : PageModel
     {
         private readonly IVariationOptionService _variationOptionService;
-        private readonly DAL.Datas.DemoContext _context;
+        private readonly IVariationService _variationService;
 
-        public CreateModel(IVariationOptionService variationOptionService, DAL.Datas.DemoContext context)
+        public CreateModel(IVariationOptionService variationOptionService, IVariationService variationService)
         {
             _variationOptionService = variationOptionService;
-            _context = context;
+            _variationService = variationService;
         }
 
-        public IActionResult OnGet()
+        public async Task<IActionResult> OnGet()
         {
-            ViewData["VariationId"] = new SelectList(_context.Variations, "Id", "Name");
+            var variations = await _variationService.GetAllVariationsWithOptionsAsync();
+            ViewData["VariationId"] = new SelectList(variations, "Id", "Name");
             return Page();
         }
 
         [BindProperty]
         public VariationOption VariationOption { get; set; } = default!;
 
-        // For more information, see https://aka.ms/RazorPagesCRUD.
         public async Task<IActionResult> OnPostAsync()
         {
             if (!ModelState.IsValid)
             {
-                ViewData["VariationId"] = new SelectList(_context.Variations, "Id", "Name");
+                var variations = await _variationService.GetAllVariationsWithOptionsAsync();
+                ViewData["VariationId"] = new SelectList(variations, "Id", "Name");
                 return Page();
             }
 
@@ -47,16 +47,16 @@ namespace Razor.Pages.VariationOptionPage
             }
             catch (InvalidOperationException ex)
             {
-                // Handle duplicate variation option value error
                 ModelState.AddModelError("VariationOption.Value", ex.Message);
-                ViewData["VariationId"] = new SelectList(_context.Variations, "Id", "Name");
+                var variations = await _variationService.GetAllVariationsWithOptionsAsync();
+                ViewData["VariationId"] = new SelectList(variations, "Id", "Name");
                 return Page();
             }
             catch (Exception ex)
             {
-                // Handle other errors
                 ModelState.AddModelError("", "An error occurred while creating the variation option. Please try again.");
-                ViewData["VariationId"] = new SelectList(_context.Variations, "Id", "Name");
+                var variations = await _variationService.GetAllVariationsWithOptionsAsync();
+                ViewData["VariationId"] = new SelectList(variations, "Id", "Name");
                 return Page();
             }
         }
