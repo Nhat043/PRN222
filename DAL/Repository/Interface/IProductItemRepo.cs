@@ -9,5 +9,7 @@ namespace DAL.Repository.Interface
         Task AddProductItemAsync(ProductItem item);
         Task UpdateProductItemAsync(ProductItem item);
         Task DeleteProductItemAsync(int id);
+        Task<IList<ProductItem>> GetProductItemsByProductIdAsync(int productId);
+        Task SetVariationOptionsAsync(int productItemId, List<int> variationOptionIds);
     }
 }
