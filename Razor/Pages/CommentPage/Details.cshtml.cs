@@ -1,42 +1,32 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.EntityFrameworkCore;
-using DAL.Datas;
+using BLL.Service.Interface;
 using DAL.Models;
 
 namespace Razor.Pages.CommentPage
 {
     public class DetailsModel : PageModel
     {
-        private readonly DAL.Datas.DemoContext _context;
+        private readonly IComService _commentService;
 
-        public DetailsModel(DAL.Datas.DemoContext context)
+        public DetailsModel(IComService commentService)
         {
-            _context = context;
+            _commentService = commentService;
         }
 
         public Comment Comment { get; set; } = default!;
 
-        public async Task<IActionResult> OnGetAsync(int? id)
+        public IActionResult OnGet(int? id)
         {
             if (id == null)
-            {
                 return NotFound();
-            }
 
-            var comment = await _context.Comments.FirstOrDefaultAsync(m => m.Id == id);
+            var comment = _commentService.GetById(id.Value);
             if (comment == null)
-            {
                 return NotFound();
-            }
-            else
-            {
-                Comment = comment;
-            }
+
+            Comment = comment;
             return Page();
         }
     }

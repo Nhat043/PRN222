@@ -32,6 +32,11 @@ namespace Razor
             builder.Services.AddScoped<IComRepo, ComRepo>();
             builder.Services.AddScoped<IComService, ComService>();
 
+
+            builder.Services.AddScoped<IAccountRepo, AccountRepo>();
+            builder.Services.AddScoped<IAccountService, AccountService>();
+
+            builder.Services.AddScoped<ICommentStatusRepo, CommentStatusRepo>();
             builder.Services.AddScoped<ICommentStatusService, CommentStatusService>();
 
             builder.Services.AddScoped<IVariationOptionRepo, VariationOptionRepo>();

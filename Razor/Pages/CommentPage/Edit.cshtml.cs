@@ -1,81 +1,78 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
-using DAL.Datas;
+using BLL.Service.Interface;
 using DAL.Models;
 
 namespace Razor.Pages.CommentPage
 {
     public class EditModel : PageModel
     {
-        private readonly DAL.Datas.DemoContext _context;
+        private readonly IComService _commentService;
+        private readonly IProductService _productService;
+        private readonly ICommentStatusService _statusService;
+        private readonly IAccountService _accountService;
 
-        public EditModel(DAL.Datas.DemoContext context)
+        public EditModel(
+            IComService commentService,
+            IProductService productService,
+            ICommentStatusService statusService,
+            IAccountService accountService)
         {
-            _context = context;
+            _commentService = commentService;
+            _productService = productService;
+            _statusService = statusService;
+            _accountService = accountService;
         }
 
         [BindProperty]
         public Comment Comment { get; set; } = default!;
 
-        public async Task<IActionResult> OnGetAsync(int? id)
+        public IActionResult OnGet(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            if (id == null) return NotFound();
 
-            var comment =  await _context.Comments.FirstOrDefaultAsync(m => m.Id == id);
-            if (comment == null)
-            {
-                return NotFound();
-            }
+            var comment = _commentService.GetById(id.Value);
+            if (comment == null) return NotFound();
+
             Comment = comment;
-           ViewData["ParentId"] = new SelectList(_context.Comments, "Id", "Content");
-           ViewData["ProductId"] = new SelectList(_context.Products, "Id", "Name");
-           ViewData["StatusId"] = new SelectList(_context.CommentStatuses, "Id", "Name");
-           ViewData["UserId"] = new SelectList(_context.Accounts, "Id", "Email");
+
+            LoadSelectLists();
             return Page();
         }
 
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more information, see https://aka.ms/RazorPagesCRUD.
-        public async Task<IActionResult> OnPostAsync()
+        public IActionResult OnPost()
         {
             if (!ModelState.IsValid)
             {
+                LoadSelectLists();
                 return Page();
             }
 
-            _context.Attach(Comment).State = EntityState.Modified;
-
             try
             {
-                await _context.SaveChangesAsync();
+                _commentService.UpdateComment(Comment);
             }
-            catch (DbUpdateConcurrencyException)
+            catch (Exception)
             {
-                if (!CommentExists(Comment.Id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
+                // Optional: Catch specific exception types if needed
+                return NotFound(); // hoặc xử lý lỗi khác tùy yêu cầu
             }
 
             return RedirectToPage("./Index");
         }
 
-        private bool CommentExists(int id)
+        private void LoadSelectLists()
         {
-            return _context.Comments.Any(e => e.Id == id);
+            ViewData["ParentId"] = new SelectList(
+    _commentService.GetProductComments(Comment.ProductId ?? 0), "Id", "Content");
+
+            ViewData["ProductId"] = new SelectList(_productService.GetAllProductsAsync().Result, "Id", "Name");
+            ViewData["StatusId"] = new SelectList(_statusService.GetAll(), "Id", "Name");
+            ViewData["UserId"] = new SelectList(_accountService.GetAllAccountsAsync().Result, "Id", "Email");
         }
     }
 }
