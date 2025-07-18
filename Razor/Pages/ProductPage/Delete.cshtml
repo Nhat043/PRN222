@@ -31,6 +31,16 @@
                     </h5>
                 </div>
                 <div class="card-body p-4">
+                    @if (!ViewData.ModelState.IsValid)
+                    {
+                        <div class="alert alert-danger" role="alert">
+                            <h6 class="alert-heading">
+                                <i class="fas fa-exclamation-triangle me-2"></i>Cannot Delete Product
+                            </h6>
+                            <div asp-validation-summary="All" class="mb-0"></div>
+                        </div>
+                    }
+
                     @if (Model.Product != null)
                     {
                         <div class="text-center mb-4">

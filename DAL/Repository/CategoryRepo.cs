@@ -76,5 +76,9 @@ namespace DAL.Repository
             }
         }
 
+        public async Task<bool> HasForeignKeyDependenciesAsync(int id)
+        {
+            return await _demoContext.Products.AnyAsync(p => p.CategoryId == id);
+        }
     }
 }

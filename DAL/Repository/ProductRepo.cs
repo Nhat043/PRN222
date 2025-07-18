@@ -101,6 +101,13 @@ namespace DAL.Repository
             }
         }
 
+        public async Task<bool> HasForeignKeyDependenciesAsync(int id)
+        {
+            return await _demoContext.ProductItems.AnyAsync(pi => pi.ProductId == id) ||
+                   await _demoContext.Comments.AnyAsync(c => c.ProductId == id) ||
+                   await _demoContext.Ratings.AnyAsync(r => r.ProductId == id);
+        }
+
         public async Task<IEnumerable<ProductStatus>> GetAllProductStatusAsync()
         {
             var productStatus = await _demoContext.ProductStatuses.ToListAsync();

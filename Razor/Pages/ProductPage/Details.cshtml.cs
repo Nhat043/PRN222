@@ -135,8 +135,18 @@ namespace Razor.Pages.ProductPage
         
         public async Task<IActionResult> OnPostDeleteProductItemAsync(int productItemId, int productId)
         {
-            await _productItemService.DeleteProductItemAsync(productItemId);
-            return RedirectToPage(new { id = productId });
+            try
+            {
+                await _productItemService.DeleteProductItemAsync(productItemId);
+                return RedirectToPage(new { id = productId });
+            }
+            catch (InvalidOperationException ex)
+            {
+                // Handle foreign key constraint error
+                ModelState.AddModelError("", ex.Message);
+                await OnGetAsync(productId);
+                return Page();
+            }
         }
     }
 }

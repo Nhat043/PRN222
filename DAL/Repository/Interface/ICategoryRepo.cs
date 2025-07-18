@@ -17,5 +17,6 @@ namespace DAL.Repository.Interface
 
         Task UpdateCategoryAsync(Category category);
         Task DeleteCategoryAsync(int id);
+        Task<bool> HasForeignKeyDependenciesAsync(int id);
     }
 }

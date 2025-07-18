@@ -53,13 +53,20 @@ namespace Razor.Pages.CategoryPage
             try
             {
                 await _categoryService.DeleteCategoryAsync(id.Value);
+                return RedirectToPage("./Index");
             }
-            catch (InvalidOperationException)
+            catch (InvalidOperationException ex)
             {
-                return NotFound();
+                // Handle foreign key constraint error
+                ModelState.AddModelError("", ex.Message);
+                // Reload the category for display
+                var category = await _categoryService.GetCategoryByIdAsync(id.Value);
+                if (category != null)
+                {
+                    Category = category;
+                }
+                return Page();
             }
-
-            return RedirectToPage("./Index");
         }
     }
 }
