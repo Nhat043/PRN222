@@ -45,6 +45,9 @@ namespace BLL.Service
             return await _orderRepository.GetOrdersByUserIdAsync(userId);
         }
 
+        public async Task<List<OrderStatus>> GetAllOrderStatusAsync()
+        {
+            return await _orderRepository.GetAllOrderStatusAsync();
+        }
     }
-
 }
