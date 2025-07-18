@@ -12,5 +12,6 @@ namespace BLL.Service.Interface
         Task AddProductItemWithVariationsAsync(ProductItem item, List<int> variationOptionIds);
         Task UpdateProductItemWithVariationsAsync(ProductItem item, List<int> variationOptionIds);
         Task DeleteProductItemAsync(int productItemId);
+        Task<bool> HasForeignKeyDependenciesAsync(int id);
     }
 }

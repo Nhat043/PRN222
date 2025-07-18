@@ -75,10 +75,18 @@ namespace BLL.Service
             if (id <= 0)
                 throw new ArgumentException("Product ID must be greater than zero.", nameof(id));
 
-            // Additional business logic can be added here
-            // For example: Check if product is referenced in orders before deletion
+            // Check for foreign key dependencies before deletion
+            if (await HasForeignKeyDependenciesAsync(id))
+            {
+                throw new InvalidOperationException("Cannot delete product. It has related product items, comments, or ratings. Please remove all related data first.");
+            }
 
             await _productRepo.DeleteProductAsync(id);
+        }
+
+        public async Task<bool> HasForeignKeyDependenciesAsync(int id)
+        {
+            return await _productRepo.HasForeignKeyDependenciesAsync(id);
         }
 
         public async Task<IEnumerable<ProductStatus>> GetAllProductStatusAsync()

@@ -53,13 +53,20 @@ namespace Razor.Pages.ProductPage
             try
             {
                 await _productService.DeleteProductAsync(id.Value);
+                return RedirectToPage("./Index");
             }
-            catch (InvalidOperationException)
+            catch (InvalidOperationException ex)
             {
-                return NotFound();
+                // Handle foreign key constraint error
+                ModelState.AddModelError("", ex.Message);
+                // Reload the product for display
+                var product = await _productService.GetProductByIdAsync(id.Value);
+                if (product != null)
+                {
+                    Product = product;
+                }
+                return Page();
             }
-
-            return RedirectToPage("./Index");
         }
     }
 }

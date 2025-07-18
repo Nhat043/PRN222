@@ -31,5 +31,6 @@ namespace BLL.Service.Interface
         Task<List<Product>> GetFilteredProductsAsync(string search, string ram, string rom, string price, int? categoryId);
 
         Task<Product?> GetProductByIdWithAvailableItemsAsync(int id);
+        Task<bool> HasForeignKeyDependenciesAsync(int id);
     }
 }

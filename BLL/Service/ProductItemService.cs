@@ -50,7 +50,18 @@ namespace BLL.Service
 
         public async Task DeleteProductItemAsync(int productItemId)
         {
+            // Check for foreign key dependencies before deletion
+            if (await HasForeignKeyDependenciesAsync(productItemId))
+            {
+                throw new InvalidOperationException("Cannot delete product item. It has related order items. Please remove all related orders first.");
+            }
+
             await _productItemRepo.DeleteProductItemAsync(productItemId);
+        }
+
+        public async Task<bool> HasForeignKeyDependenciesAsync(int id)
+        {
+            return await _productItemRepo.HasForeignKeyDependenciesAsync(id);
         }
     }
 }

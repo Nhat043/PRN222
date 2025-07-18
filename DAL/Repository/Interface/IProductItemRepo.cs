@@ -11,5 +11,6 @@ namespace DAL.Repository.Interface
         Task DeleteProductItemAsync(int id);
         Task<IList<ProductItem>> GetProductItemsByProductIdAsync(int productId);
         Task SetVariationOptionsAsync(int productItemId, List<int> variationOptionIds);
+        Task<bool> HasForeignKeyDependenciesAsync(int id);
     }
 }
