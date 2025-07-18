@@ -61,9 +61,9 @@ public class OrderController : Controller
             return RedirectToAction("Index", "Cart");
         }
 
-        int total = cart.Sum(item =>
-            item.SellingPrice * item.Quantity - ((int)(item.Discount ?? 0) * item.Quantity)
-        ) ?? 0;
+        int total = (int)cart.Sum(item =>
+            (item.SellingPrice ?? 0) * item.Quantity * (1 - (decimal)(item.Discount ?? 0) / 100)
+        );
 
         // 1. Tạo Order và lưu
         var order = new Order
