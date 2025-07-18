@@ -18,12 +18,13 @@ namespace BLL.Service
             _statisticsRepo = statisticsRepo;
         }
 
-        public async Task<string> GetRevenueChartJsonAsync()
+        public async Task<string> GetRevenueChartJsonAsync(DateTime startDate, DateTime endDate)
         {
             var orderItems = await _statisticsRepo.GetOrderItemsWithRelatedDataAsync();
             
             var revenueByMonth = orderItems
-                .Where(oi => oi.Order != null && oi.ProductItem != null && oi.Order.StatusId == 2)
+                .Where(oi => oi.Order != null && oi.ProductItem != null && oi.Order.StatusId == 2 && 
+                            oi.Order.Date >= startDate && oi.Order.Date <= endDate)
                 .GroupBy(oi => new { oi.Order.Date.Year, oi.Order.Date.Month })
                 .OrderBy(g => g.Key.Year).ThenBy(g => g.Key.Month)
                 .Select(g => new
@@ -61,12 +62,13 @@ namespace BLL.Service
             });
         }
 
-        public async Task<string> GetOrdersChartJsonAsync()
+        public async Task<string> GetOrdersChartJsonAsync(DateTime startDate, DateTime endDate)
         {
             var orderItems = await _statisticsRepo.GetOrderItemsWithRelatedDataAsync();
             
             var ordersByMonth = orderItems
-                .Where(oi => oi.Order != null && oi.Order.StatusId == 2)
+                .Where(oi => oi.Order != null && oi.Order.StatusId == 2 && 
+                            oi.Order.Date >= startDate && oi.Order.Date <= endDate)
                 .GroupBy(oi => new { oi.Order.Date.Year, oi.Order.Date.Month })
                 .OrderBy(g => g.Key.Year).ThenBy(g => g.Key.Month)
                 .Select(g => new
@@ -95,12 +97,14 @@ namespace BLL.Service
             });
         }
 
-        public async Task<string> GetBestProductsChartJsonAsync()
+        public async Task<string> GetBestProductsChartJsonAsync(DateTime startDate, DateTime endDate)
         {
             var orderItems = await _statisticsRepo.GetOrderItemsWithRelatedDataAsync();
             
             var bestProducts = orderItems
-                .Where(oi => oi.ProductItem != null && oi.ProductItem.Product != null && oi.Order != null && oi.Order.StatusId == 2)
+                .Where(oi => oi.ProductItem != null && oi.ProductItem.Product != null && 
+                            oi.Order != null && oi.Order.StatusId == 2 &&
+                            oi.Order.Date >= startDate && oi.Order.Date <= endDate)
                 .GroupBy(oi => oi.ProductItem.Product.Name)
                 .OrderByDescending(g => g.Sum(oi => oi.Quantity))
                 .Take(7)
@@ -130,12 +134,13 @@ namespace BLL.Service
             });
         }
 
-        public async Task<string> GetAovChartJsonAsync()
+        public async Task<string> GetAovChartJsonAsync(DateTime startDate, DateTime endDate)
         {
             var orderItems = await _statisticsRepo.GetOrderItemsWithRelatedDataAsync();
             
             var aovByMonth = orderItems
-                .Where(oi => oi.Order != null && oi.Order.StatusId == 2)
+                .Where(oi => oi.Order != null && oi.Order.StatusId == 2 && 
+                            oi.Order.Date >= startDate && oi.Order.Date <= endDate)
                 .GroupBy(oi => new { oi.Order.Date.Year, oi.Order.Date.Month })
                 .OrderBy(g => g.Key.Year).ThenBy(g => g.Key.Month)
                 .Select(g => new
