@@ -23,7 +23,7 @@ namespace BLL.Service
             var orderItems = await _statisticsRepo.GetOrderItemsWithRelatedDataAsync();
             
             var revenueByMonth = orderItems
-                .Where(oi => oi.Order != null && oi.ProductItem != null)
+                .Where(oi => oi.Order != null && oi.ProductItem != null && oi.Order.StatusId == 2)
                 .GroupBy(oi => new { oi.Order.Date.Year, oi.Order.Date.Month })
                 .OrderBy(g => g.Key.Year).ThenBy(g => g.Key.Month)
                 .Select(g => new
@@ -66,7 +66,7 @@ namespace BLL.Service
             var orderItems = await _statisticsRepo.GetOrderItemsWithRelatedDataAsync();
             
             var ordersByMonth = orderItems
-                .Where(oi => oi.Order != null)
+                .Where(oi => oi.Order != null && oi.Order.StatusId == 2)
                 .GroupBy(oi => new { oi.Order.Date.Year, oi.Order.Date.Month })
                 .OrderBy(g => g.Key.Year).ThenBy(g => g.Key.Month)
                 .Select(g => new
@@ -100,7 +100,7 @@ namespace BLL.Service
             var orderItems = await _statisticsRepo.GetOrderItemsWithRelatedDataAsync();
             
             var bestProducts = orderItems
-                .Where(oi => oi.ProductItem != null && oi.ProductItem.Product != null)
+                .Where(oi => oi.ProductItem != null && oi.ProductItem.Product != null && oi.Order != null && oi.Order.StatusId == 2)
                 .GroupBy(oi => oi.ProductItem.Product.Name)
                 .OrderByDescending(g => g.Sum(oi => oi.Quantity))
                 .Take(7)
@@ -135,7 +135,7 @@ namespace BLL.Service
             var orderItems = await _statisticsRepo.GetOrderItemsWithRelatedDataAsync();
             
             var aovByMonth = orderItems
-                .Where(oi => oi.Order != null)
+                .Where(oi => oi.Order != null && oi.Order.StatusId == 2)
                 .GroupBy(oi => new { oi.Order.Date.Year, oi.Order.Date.Month })
                 .OrderBy(g => g.Key.Year).ThenBy(g => g.Key.Month)
                 .Select(g => new
