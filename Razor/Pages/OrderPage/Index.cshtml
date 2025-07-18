@@ -1,49 +1,73 @@
 ﻿@page
 @model Razor.Pages.OrderPage.IndexModel
 
-<h2>Order List</h2>
-<table class="table">
-    <thead>
-        <tr>
-            <th>Order ID</th>
-            <th>Placed By</th>
-            <th>Order Date</th>
-            <th>Total Price</th>
-            <th>Status</th>
-            <th>Action</th>
-            <th>Details</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var order in Model.Orders)
-        {
-            <tr>
-                <td>@order.Id</td>
-                <td>@(order.User?.Name ?? order.User?.Email ?? "Unknown")</td>
-
-                <td>@order.Date.ToString("dd/MM/yyyy HH:mm")</td>
-                <td>@order.Price.ToString("n0") đ</td>
-                <td>@order.Status?.Name</td>
-
-                <td colspan="2">
-                    <form method="post" asp-page-handler="UpdateStatus">
-                        <input type="hidden" name="orderId" value="@order.Id" />
-                        <select name="statusId">
-                            <option value="1" selected="@(order.StatusId == 1)">Pending</option>
-                            <option value="2" selected="@(order.StatusId == 2)">Approved</option>
-                            <option value="3" selected="@(order.StatusId == 3)">Rejected</option>
-                        </select>
-                        <button type="submit">Save</button>
-                    </form>
-                </td>
-
-                <td>
-                    <a asp-page="/OrderPage/Details" asp-route-id="@order.Id">View</a>
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
+<div class="card shadow-sm my-4">
+    <div class="card-header bg-primary text-white d-flex align-items-center">
+        <i class="bi bi-list-check me-2"></i>
+        <h4 class="mb-0">Order List</h4>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Order ID</th>
+                        <th>Placed By</th>
+                        <th>Order Date</th>
+                        <th>Total Price</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                        <th>Details</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var order in Model.Orders)
+                    {
+                        <tr>
+                            <td>@order.Id</td>
+                            <td>@(order.User?.Name ?? order.User?.Email ?? "Unknown")</td>
+                            <td>@order.Date.ToString("dd/MM/yyyy HH:mm")</td>
+                            <td class="fw-bold text-primary">@order.Price.ToString("n0") đ</td>
+                            <td>
+                                @if (order.StatusId == 1)
+                                {
+                                    <span class="badge bg-warning text-dark">Pending</span>
+                                }
+                                else if (order.StatusId == 2)
+                                {
+                                    <span class="badge bg-success">Approved</span>
+                                }
+                                else if (order.StatusId == 3)
+                                {
+                                    <span class="badge bg-danger">Rejected</span>
+                                }
+                            </td>
+                            <td>
+                                <form method="post" asp-page-handler="UpdateStatus" class="d-flex gap-2 align-items-center">
+                                    <input type="hidden" name="orderId" value="@order.Id" />
+                                    <select class="form-select form-select-sm w-auto" name="statusId" @(order.StatusId != 1 ? "disabled" : "")>
+                                        <option value="1" selected="@(order.StatusId == 1)">Pending</option>
+                                        <option value="2" selected="@(order.StatusId == 2)">Approved</option>
+                                        <option value="3" selected="@(order.StatusId == 3)">Rejected</option>
+                                    </select>
+                                    <button type="submit" class="btn btn-sm btn-outline-primary"
+                                            @(order.StatusId != 1 ? "disabled data-bs-toggle='tooltip' title='Only pending orders can be updated'" : "")>
+                                        <i class="bi bi-save"></i> Save
+                                    </button>
+                                </form>
+                            </td>
+                            <td>
+                                <a asp-page="/OrderPage/Details" asp-route-id="@order.Id" class="btn btn-sm btn-outline-secondary">
+                                    <i class="bi bi-eye"></i> View
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
 <script src="~/microsoft/signalr/dist/browser/signalr.js"></script>
 <script>
     var connection = new signalR.HubConnectionBuilder()
@@ -59,4 +83,10 @@
         console.log("New order received");
         location.reload();
     });
+
+    // Enable Bootstrap tooltips
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl)
+        });
 </script>
