@@ -21,12 +21,18 @@ namespace DAL.Repository
 
         public async Task<IEnumerable<Account>> GetAllAccountsAsync()
         {
-            return await _demoContext.Accounts.ToListAsync();
+            return await _demoContext.Accounts
+                .Include(a => a.Role)
+                .Include(a => a.Status)
+                .ToListAsync();
         }
 
         public async Task<Account> GetAccountByIdAsync(int accountId)
         {
-            return await _demoContext.Accounts.FirstOrDefaultAsync(c => c.Id == accountId);
+            return await _demoContext.Accounts
+                .Include(a => a.Role)
+                .Include(a => a.Status)
+                .FirstOrDefaultAsync(c => c.Id == accountId);
         }
         public async Task<Account> GetAccountByUserNameAsync(string username)
         {

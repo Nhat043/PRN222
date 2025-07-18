@@ -4,6 +4,23 @@
     ViewData["Title"] = "Account Details";
     Layout = "../Shared/_Layout.cshtml";
 }
+
+@if (!string.IsNullOrEmpty(Model.ErrorMessage))
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="fas fa-exclamation-triangle me-2"></i>@Model.ErrorMessage
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+@if (!string.IsNullOrEmpty(Model.SuccessMessage))
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="fas fa-check-circle me-2"></i>@Model.SuccessMessage
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
 <div class="d-flex justify-content-center align-items-center" style="min-height: 70vh;">
     <div class="card shadow-lg p-4" style="min-width: 400px; max-width: 500px; width: 100%;">
         <h3 class="mb-4 text-center"><i class="fas fa-user text-info me-2"></i> Account Details</h3>
@@ -34,10 +51,11 @@
             </dd>
         </dl>
         <div class="mt-4 text-center">
-            @if (Model.Account.StatusId == 1)
+            @if (Model.Account.StatusId == 1 && Model.Account.RoleId != 1) @* Only show ban button for non-admin active accounts *@
             {
                 <form method="post" asp-page-handler="Ban" asp-route-id="@Model.Account.Id" class="d-inline">
-                    <button type="submit" class="btn btn-danger me-2" data-bs-toggle="tooltip" data-bs-placement="top" title="Ban">
+                    <button type="submit" class="btn btn-danger me-2" data-bs-toggle="tooltip" data-bs-placement="top" title="Ban"
+                            onclick="return confirm('Are you sure you want to ban this account?')">
                         <i class="fas fa-user-slash me-1"></i> Ban
                     </button>
                 </form>
@@ -49,6 +67,12 @@
                         <i class="fas fa-user-check me-1"></i> Unban
                     </button>
                 </form>
+            }
+            @if (Model.Account.RoleId == 1)
+            {
+                <div class="alert alert-warning mt-2" role="alert">
+                    <i class="fas fa-shield-alt me-2"></i>This is an admin account and cannot be banned.
+                </div>
             }
             <a asp-page="./Index" class="btn btn-outline-secondary"><i class="fas fa-arrow-left me-1"></i> Back to List</a>
         </div>
