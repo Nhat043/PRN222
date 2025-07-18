@@ -32,9 +32,14 @@ public class OrderController : Controller
 
         var cart = HttpContext.Session.GetObject<List<CartItemViewModel>>("Cart") ?? new List<CartItemViewModel>();
 
-        decimal total = cart.Sum(item =>
-        (item.SellingPrice ?? 0) * item.Quantity * (1 - (decimal)(item.Discount ?? 0) / 100)
-        );
+        decimal total = cart.Sum(item => {
+            IPriceCalculator calculator = new BasePriceCalculator();
+            if (item.Discount.HasValue && item.Discount.Value > 0)
+            {
+                calculator = new DiscountDecorator(calculator, item.Discount.Value);
+            }
+            return calculator.CalculatePrice(item.SellingPrice ?? 0, item.Quantity);
+        });
 
         var model = new CheckoutViewModel
         {
@@ -61,9 +66,14 @@ public class OrderController : Controller
             return RedirectToAction("Index", "Cart");
         }
 
-        int total = (int)cart.Sum(item =>
-            (item.SellingPrice ?? 0) * item.Quantity * (1 - (decimal)(item.Discount ?? 0) / 100)
-        );
+        int total = (int)cart.Sum(item => {
+            IPriceCalculator calculator = new BasePriceCalculator();
+            if (item.Discount.HasValue && item.Discount.Value > 0)
+            {
+                calculator = new DiscountDecorator(calculator, item.Discount.Value);
+            }
+            return calculator.CalculatePrice(item.SellingPrice ?? 0, item.Quantity);
+        });
 
         // 1. Tạo Order và lưu
         var order = new Order
