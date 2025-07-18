@@ -81,5 +81,31 @@ namespace BLL.Service
 
             await _accountRepo.UpdateAccountAsync(account);
         }
+
+        public async Task<bool> BanAccountAsync(int accountId)
+        {
+            var account = await _accountRepo.GetAccountByIdAsync(accountId);
+            if (account == null)
+                return false;
+
+            // Prevent banning admin accounts (RoleId = 1)
+            if (account.RoleId == 1)
+                return false;
+
+            account.StatusId = 2; // 2 = banned
+            await _accountRepo.UpdateAccountAsync(account);
+            return true;
+        }
+
+        public async Task<bool> UnbanAccountAsync(int accountId)
+        {
+            var account = await _accountRepo.GetAccountByIdAsync(accountId);
+            if (account == null)
+                return false;
+
+            account.StatusId = 1; // 1 = active
+            await _accountRepo.UpdateAccountAsync(account);
+            return true;
+        }
     }
 }
