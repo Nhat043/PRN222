@@ -64,7 +64,9 @@ namespace DAL.Repository
                 .ToListAsync();
         }
 
-
+        public async Task<List<OrderStatus>> GetAllOrderStatusAsync()
+        {
+            return await _dbContext.OrderStatuses.ToListAsync();
+        }
     }
-
 }

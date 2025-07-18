@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using DAL.Datas;
 using DAL.Models;
 using BLL.Service.Interface;
+using Razor.Models;
 
 namespace Razor.Pages.ProductPage
 {
@@ -22,7 +23,7 @@ namespace Razor.Pages.ProductPage
             _categoryService = categoryService;
         }
 
-        public IList<Product> Product { get; set; } = default!;
+        public PaginatedList<Product> Product { get; set; } = default!;
         public IList<Category> Categories { get; set; } = default!;
         public IList<ProductStatus> ProductStatuses { get; set; } = default!;
 
@@ -34,6 +35,14 @@ namespace Razor.Pages.ProductPage
 
         [BindProperty(SupportsGet = true)]
         public int? StatusId { get; set; }
+
+        [BindProperty(SupportsGet = true)]
+        public int PageIndex { get; set; } = 1;
+
+        [BindProperty(SupportsGet = true)]
+        public int PageSize { get; set; } = 10; // Default page size
+
+        public int[] PageSizeOptions { get; set; } = { 5, 10, 20, 50 };
 
         public async Task OnGetAsync()
         {
@@ -60,7 +69,8 @@ namespace Razor.Pages.ProductPage
                 filteredProducts = filteredProducts.Where(p => p.StatusId == StatusId.Value);
             }
             
-            Product = filteredProducts.ToList();
+            // Apply pagination
+            Product = PaginatedList<Product>.Create(filteredProducts, PageIndex, PageSize);
             
             // Get categories and statuses for filter dropdowns
             Categories = (IList<Category>)await _categoryService.GetAllCategoriesAsync();
