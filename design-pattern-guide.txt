@@ -1,0 +1,147 @@
+Complete Design Patterns Guide
+CREATIONAL PATTERNS
+Deal with object creation mechanisms
+1. Abstract Factory
+Intent: Provide an interface for creating families of related or dependent objects without specifying their concrete classes.
+When to Use: When you need to create groups of related objects that work together, like UI components for different operating systems (Windows buttons, Mac buttons, etc.).
+How it Works: Creates an abstract factory interface that multiple concrete factories implement. Each concrete factory produces a family of related products.
+Example: A GUI framework that needs to create Windows-style or Mac-style buttons, text fields, and menus together.
+
+2. Builder
+Intent: Separate the construction of a complex object from its representation so that the same construction process can create different representations.
+When to Use: When creating complex objects with many optional parameters or when you want to construct objects step by step.
+How it Works: Uses a separate Builder class to construct the object piece by piece, with a Director class orchestrating the construction process.
+Example: Building different document formats (ASCII, TeX, HTML) from the same RTF input by using different builders.
+
+3. Factory Method
+Intent: Define an interface for creating an object, but let subclasses decide which class to instantiate.
+When to Use: When a class can't anticipate the class of objects it must create, or when you want to delegate object creation to subclasses.
+How it Works: Defines a method for creating objects, but subclasses override this method to specify which concrete class to instantiate.
+Example: A document framework where Application creates documents, but MyApplication decides whether to create MyDocument instances.
+
+4. Prototype
+Intent: Specify the kinds of objects to create using a prototypical instance, and create new objects by copying this prototype.
+When to Use: When creating objects is expensive or when you want to avoid creating subclasses just for object creation.
+How it Works: Creates new objects by cloning existing prototype objects rather than instantiating classes directly.
+Example: A music editor that creates new notes by cloning existing note prototypes instead of creating new instances from scratch.
+
+5. Singleton
+Intent: Ensure a class only has one instance and provide a global point of access to it.
+When to Use: When exactly one instance of a class is needed (like a printer spooler, file system, or window manager).
+How it Works: Private constructor prevents direct instantiation, and a static method controls access to the single instance.
+Example: A printer spooler that manages all print jobs in a system - you only want one spooler managing the queue.
+
+STRUCTURAL PATTERNS
+Deal with object composition and relationships
+6. Adapter
+Intent: Convert the interface of a class into another interface clients expect. Allows classes to work together that couldn't otherwise due to incompatible interfaces.
+When to Use: When you want to use an existing class with an incompatible interface, or when you want to create a reusable class that cooperates with classes with incompatible interfaces.
+How it Works: Creates a wrapper class that translates requests from one interface to another. Can use inheritance or composition.
+Example: Using a sophisticated TextView class in a drawing editor by adapting it to work with the Shape interface.
+
+7. Bridge
+Intent: Decouple an abstraction from its implementation so that the two can vary independently.
+When to Use: When you want to avoid permanent binding between an abstraction and its implementation, or when you want to share implementations among multiple objects.
+How it Works: Separates the abstraction (interface) from implementation into two separate class hierarchies connected by composition.
+Example: Window abstractions (Window, IconWindow, TransientWindow) that can work with different platform implementations (XWindow, PMWindow).
+
+8. Composite
+Intent: Compose objects into tree structures to represent part-whole hierarchies. Lets clients treat individual objects and compositions uniformly.
+When to Use: When you want to represent part-whole hierarchies of objects, or when you want clients to ignore the difference between compositions and individual objects.
+How it Works: Creates a tree structure where both individual objects (leaves) and compositions (branches) implement the same interface.
+Example: A drawing program where simple shapes (lines, rectangles) and complex pictures (groups of shapes) are treated uniformly.
+
+9. Decorator
+Intent: Attach additional responsibilities to an object dynamically. Provides a flexible alternative to subclassing for extending functionality.
+When to Use: When you want to add responsibilities to objects without subclassing, or when extension by subclassing is impractical.
+How it Works: Wraps objects in decorator classes that have the same interface as the original object but add new behavior.
+Example: Adding borders, scroll bars, or other visual elements to a text view without modifying the original TextView class.
+
+10. Facade
+Intent: Provide a unified interface to a set of interfaces in a subsystem. Defines a higher-level interface that makes the subsystem easier to use.
+When to Use: When you want to provide a simple interface to a complex subsystem, or when you want to decouple clients from subsystem components.
+How it Works: Creates a single class that provides simplified methods which delegate to the appropriate subsystem classes.
+Example: A compiler facade that provides simple compile() method, hiding the complexity of scanner, parser, and code generator classes.
+
+11. Flyweight
+Intent: Use sharing to support large numbers of fine-grained objects efficiently.
+When to Use: When you need to create a large number of similar objects and storage costs are high.
+How it Works: Separates intrinsic state (shared) from extrinsic state (context-dependent) and shares objects with the same intrinsic state.
+Example: A text editor where character objects are shared among all occurrences of the same character, with position being extrinsic state.
+
+12. Proxy
+Intent: Provide a surrogate or placeholder for another object to control access to it.
+When to Use: When you need to control access to an object, or when you want to add functionality like lazy loading, access control, or caching.
+How it Works: Creates a proxy object with the same interface as the original object, which controls access and may add additional behavior.
+Example: An image proxy that doesn't load the actual image until it needs to be displayed, saving memory and loading time.
+
+BEHAVIORAL PATTERNS
+Deal with communication between objects and assignment of responsibilities
+13. Chain of Responsibility
+Intent: Avoid coupling the sender of a request to its receiver by giving more than one object a chance to handle the request.
+When to Use: When you want to decouple senders and receivers of requests, or when multiple objects might handle a request.
+How it Works: Creates a chain of handler objects, each with a chance to process the request or pass it to the next handler.
+Example: Context-sensitive help system where help requests bubble up from specific UI components to more general containers.
+
+14. Command
+Intent: Encapsulate a request as an object, allowing you to parameterize clients with different requests, queue operations, and support undo.
+When to Use: When you want to parameterize objects with actions, queue operations, or support undo functionality.
+How it Works: Encapsulates requests as objects containing all information needed to execute the action, including the receiver and method to call.
+Example: Menu items and buttons that execute commands like Cut, Copy, Paste - each command knows how to execute and undo itself.
+
+15. Iterator
+Intent: Provide a way to access elements of an aggregate object sequentially without exposing its underlying representation.
+When to Use: When you want to access elements of a collection without exposing its internal structure, or when you want to support multiple traversal methods.
+How it Works: Creates iterator objects that know how to traverse a specific collection type, keeping track of current position.
+Example: Iterating through a list structure without knowing whether it's implemented as an array, linked list, or tree.
+
+16. Mediator
+Intent: Define an object that encapsulates how a set of objects interact, promoting loose coupling by preventing objects from referring to each other explicitly.
+When to Use: When you want to reduce dependencies between communicating objects, or when object interactions are complex and hard to understand.
+How it Works: Creates a mediator object that handles all communication between related objects, centralizing complex interactions.
+Example: A dialog box where the mediator coordinates interactions between list boxes, text fields, and buttons.
+
+17. Memento
+Intent: Without violating encapsulation, capture and externalize an object's internal state so it can be restored later.
+When to Use: When you need to save and restore object state (like undo functionality) without exposing internal implementation details.
+How it Works: Creates memento objects that store snapshots of an object's state, which can be used later to restore the object.
+Example: Undo functionality in applications where the memento stores the previous state of edited objects.
+
+18. Observer
+Intent: Define a one-to-many dependency between objects so that when one object changes state, all dependents are notified automatically.
+When to Use: When changes to one object require updating multiple other objects, and you don't know how many objects need updating.
+How it Works: Subject maintains a list of observers and notifies them automatically when state changes occur.
+Example: Model-View architectures where multiple views automatically update when the underlying data model changes.
+
+19. State
+Intent: Allow an object to alter its behavior when its internal state changes. The object will appear to change its class.
+When to Use: When an object's behavior depends on its state and it must change behavior at runtime based on that state.
+How it Works: Encapsulates state-specific behavior in separate state classes and delegates behavior to the current state object.
+Example: A TCP connection that behaves differently when in Established, Listening, or Closed states.
+
+20. Strategy
+Intent: Define a family of algorithms, encapsulate each one, and make them interchangeable.
+When to Use: When you have multiple ways to perform a task and want to choose the algorithm at runtime, or when you want to avoid conditional statements.
+How it Works: Encapsulates algorithms in separate strategy classes and makes them interchangeable through a common interface.
+Example: Text formatting algorithms (simple, TeX, array) that can be switched dynamically in a word processor.
+
+21. Template Method
+Intent: Define the skeleton of an algorithm in an operation, deferring some steps to subclasses.
+When to Use: When you want to define the overall structure of an algorithm but let subclasses customize specific steps.
+How it Works: Creates an abstract base class with a template method that defines the algorithm structure, with abstract methods for customizable steps.
+Example: Application framework where the base Application class defines the startup sequence, but subclasses implement specific initialization steps.
+
+22. Visitor
+Intent: Represent an operation to be performed on elements of an object structure, letting you define new operations without changing the element classes.
+When to Use: When you need to perform many different operations on objects in a complex structure, and you want to avoid polluting classes with these operations.
+How it Works: Creates visitor classes that implement operations, and elements accept visitors to perform operations on themselves.
+Example: Compiler operations (type checking, code generation) on abstract syntax tree nodes without modifying the node classes.
+
+Summary
+These patterns provide proven solutions to common design problems. Choose patterns based on your specific needs:
+
+Creational: When you need flexible object creation
+Structural: When you need to compose objects or adapt interfaces
+Behavioral: When you need to manage algorithms and object interactions
+
+Remember that patterns are tools - use them when they solve real problems, not just because they exist.
