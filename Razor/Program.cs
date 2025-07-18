@@ -50,6 +50,9 @@ namespace Razor
             builder.Services.AddScoped<IRatingRepo, RatingRepo>();
             builder.Services.AddScoped<IRatingService, RatingService>();
 
+            builder.Services.AddScoped<IStatisticsRepo, StatisticsRepo>();
+            builder.Services.AddScoped<IStatisticsService, StatisticsService>();
+
             builder.Services.AddScoped<IVariationOptionRepo, VariationOptionRepo>();
             builder.Services.AddScoped<IVariationOptionService, VariationOptionService>();
 
