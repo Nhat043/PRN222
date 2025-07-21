@@ -12,10 +12,12 @@ namespace Razor.Pages.OrderPage
     public class IndexModel : PageModel
     {
         private readonly IOrderService _orderService;
+        private readonly IProductItemService _productItemService;
 
-        public IndexModel(IOrderService orderService)
+        public IndexModel(IOrderService orderService, IProductItemService productItemService)
         {
             _orderService = orderService;
+            _productItemService = productItemService;
         }
 
         public PaginatedList<Order> Orders { get; set; } = default!;
@@ -56,6 +58,12 @@ namespace Razor.Pages.OrderPage
                 filteredOrders = filteredOrders.Where(o => o.StatusId == StatusId.Value);
             }
             
+            // Sort by status (pending first, then approved, then rejected) and then by date (newest first)
+            filteredOrders = filteredOrders.OrderBy(o => o.StatusId == 1 ? 1 : 
+                                                       o.StatusId == 2 ? 2 : 
+                                                       o.StatusId == 3 ? 3 : 4)
+                                         .ThenByDescending(o => o.Date);
+            
             // Apply pagination
             Orders = PaginatedList<Order>.Create(filteredOrders, PageIndex, PageSize);
             
@@ -68,6 +76,23 @@ namespace Razor.Pages.OrderPage
             var order = await _orderService.GetOrderByIdAsync(orderId);
             if (order != null)
             {
+                // Check if the order status is being changed to rejected (status ID 3)
+                if (statusId == 3 && order.StatusId != 3)
+                {
+                    // Restore product item quantities for all order items
+                    foreach (var orderItem in order.OrderItems)
+                    {
+                        var productItem = await _productItemService.GetProductItemByIdAsync(orderItem.ProductItemId.Value);
+                        if (productItem != null)
+                        {
+                            // Restore the quantity that was deducted when the order was created
+                            productItem.Quantity += orderItem.Quantity;
+                            await _productItemService.UpdateProductItemAsync(productItem);
+                        }
+                    }
+                }
+                
+                // Update the order status
                 order.StatusId = statusId;
                 await _orderService.UpdateOrderAsync(order);
             }
