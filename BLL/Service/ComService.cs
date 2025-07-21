@@ -27,6 +27,12 @@ namespace BLL.Service
         public void HideComment(int commentId) => _repo.SoftDeleteComment(commentId);
 
         public Comment GetById(int id) => _repo.GetCommentById(id);
+
+        public async Task<List<Comment>> GetAllCommentsAsync()
+        {
+            return await _repo.GetAllCommentsAsync();
+        }
+
     }
 
 }

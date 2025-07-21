@@ -15,6 +15,9 @@ namespace DAL.Repository.Interface
         void SoftDeleteComment(int commentId);
         Comment? GetCommentById(int id);
 
+        Task<List<Comment>> GetAllCommentsAsync();
+
+
     }
 
 }
