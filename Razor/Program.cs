@@ -5,6 +5,7 @@ using DAL.Repository.Interface;
 using DAL.Repository;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
+using Razor.Hubs;
 
 namespace Razor
 {
@@ -69,6 +70,20 @@ namespace Razor
                 options.Cookie.IsEssential = true;
             });
 
+            // Thêm dịch vụ SignalR
+            builder.Services.AddSignalR();
+
+            var allowedOrigins = builder.Configuration.GetSection("AllowedOrigins").Get<string[]>();
+            builder.Services.AddCors(options =>
+            {
+                options.AddDefaultPolicy(policy =>
+                {
+                    policy.WithOrigins(allowedOrigins)
+                          .AllowAnyHeader()
+                          .AllowAnyMethod()
+                          .AllowCredentials();
+                });
+            });
 
             var app = builder.Build();
 
@@ -96,6 +111,11 @@ namespace Razor
             app.UseStaticFiles();
 
             app.UseRouting();
+
+            app.UseCors();
+            // Enable SignalR
+            app.MapHub<AccountSignalR>("/AccountSignalRChanel");
+
             app.UseSession();
             app.UseAuthorization();
 
