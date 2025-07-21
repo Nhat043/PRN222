@@ -3,14 +3,11 @@
 
 // Write your JavaScript code.
 var connection = new signalR.HubConnectionBuilder()
-    .withUrl("https://localhost:7082/ProductSignalRChanel") // Host Hub
+    .withUrl("https://localhost:7082/AccountSignalRChanel") // Host Hub
     .build();
 
-Sửa lại port theo Razor
-
-
 connection.on("load", function () {
-    location.href = '/Auth/Login'; // hoặc location.reload();
+    location.href = '/'; // hoặc location.reload();
 });
 
 connection.start()

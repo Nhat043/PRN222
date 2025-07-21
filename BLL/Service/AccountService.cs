@@ -24,7 +24,7 @@ namespace BLL.Service
         {
             _accountRepo = accountRepo;
             _connection = new HubConnectionBuilder()
-                .WithUrl("https://localhost:7082/ProductSignalRChanel") 
+                .WithUrl("https://localhost:7082/AccountSignalRChanel") 
                 .WithAutomaticReconnect()
                 .Build();
         }
