@@ -7,14 +7,15 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using DAL.Datas;
 using DAL.Models;
+using BLL.Service.Interface;
 
 namespace Razor.Pages.CommentPage
 {
     public class IndexModel : PageModel
     {
-        private readonly DAL.Datas.DemoContext _context;
+        private readonly IComService _context;
 
-        public IndexModel(DAL.Datas.DemoContext context)
+        public IndexModel(IComService context)
         {
             _context = context;
         }
@@ -23,11 +24,7 @@ namespace Razor.Pages.CommentPage
 
         public async Task OnGetAsync()
         {
-            Comment = await _context.Comments
-                .Include(c => c.Parent)
-                .Include(c => c.Product)
-                .Include(c => c.Status)
-                .Include(c => c.User).ToListAsync();
+            Comment = await _context.GetAllCommentsAsync();
         }
     }
 }
