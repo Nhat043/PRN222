@@ -12,26 +12,34 @@
 }
 
 <style>
-    .rating input {
-        display: none;
-    }
-
-    .rating span {
-        font-size: 24px;
-        color: #ddd;
-        cursor: pointer;
-    }
-
-    .rating input:checked ~ span {
-        color: gold;
-    }
-
-    .comment-actions {
+    .rating {
         display: flex;
-        gap: 8px;
-        flex-wrap: wrap;
-        margin-bottom: 8px;
+        flex-direction: row-reverse;
+        justify-content: start;
     }
+
+        .rating input {
+            display: none;
+        }
+
+        .rating label {
+            cursor: pointer;
+            font-size: 28px;
+            color: #ddd;
+            transition: color 0.2s;
+        }
+
+            /* Hover effect */
+            .rating label:hover,
+            .rating label:hover ~ label {
+                color: gold;
+            }
+
+        /* Checked state */
+        .rating input:checked ~ label {
+            color: gold;
+        }
+
 </style>
 
 <div class="container mt-5">
@@ -78,19 +86,19 @@
     <!-- Rating -->
     <div class="rating-container mt-4">
         <h5 class="mb-3 mt-5">Rating</h5>
+
         @if (!string.IsNullOrEmpty(accountName))
         {
             <form method="post" asp-action="Rate" asp-controller="Product">
                 <input type="hidden" name="productId" value="@Model.Id" />
                 <div class="rating">
-                    @for (int i = 1; i <= 5; i++)
+                    @for (int i = 5; i >= 1; i--) // Reverse loop for proper CSS effect
                     {
-                        <label>
-                            <input type="radio" name="ratingValue" value="@i" onclick="this.form.submit();" />
-                            <span>&#9733;</span>
-                        </label>
+                        <input type="radio" id="star-@i" name="ratingValue" value="@i" onclick="this.form.submit();" />
+                        <label for="star-@i">&#9733;</label>
                     }
                 </div>
+
             </form>
         }
         else
@@ -99,6 +107,7 @@
         }
         <div>
             <span>Average: @ViewBag.AvgRating.ToString("0.0") / 5</span>
+            <span class="ms-2 text-muted">(@ViewBag.ReviewCount rating counts)</span>
         </div>
     </div>
 

@@ -23,7 +23,11 @@ namespace DAL.Repository
             var ratings = _context.Ratings.Where(r => r.ProductId == productId && r.RatingValue.HasValue);
             return ratings.Any() ? ratings.Average(r => r.RatingValue.Value) : 5.0;
         }
-
+        public int GetReviewCount(int productId)
+        {
+            return _context.Ratings
+                .Count(r => r.ProductId == productId && r.RatingValue.HasValue);
+        }
         public void InsertOrUpdateRating(Rating rating)
         {
             var existing = _context.Ratings
