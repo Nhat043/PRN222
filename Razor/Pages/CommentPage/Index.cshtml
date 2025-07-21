@@ -56,7 +56,7 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach (var item in Model.Comment)
+                                    @foreach (var item in Model.Comment.Where(c => c.StatusId != 2 && (c.Parent == null || c.Parent.StatusId != 2)))
                                     {
                                         <tr>
                                             <td class="align-middle">
@@ -128,7 +128,7 @@
                                                         </a>
                                                     }
 
-                                                    <!-- ✅ Nút Reply mới thêm -->
+                                                    <!--  Nút Reply mới thêm -->
                                                     <a asp-page="./Create"
                                                        asp-route-parentId="@item.Id"
                                                        asp-route-productId="@item.ProductId"
