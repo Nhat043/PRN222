@@ -1,10 +1,11 @@
-﻿using BLL.Service.Interface;
-using BLL.Service;
+﻿using BLL.Service;
+using BLL.Service.Interface;
 using DAL.Datas;
-using DAL.Repository.Interface;
 using DAL.Repository;
+using DAL.Repository.Interface;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
+using Razor.Hubs;
 
 namespace Razor
 {
@@ -16,6 +17,7 @@ namespace Razor
 
             // Add services to the container.
             builder.Services.AddRazorPages();
+            builder.Services.AddSignalR();
             builder.Services.AddDbContext<DemoContext>(options =>
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
@@ -69,7 +71,18 @@ namespace Razor
                 options.Cookie.IsEssential = true;
             });
 
-
+            //Add CORS policy for SignalR
+            var allowedOrigins = builder.Configuration.GetSection("AllowedOrigins").Get<string[]>();
+            builder.Services.AddCors(options =>
+            {
+                options.AddDefaultPolicy(policy =>
+                {
+                    policy.WithOrigins(allowedOrigins)
+                          .AllowAnyHeader()
+                          .AllowAnyMethod()
+                          .AllowCredentials(); // SignalR cần dòng này
+                });
+            });
             var app = builder.Build();
 
            
@@ -96,9 +109,10 @@ namespace Razor
             app.UseStaticFiles();
 
             app.UseRouting();
+            app.MapHub<DataSignalR>("/DataSignalRChanel");
             app.UseSession();
             app.UseAuthorization();
-
+            app.UseCors(); // Enable CORS for SignalR
             app.MapRazorPages();
 
             // Redirect root to ProductPage/Index
