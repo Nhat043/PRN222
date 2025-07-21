@@ -11,10 +11,12 @@ namespace DAL.Repository.Interface
     {
         Task<IEnumerable<Category>> GetAllCategoriesAsync();
         Task<Category> GetCategoryByIdAsync(int id);
+        Task<bool> IsCategoryNameExistsAsync(string name, int? excludeId = null);
 
         Task AddCategoryAsync(Category category);
 
         Task UpdateCategoryAsync(Category category);
         Task DeleteCategoryAsync(int id);
+        Task<bool> HasForeignKeyDependenciesAsync(int id);
     }
 }

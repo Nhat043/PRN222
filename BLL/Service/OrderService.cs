@@ -60,6 +60,9 @@ namespace BLL.Service
             await _connection.InvokeAsync("NotifyAdminNewOrder");
         }
 
+        public async Task<List<OrderStatus>> GetAllOrderStatusAsync()
+        {
+            return await _orderRepository.GetAllOrderStatusAsync();
+        }
     }
-
 }

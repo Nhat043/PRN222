@@ -1,92 +1,294 @@
-﻿@page
+@page
 @model Razor.Pages.OrderPage.IndexModel
 
-<div class="card shadow-sm my-4">
-    <div class="card-header bg-primary text-white d-flex align-items-center">
-        <i class="bi bi-list-check me-2"></i>
-        <h4 class="mb-0">Order List</h4>
+@{
+    ViewData["Title"] = "Orders Management";
+}
+
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1 class="h3 mb-0 text-gray-800">
+                        <i class="fas fa-shopping-cart me-2"></i>Orders
+                    </h1>
+                    <p class="text-muted">Manage customer orders and their status</p>
+                </div>
+            </div>
+        </div>
     </div>
-    <div class="card-body p-0">
-        <div class="table-responsive">
-            <table class="table table-hover align-middle mb-0">
-                <thead class="table-light">
-                    <tr>
-                        <th>Order ID</th>
-                        <th>Placed By</th>
-                        <th>Order Date</th>
-                        <th>Total Price</th>
-                        <th>Status</th>
-                        <th>Action</th>
-                        <th>Details</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var order in Model.Orders)
-                    {
-                        <tr>
-                            <td>@order.Id</td>
-                            <td>@(order.User?.Name ?? order.User?.Email ?? "Unknown")</td>
-                            <td>@order.Date.ToString("dd/MM/yyyy HH:mm")</td>
-                            <td class="fw-bold text-primary">@order.Price.ToString("n0") đ</td>
-                            <td>
-                                @if (order.StatusId == 1)
+
+    <!-- Filter Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-light">
+                    <h6 class="mb-0">
+                        <i class="fas fa-filter me-2"></i>Filters
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <form method="get" class="row g-3">
+                        <div class="col-md-4">
+                            <label asp-for="SearchTerm" class="form-label">Search</label>
+                            <input asp-for="SearchTerm" type="text" class="form-control" 
+                                   placeholder="Search by order ID, customer name or email..." />
+                        </div>
+                        <div class="col-md-3">
+                            <label asp-for="StatusId" class="form-label">Status</label>
+                            <select asp-for="StatusId" class="form-select">
+                                <option value="">All Statuses</option>
+                                @foreach (var status in Model.OrderStatuses)
                                 {
-                                    <span class="badge bg-warning text-dark">Pending</span>
+                                    <option value="@status.Id" selected="@(Model.StatusId == status.Id)">
+                                        @status.Name
+                                    </option>
                                 }
-                                else if (order.StatusId == 2)
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Page Size</label>
+                            <select asp-for="PageSize" class="form-select" onchange="this.form.submit()">
+                                @foreach (var size in Model.PageSizeOptions)
                                 {
-                                    <span class="badge bg-success">Approved</span>
+                                    <option value="@size" selected="@(Model.PageSize == size)">@size per page</option>
                                 }
-                                else if (order.StatusId == 3)
-                                {
-                                    <span class="badge bg-danger">Rejected</span>
-                                }
-                            </td>
-                            <td>
-                                <form method="post" asp-page-handler="UpdateStatus" class="d-flex gap-2 align-items-center">
-                                    <input type="hidden" name="orderId" value="@order.Id" />
-                                    <select class="form-select form-select-sm w-auto" name="statusId" @(order.StatusId != 1 ? "disabled" : "")>
-                                        <option value="1" selected="@(order.StatusId == 1)">Pending</option>
-                                        <option value="2" selected="@(order.StatusId == 2)">Approved</option>
-                                        <option value="3" selected="@(order.StatusId == 3)">Rejected</option>
-                                    </select>
-                                    <button type="submit" class="btn btn-sm btn-outline-primary"
-                                            @(order.StatusId != 1 ? "disabled data-bs-toggle='tooltip' title='Only pending orders can be updated'" : "")>
-                                        <i class="bi bi-save"></i> Save
-                                    </button>
-                                </form>
-                            </td>
-                            <td>
-                                <a asp-page="/OrderPage/Details" asp-route-id="@order.Id" class="btn btn-sm btn-outline-secondary">
-                                    <i class="bi bi-eye"></i> View
+                            </select>
+                        </div>
+                        <div class="col-md-3 d-flex align-items-end">
+                            <div class="d-grid gap-2 w-100">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-search me-2"></i>Search
+                                </button>
+                                <a href="@Url.Page("./Index")" class="btn btn-outline-secondary">
+                                    <i class="fas fa-undo me-2"></i>Reset
                                 </a>
-                            </td>
-                        </tr>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Order Table -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-white py-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0 text-gray-800">
+                            <i class="fas fa-list me-2"></i>Order List
+                        </h5>
+                        <div class="d-flex align-items-center">
+                            <span class="badge bg-primary me-3">
+                                @Model.Orders.TotalCount orders found
+                            </span>
+                            <span class="text-muted small">
+                                Showing @((Model.Orders.PageIndex - 1) * Model.PageSize + 1)
+                                to @Math.Min(Model.Orders.PageIndex * Model.PageSize, Model.Orders.TotalCount)
+                                of @Model.Orders.TotalCount
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body p-0">
+                    @if (Model.Orders != null && Model.Orders.Any())
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th><i class="fas fa-hashtag me-2"></i>Order ID</th>
+                                        <th><i class="fas fa-user me-2"></i>Placed By</th>
+                                        <th><i class="fas fa-calendar me-2"></i>Order Date</th>
+                                        <th><i class="fas fa-money-bill me-2"></i>Total Price</th>
+                                        <th><i class="fas fa-circle me-2"></i>Status</th>
+                                        <th><i class="fas fa-cogs me-2"></i>Action</th>
+                                        <th class="text-end"><i class="fas fa-eye me-2"></i>Details</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var order in Model.Orders)
+                                    {
+                                        <tr>
+                                            <td>#@order.Id</td>
+                                            <td>
+                                                <div class="fw-medium">@order.User?.Name ?? "Unknown"</div>
+                                                <small class="text-muted">@order.User?.Email</small>
+                                            </td>
+                                            <td>
+                                                <div class="fw-medium">@order.Date.ToString("dd/MM/yyyy")</div>
+                                                <small class="text-muted">@order.Date.ToString("HH:mm")</small>
+                                            </td>
+                                            <td class="fw-bold text-primary">@order.Price.ToString("n0") đ</td>
+                                            <td>
+                                                @{
+                                                    var statusClass = order.StatusId switch
+                                                    {
+                                                        1 => "bg-warning text-dark",
+                                                        2 => "bg-success",
+                                                        3 => "bg-danger",
+                                                        _ => "bg-secondary"
+                                                    };
+                                                    var statusText = order.StatusId switch
+                                                    {
+                                                        1 => "Pending",
+                                                        2 => "Approved",
+                                                        3 => "Rejected",
+                                                        _ => "Unknown"
+                                                    };
+                                                }
+                                                <span class="badge @statusClass">@statusText</span>
+                                            </td>
+                                            <td>
+                                                <form method="post" asp-page-handler="UpdateStatus" class="d-flex gap-2 align-items-center">
+                                                    <input type="hidden" name="orderId" value="@order.Id" />
+                                                    <select class="form-select form-select-sm w-auto" name="statusId" @(order.StatusId != 1 ? "disabled" : "")>
+                                                        <option value="1" selected="@(order.StatusId == 1)">Pending</option>
+                                                        <option value="2" selected="@(order.StatusId == 2)">Approved</option>
+                                                        <option value="3" selected="@(order.StatusId == 3)">Rejected</option>
+                                                    </select>
+                                                    <button type="submit" class="btn btn-sm btn-outline-primary"
+                                                            @(order.StatusId != 1 ? "disabled data-bs-toggle='tooltip' title='Only pending orders can be updated'" : "")>
+                                                        <i class="fas fa-save"></i>
+                                                    </button>
+                                                </form>
+                                            </td>
+                                            <td class="text-end">
+                                                <a asp-page="/OrderPage/Details" asp-route-id="@order.Id"
+                                                   class="btn btn-sm btn-outline-info" title="View Details">
+                                                    <i class="fas fa-eye"></i>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Pagination -->
+                        @if (Model.Orders.TotalPages > 1)
+                        {
+                            <div class="card-footer bg-white border-top">
+                                <nav aria-label="Order pagination">
+                                    <ul class="pagination justify-content-center mb-0">
+                                        @* Previous *@
+                                        @if (Model.Orders.HasPreviousPage)
+                                        {
+                                            <li class="page-item">
+                                                <a class="page-link" asp-route-pageIndex="@(Model.Orders.PageIndex - 1)"
+                                                   asp-route-searchTerm="@Model.SearchTerm"
+                                                   asp-route-statusId="@Model.StatusId"
+                                                   asp-route-pageSize="@Model.PageSize">
+                                                    <i class="fas fa-chevron-left"></i>
+                                                </a>
+                                            </li>
+                                        }
+                                        else
+                                        {
+                                            <li class="page-item disabled">
+                                                <span class="page-link"><i class="fas fa-chevron-left"></i></span>
+                                            </li>
+                                        }
+
+                                        @* Page Numbers *@
+                                        @{
+                                            var start = Math.Max(1, Model.Orders.PageIndex - 2);
+                                            var end = Math.Min(Model.Orders.TotalPages, Model.Orders.PageIndex + 2);
+                                        }
+
+                                        @if (start > 1)
+                                        {
+                                            <li class="page-item"><a class="page-link" asp-route-pageIndex="1">1</a></li>
+                                            @if (start > 2)
+                                            {
+                                                <li class="page-item disabled"><span class="page-link">...</span></li>
+                                            }
+                                        }
+
+                                        @for (int i = start; i <= end; i++)
+                                        {
+                                            <li class="page-item @(i == Model.Orders.PageIndex ? "active" : "")">
+                                                <a class="page-link" asp-route-pageIndex="@i">@i</a>
+                                            </li>
+                                        }
+
+                                        @if (end < Model.Orders.TotalPages)
+                                        {
+                                            @if (end < Model.Orders.TotalPages - 1)
+                                            {
+                                                <li class="page-item disabled"><span class="page-link">...</span></li>
+                                            }
+                                            <li class="page-item"><a class="page-link" asp-route-pageIndex="@Model.Orders.TotalPages">@Model.Orders.TotalPages</a></li>
+                                        }
+
+                                        @* Next *@
+                                        @if (Model.Orders.HasNextPage)
+                                        {
+                                            <li class="page-item">
+                                                <a class="page-link" asp-route-pageIndex="@(Model.Orders.PageIndex + 1)">
+                                                    <i class="fas fa-chevron-right"></i>
+                                                </a>
+                                            </li>
+                                        }
+                                        else
+                                        {
+                                            <li class="page-item disabled">
+                                                <span class="page-link"><i class="fas fa-chevron-right"></i></span>
+                                            </li>
+                                        }
+                                    </ul>
+                                </nav>
+                            </div>
+                        }
                     }
-                </tbody>
-            </table>
+                    else
+                    {
+                        <div class="text-center py-5">
+                            <i class="fas fa-shopping-cart fa-3x text-muted mb-3"></i>
+                            <h5 class="text-muted">No Orders Found</h5>
+                            <p class="text-muted">
+                                @if (!string.IsNullOrWhiteSpace(Model.SearchTerm) || Model.StatusId.HasValue)
+                                {
+                                    <span>Try adjusting your search criteria.</span>
+                                }
+                                else
+                                {
+                                    <span>No orders have been placed yet.</span>
+                                }
+                            </p>
+                        </div>
+                    }
+                </div>
+            </div>
         </div>
     </div>
 </div>
-<script src="~/microsoft/signalr/dist/browser/signalr.js"></script>
-<script>
-    var connection = new signalR.HubConnectionBuilder()
-        .withUrl("/DataSignalRChanel")
-        .build();
-    connection.start().then(function() {
-        console.log("Connected to SignalR");
-    }).catch(function(err) {
-        console.error("Error connecting to SignalR: " + err);
-    });
 
-    connection.on("NewOrderReceived", function() {
-        console.log("New order received");
-        location.reload();
-    });
+@section Scripts {
+    <script src="~/microsoft/signalr/dist/browser/signalr.js"></script>
+    <script>
+        var connection = new signalR.HubConnectionBuilder()
+            .withUrl("/DataSignalRChanel")
+            .build();
 
-    // Enable Bootstrap tooltips
+        connection.start().then(function () {
+            console.log("Connected to SignalR");
+        }).catch(function (err) {
+            console.error("SignalR error: " + err);
+        });
+
+        connection.on("NewOrderReceived", function () {
+            console.log("New order received");
+            location.reload();
+        });
+
         var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
         var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
             return new bootstrap.Tooltip(tooltipTriggerEl)
         });
-</script>
+    </script>
+}

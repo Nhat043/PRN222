@@ -29,9 +29,7 @@ namespace Razor.Pages.ProductPage
         public async Task<IActionResult> OnGetAsync()
         {
             var categories = await _productService.GetAllCategoriesAsync();
-            var statuses = await _productService.GetAllProductStatusAsync();
             ViewData["CategoryId"] = new SelectList(categories, "Id", "Name");
-        ViewData["StatusId"] = new SelectList(statuses, "Id", "Name");
             return Page();
         }
 
@@ -48,9 +46,7 @@ namespace Razor.Pages.ProductPage
             if (!ModelState.IsValid)
             {
                 var categories = await _productService.GetAllCategoriesAsync();
-                var statuses = await _productService.GetAllProductStatusAsync();
                 ViewData["CategoryId"] = new SelectList(categories, "Id", "Name");
-                ViewData["StatusId"] = new SelectList(statuses, "Id", "Name");
                 return Page();
             }
             Console.WriteLine("Start to process image");
@@ -100,6 +96,8 @@ namespace Razor.Pages.ProductPage
                 Console.WriteLine("error process image: " + ex.Message);
             }
             
+            // Set default status to "available" (id=1)
+            Product.StatusId = 1;
 
             await _productService.AddProductAsync(Product);
 
@@ -119,9 +117,7 @@ namespace Razor.Pages.ProductPage
         private async Task<IActionResult> ReloadFormAsync()
         {
             var categories = await _productService.GetAllCategoriesAsync();
-            var statuses = await _productService.GetAllProductStatusAsync();
             ViewData["CategoryId"] = new SelectList(categories, "Id", "Name");
-            ViewData["StatusId"] = new SelectList(statuses, "Id", "Name");
             return Page();
         }
 

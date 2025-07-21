@@ -29,6 +29,19 @@ namespace DAL.Repository
             return await _demoContext.Categories.FirstOrDefaultAsync(c => c.Id == categoryId);
         }
 
+        public async Task<bool> IsCategoryNameExistsAsync(string name, int? excludeId = null)
+        {
+            if (string.IsNullOrWhiteSpace(name))
+                return false;
+
+            var query = _demoContext.Categories.Where(c => c.Name.Trim().ToLower() == name.Trim().ToLower());
+            
+            if (excludeId.HasValue)
+                query = query.Where(c => c.Id != excludeId.Value);
+
+            return await query.AnyAsync();
+        }
+
         public async Task AddCategoryAsync(Category category)
         {
             if (category == null)
@@ -63,5 +76,9 @@ namespace DAL.Repository
             }
         }
 
+        public async Task<bool> HasForeignKeyDependenciesAsync(int id)
+        {
+            return await _demoContext.Products.AnyAsync(p => p.CategoryId == id);
+        }
     }
 }

@@ -59,6 +59,8 @@ namespace MVC
             builder.Services.AddScoped<IOrderRepository, OrderRepository>();
             builder.Services.AddScoped<IOrderService, OrderService>();
 
+            builder.Services.AddScoped<BLL.Service.Interface.IPriceCalculator, BLL.Service.Interface.BasePriceCalculator>();
+
             // Add session services
             builder.Services.AddSession(options =>
             {

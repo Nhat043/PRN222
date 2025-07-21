@@ -98,6 +98,7 @@ The `DemoContext.cs` in the DAL project handles all database connections and ent
 
 ---
 
+
 ## SignalR Configuration Guide
 
 ### Overview
@@ -235,3 +236,25 @@ For each team member, ensure:
 | `MVC/wwwroot/js/site.js` | Browser SignalR connection | Yes |
 | `Razor/appsettings.json` | CORS configuration | Yes |
 | `Razor/Program.cs` | Hub mapping | No (unless duplicate) |
+# Design Patterns Used
+
+## Decorator Pattern (Price Calculation)
+This project implements the **Decorator design pattern** for flexible and extensible price calculation logic. The pattern is used to allow dynamic addition of pricing rules (such as discounts) without modifying the core calculation logic.
+
+**Example:**
+```csharp
+IPriceCalculator calculator = new BasePriceCalculator();
+if (Discount.HasValue && Discount.Value > 0)
+{
+    calculator = new DiscountDecorator(calculator, Discount.Value);
+}
+decimal total = calculator.CalculatePrice(SellingPrice ?? 0, Quantity);
+```
+- `BasePriceCalculator` provides the basic price calculation.
+- `DiscountDecorator` applies a discount on top of the base calculation.
+- This makes it easy to add more decorators (e.g., for tax, vouchers) in the future.
+
+## BLL Structure: Interface & Implementation Separation
+- All service interfaces are in `BLL/Service/Interface/` (e.g., `IProductService`, `IOrderService`).
+- All service implementations are in `BLL/Service/` (e.g., `ProductService`, `OrderService`).
+- This separation improves testability, maintainability, and supports dependency injection.

@@ -55,5 +55,37 @@ namespace DAL.Repository
                 await _context.SaveChangesAsync();
             }
         }
+
+        public async Task<bool> HasForeignKeyDependenciesAsync(int id)
+        {
+            return await _context.OrderItems.AnyAsync(oi => oi.ProductItemId == id);
+        }
+
+        public async Task<IList<ProductItem>> GetProductItemsByProductIdAsync(int productId)
+        {
+            return await _context.ProductItems
+                .Include(pi => pi.Status)
+                .Include(pi => pi.VariationOptions)
+                .Where(pi => pi.ProductId == productId)
+                .ToListAsync();
+        }
+
+        public async Task SetVariationOptionsAsync(int productItemId, List<int> variationOptionIds)
+        {
+            var productItem = await _context.ProductItems
+                .Include(pi => pi.VariationOptions)
+                .FirstOrDefaultAsync(pi => pi.Id == productItemId);
+            if (productItem == null) return;
+            productItem.VariationOptions.Clear();
+            if (variationOptionIds != null && variationOptionIds.Count > 0)
+            {
+                var options = await _context.VariationOptions.Where(vo => variationOptionIds.Contains(vo.Id)).ToListAsync();
+                foreach (var option in options)
+                {
+                    productItem.VariationOptions.Add(option);
+                }
+            }
+            await _context.SaveChangesAsync();
+        }
     }
 }

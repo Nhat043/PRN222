@@ -4,8 +4,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.EntityFrameworkCore;
-using DAL.Datas;
 using DAL.Models;
 using BLL.Service.Interface;
 
@@ -14,12 +12,16 @@ namespace Razor.Pages.ProductPage
     public class DetailsModel : PageModel
     {
         private readonly IProductService _productService;
-        private readonly DemoContext _context;
+        private readonly IProductItemService _productItemService;
+        private readonly IVariationService _variationService;
+        private readonly IProductItemStatusService _statusService;
 
-        public DetailsModel(IProductService productService, DemoContext context)
+        public DetailsModel(IProductService productService, IProductItemService productItemService, IVariationService variationService, IProductItemStatusService statusService)
         {
             _productService = productService;
-            _context = context;
+            _productItemService = productItemService;
+            _variationService = variationService;
+            _statusService = statusService;
         }
 
         public Product Product { get; set; } = default!;
@@ -43,7 +45,7 @@ namespace Razor.Pages.ProductPage
                 return NotFound();
             }
 
-            var product = await _productService.GetProductByIdAsync(id.Value);
+            var product = await _productService.GetProductByIdWithCategoryAndStatusAsync(id.Value);
             if (product == null)
             {
                 return NotFound();
@@ -51,41 +53,23 @@ namespace Razor.Pages.ProductPage
             else
             {
                 Product = product;
-                
-                // Load product items for this product
-                ProductItems = await _context.ProductItems
-                    .Include(pi => pi.Status)
-                    .Include(pi => pi.VariationOptions)
-                    .Where(pi => pi.ProductId == id.Value)
-                    .ToListAsync();
-                
-                // Load variations and statuses for the form
-                Variations = await _context.Variations
-                    .Include(v => v.VariationOptions)
-                    .ToListAsync();
-                    
-                Statuses = await _context.ProductItemStatuses.ToListAsync();
+                ProductItems = await _productItemService.GetProductItemsByProductIdAsync(id.Value);
+                Variations = await _variationService.GetAllVariationsWithOptionsAsync();
+                Statuses = await _statusService.GetAllProductItemStatusesAsync();
             }
             return Page();
         }
         
         public async Task<IActionResult> OnGetEditProductItemAsync(int productId, int productItemId)
         {
-            var productItem = await _context.ProductItems
-                .Include(pi => pi.VariationOptions)
-                .FirstOrDefaultAsync(pi => pi.Id == productItemId && pi.ProductId == productId);
-                
-            if (productItem == null)
+            var productItem = await _productItemService.GetProductItemByIdAsync(productItemId);
+            if (productItem == null || productItem.ProductId != productId)
             {
                 return NotFound();
             }
-            
             EditingProductItem = productItem;
             EditingProductItemId = productItemId;
-            
-            // Load the product and other data
             await OnGetAsync(productId);
-            
             return Page();
         }
         
@@ -95,17 +79,9 @@ namespace Razor.Pages.ProductPage
             {
                 return RedirectToPage(new { id = productId });
             }
-
             NewProductItem.ProductId = productId;
-            
-            // Add the product item first
-            _context.ProductItems.Add(NewProductItem);
-            await _context.SaveChangesAsync();
-            
-            // Handle variation options if any were selected
             var form = await Request.ReadFormAsync();
             var variationOptionIds = new List<int>();
-            
             foreach (var key in form.Keys)
             {
                 if (key.StartsWith("SelectedVariationOptionIds["))
@@ -117,22 +93,7 @@ namespace Razor.Pages.ProductPage
                     }
                 }
             }
-            
-            // Add variation options to the product item
-            if (variationOptionIds.Any())
-            {
-                var variationOptions = await _context.VariationOptions
-                    .Where(vo => variationOptionIds.Contains(vo.Id))
-                    .ToListAsync();
-                
-                // Add each variation option individually
-                foreach (var option in variationOptions)
-                {
-                    NewProductItem.VariationOptions.Add(option);
-                }
-                await _context.SaveChangesAsync();
-            }
-            
+            await _productItemService.AddProductItemWithVariationsAsync(NewProductItem, variationOptionIds);
             return RedirectToPage(new { id = productId });
         }
         
@@ -144,30 +105,19 @@ namespace Razor.Pages.ProductPage
                 await OnGetAsync(productId);
                 return Page();
             }
-
-            var existingProductItem = await _context.ProductItems
-                .Include(pi => pi.VariationOptions)
-                .FirstOrDefaultAsync(pi => pi.Id == productItemId && pi.ProductId == productId);
-                
-            if (existingProductItem == null)
+            var existingProductItem = await _productItemService.GetProductItemByIdAsync(productItemId);
+            if (existingProductItem == null || existingProductItem.ProductId != productId)
             {
                 return NotFound();
             }
-            
             // Update the basic properties
             existingProductItem.Quantity = EditingProductItem.Quantity;
             existingProductItem.ImportPrice = EditingProductItem.ImportPrice;
             existingProductItem.SellingPrice = EditingProductItem.SellingPrice;
             existingProductItem.Discount = EditingProductItem.Discount;
             existingProductItem.StatusId = EditingProductItem.StatusId;
-            
-            // Clear existing variation options
-            existingProductItem.VariationOptions.Clear();
-            
-            // Handle new variation options
             var form = await Request.ReadFormAsync();
             var variationOptionIds = new List<int>();
-            
             foreach (var key in form.Keys)
             {
                 if (key.StartsWith("EditingVariationOptionIds["))
@@ -179,43 +129,24 @@ namespace Razor.Pages.ProductPage
                     }
                 }
             }
-            
-            // Add new variation options
-            if (variationOptionIds.Any())
-            {
-                var variationOptions = await _context.VariationOptions
-                    .Where(vo => variationOptionIds.Contains(vo.Id))
-                    .ToListAsync();
-                
-                foreach (var option in variationOptions)
-                {
-                    existingProductItem.VariationOptions.Add(option);
-                }
-            }
-            
-            await _context.SaveChangesAsync();
-            
+            await _productItemService.UpdateProductItemWithVariationsAsync(existingProductItem, variationOptionIds);
             return RedirectToPage(new { id = productId });
         }
         
         public async Task<IActionResult> OnPostDeleteProductItemAsync(int productItemId, int productId)
         {
-            var productItem = await _context.ProductItems
-                .Include(pi => pi.VariationOptions)
-                .FirstOrDefaultAsync(pi => pi.Id == productItemId);
-                
-            if (productItem != null)
+            try
             {
-                // Remove variation options first
-                productItem.VariationOptions.Clear();
-                await _context.SaveChangesAsync();
-                
-                // Then remove the product item
-                _context.ProductItems.Remove(productItem);
-                await _context.SaveChangesAsync();
+                await _productItemService.DeleteProductItemAsync(productItemId);
+                return RedirectToPage(new { id = productId });
             }
-            
-            return RedirectToPage(new { id = productId });
+            catch (InvalidOperationException ex)
+            {
+                // Handle foreign key constraint error
+                ModelState.AddModelError("", ex.Message);
+                await OnGetAsync(productId);
+                return Page();
+            }
         }
     }
 }

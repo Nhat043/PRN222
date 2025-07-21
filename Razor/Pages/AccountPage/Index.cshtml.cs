@@ -7,45 +7,52 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using DAL.Datas;
 using DAL.Models;
+using BLL.Service.Interface;
 
 namespace Razor.Pages_AccountPage
 {
     public class IndexModel : PageModel
     {
-        private readonly DAL.Datas.DemoContext _context;
+        private readonly IAccountService _accountService;
 
-        public IndexModel(DAL.Datas.DemoContext context)
+        public IndexModel(IAccountService accountService)
         {
-            _context = context;
+            _accountService = accountService;
         }
 
         public IList<Account> Account { get;set; } = default!;
+        public string? ErrorMessage { get; set; }
+        public string? SuccessMessage { get; set; }
 
         public async Task OnGetAsync()
         {
-            Account = await _context.Accounts
-                .Include(a => a.Role)
-                .Include(a => a.Status).ToListAsync();
+            Account = (await _accountService.GetAllAccountsAsync()).ToList();
         }
 
         public async Task<IActionResult> OnPostBanAsync(int id)
         {
-            var account = await _context.Accounts.FindAsync(id);
-            if (account != null)
+            var success = await _accountService.BanAccountAsync(id);
+            if (!success)
             {
-                account.StatusId = 2; // 2 = banned
-                await _context.SaveChangesAsync();
+                ErrorMessage = "Cannot ban admin accounts or account not found.";
+            }
+            else
+            {
+                SuccessMessage = "Account banned successfully.";
             }
             return RedirectToPage();
         }
 
         public async Task<IActionResult> OnPostUnbanAsync(int id)
         {
-            var account = await _context.Accounts.FindAsync(id);
-            if (account != null)
+            var success = await _accountService.UnbanAccountAsync(id);
+            if (!success)
             {
-                account.StatusId = 1; // 1 = active
-                await _context.SaveChangesAsync();
+                ErrorMessage = "Account not found.";
+            }
+            else
+            {
+                SuccessMessage = "Account unbanned successfully.";
             }
             return RedirectToPage();
         }

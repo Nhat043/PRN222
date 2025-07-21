@@ -1,4 +1,5 @@
-﻿using DAL.Models;
+﻿using BLL.Service.Interface;
+using DAL.Models;
 
 namespace MVC.Models;
 
@@ -12,5 +13,14 @@ public class CartItemViewModel
     public decimal? Discount { get; set; }
     public string? Ram { get; set; }   
     public string? Rom { get; set; }
-    public decimal TotalPrice =>((SellingPrice ?? 0) - (SellingPrice ?? 0) * (Discount ?? 0) / 100) * Quantity;
+    public decimal TotalPrice {
+        get {
+            IPriceCalculator calculator = new BasePriceCalculator();
+            if (Discount.HasValue && Discount.Value > 0)
+            {
+                calculator = new DiscountDecorator(calculator, Discount.Value);
+            }
+            return calculator.CalculatePrice(SellingPrice ?? 0, Quantity);
+        }
+    }
 }

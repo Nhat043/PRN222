@@ -1,62 +1,42 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.EntityFrameworkCore;
-using DAL.Datas;
 using DAL.Models;
+using BLL.Service.Interface;
 
 namespace Razor.Pages.CommentPage
 {
     public class DeleteModel : PageModel
     {
-        private readonly DAL.Datas.DemoContext _context;
+        private readonly IComService _commentService;
 
-        public DeleteModel(DAL.Datas.DemoContext context)
+        public DeleteModel(IComService commentService)
         {
-            _context = context;
+            _commentService = commentService;
         }
 
         [BindProperty]
         public Comment Comment { get; set; } = default!;
 
-        public async Task<IActionResult> OnGetAsync(int? id)
+        public IActionResult OnGet(int? id)
         {
             if (id == null)
-            {
                 return NotFound();
-            }
 
-            var comment = await _context.Comments.FirstOrDefaultAsync(m => m.Id == id);
-
+            var comment = _commentService.GetById(id.Value);
             if (comment == null)
-            {
                 return NotFound();
-            }
-            else
-            {
-                Comment = comment;
-            }
+
+            Comment = comment;
             return Page();
         }
 
-        public async Task<IActionResult> OnPostAsync(int? id)
+        public IActionResult OnPost(int? id)
         {
             if (id == null)
-            {
                 return NotFound();
-            }
 
-            var comment = await _context.Comments.FindAsync(id);
-            if (comment != null)
-            {
-                Comment = comment;
-                _context.Comments.Remove(Comment);
-                await _context.SaveChangesAsync();
-            }
-
+            _commentService.HideComment(id.Value); // ❗ Soft delete (statusId = 2)
             return RedirectToPage("./Index");
         }
     }

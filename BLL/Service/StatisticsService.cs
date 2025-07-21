@@ -1,39 +1,30 @@
+using BLL.Service.Interface;
+using DAL.Models;
+using DAL.Repository.Interface;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
-using DAL.Datas;
-using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.EntityFrameworkCore;
 using System.Text.Json;
+using System.Threading.Tasks;
 
-namespace Razor.Pages
+namespace BLL.Service
 {
-    public class StatisticsPageModel : PageModel
+    public class StatisticsService : IStatisticsService
     {
-        public string RevenueChartJson { get; set; } = "{}";
-        public string OrdersChartJson { get; set; } = "{}";
-        public string BestProductsChartJson { get; set; } = "{}";
-        public string AovChartJson { get; set; } = "{}";
+        private readonly IStatisticsRepo _statisticsRepo;
 
-        private readonly DemoContext _context;
-        public StatisticsPageModel(DemoContext context)
+        public StatisticsService(IStatisticsRepo statisticsRepo)
         {
-            _context = context;
+            _statisticsRepo = statisticsRepo;
         }
 
-        public async Task OnGetAsync()
+        public async Task<string> GetRevenueChartJsonAsync(DateTime startDate, DateTime endDate)
         {
-            // Get all order items with related data
-            var orderItems = await _context.OrderItems
-                .Include(oi => oi.Order)
-                .Include(oi => oi.ProductItem)
-                    .ThenInclude(pi => pi.Product)
-                .ToListAsync();
-
-            // Revenue Over Time (by month)
+            var orderItems = await _statisticsRepo.GetOrderItemsWithRelatedDataAsync();
+            
             var revenueByMonth = orderItems
-                .Where(oi => oi.Order != null && oi.ProductItem != null)
+                .Where(oi => oi.Order != null && oi.ProductItem != null && oi.Order.StatusId == 2 && 
+                            oi.Order.Date >= startDate && oi.Order.Date <= endDate)
                 .GroupBy(oi => new { oi.Order.Date.Year, oi.Order.Date.Month })
                 .OrderBy(g => g.Key.Year).ThenBy(g => g.Key.Month)
                 .Select(g => new
@@ -49,7 +40,8 @@ namespace Razor.Pages
                     })
                 })
                 .ToList();
-            RevenueChartJson = JsonSerializer.Serialize(new {
+
+            return JsonSerializer.Serialize(new {
                 type = "line",
                 data = new {
                     labels = revenueByMonth.Select(x => x.Label),
@@ -68,10 +60,15 @@ namespace Razor.Pages
                     plugins = new { legend = new { display = true } }
                 }
             });
+        }
 
-            // Orders Per Month
+        public async Task<string> GetOrdersChartJsonAsync(DateTime startDate, DateTime endDate)
+        {
+            var orderItems = await _statisticsRepo.GetOrderItemsWithRelatedDataAsync();
+            
             var ordersByMonth = orderItems
-                .Where(oi => oi.Order != null)
+                .Where(oi => oi.Order != null && oi.Order.StatusId == 2 && 
+                            oi.Order.Date >= startDate && oi.Order.Date <= endDate)
                 .GroupBy(oi => new { oi.Order.Date.Year, oi.Order.Date.Month })
                 .OrderBy(g => g.Key.Year).ThenBy(g => g.Key.Month)
                 .Select(g => new
@@ -80,7 +77,8 @@ namespace Razor.Pages
                     Orders = g.Select(oi => oi.OrderId).Distinct().Count()
                 })
                 .ToList();
-            OrdersChartJson = JsonSerializer.Serialize(new {
+
+            return JsonSerializer.Serialize(new {
                 type = "bar",
                 data = new {
                     labels = ordersByMonth.Select(x => x.Label),
@@ -97,10 +95,16 @@ namespace Razor.Pages
                     plugins = new { legend = new { display = false } }
                 }
             });
+        }
 
-            // Best-Selling Products (by quantity)
+        public async Task<string> GetBestProductsChartJsonAsync(DateTime startDate, DateTime endDate)
+        {
+            var orderItems = await _statisticsRepo.GetOrderItemsWithRelatedDataAsync();
+            
             var bestProducts = orderItems
-                .Where(oi => oi.ProductItem != null && oi.ProductItem.Product != null)
+                .Where(oi => oi.ProductItem != null && oi.ProductItem.Product != null && 
+                            oi.Order != null && oi.Order.StatusId == 2 &&
+                            oi.Order.Date >= startDate && oi.Order.Date <= endDate)
                 .GroupBy(oi => oi.ProductItem.Product.Name)
                 .OrderByDescending(g => g.Sum(oi => oi.Quantity))
                 .Take(7)
@@ -110,7 +114,8 @@ namespace Razor.Pages
                     Quantity = g.Sum(oi => oi.Quantity)
                 })
                 .ToList();
-            BestProductsChartJson = JsonSerializer.Serialize(new {
+
+            return JsonSerializer.Serialize(new {
                 type = "bar",
                 data = new {
                     labels = bestProducts.Select(x => x.Product),
@@ -127,10 +132,15 @@ namespace Razor.Pages
                     plugins = new { legend = new { display = false } }
                 }
             });
+        }
 
-            // Average Order Value (AOV) by month
+        public async Task<string> GetAovChartJsonAsync(DateTime startDate, DateTime endDate)
+        {
+            var orderItems = await _statisticsRepo.GetOrderItemsWithRelatedDataAsync();
+            
             var aovByMonth = orderItems
-                .Where(oi => oi.Order != null)
+                .Where(oi => oi.Order != null && oi.Order.StatusId == 2 && 
+                            oi.Order.Date >= startDate && oi.Order.Date <= endDate)
                 .GroupBy(oi => new { oi.Order.Date.Year, oi.Order.Date.Month })
                 .OrderBy(g => g.Key.Year).ThenBy(g => g.Key.Month)
                 .Select(g => new
@@ -139,7 +149,8 @@ namespace Razor.Pages
                     AOV = g.Select(oi => oi.Order).Distinct().Average(o => (double?)o.Price) ?? 0
                 })
                 .ToList();
-            AovChartJson = JsonSerializer.Serialize(new {
+
+            return JsonSerializer.Serialize(new {
                 type = "line",
                 data = new {
                     labels = aovByMonth.Select(x => x.Label),

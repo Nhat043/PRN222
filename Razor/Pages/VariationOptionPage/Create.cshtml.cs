@@ -5,41 +5,60 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using DAL.Datas;
 using DAL.Models;
+using BLL.Service.Interface;
 
 namespace Razor.Pages.VariationOptionPage
 {
     public class CreateModel : PageModel
     {
-        private readonly DAL.Datas.DemoContext _context;
+        private readonly IVariationOptionService _variationOptionService;
+        private readonly IVariationService _variationService;
 
-        public CreateModel(DAL.Datas.DemoContext context)
+        public CreateModel(IVariationOptionService variationOptionService, IVariationService variationService)
         {
-            _context = context;
+            _variationOptionService = variationOptionService;
+            _variationService = variationService;
         }
 
-        public IActionResult OnGet()
+        public async Task<IActionResult> OnGet()
         {
-        ViewData["VariationId"] = new SelectList(_context.Variations, "Id", "Name");
+            var variations = await _variationService.GetAllVariationsWithOptionsAsync();
+            ViewData["VariationId"] = new SelectList(variations, "Id", "Name");
             return Page();
         }
 
         [BindProperty]
         public VariationOption VariationOption { get; set; } = default!;
 
-        // For more information, see https://aka.ms/RazorPagesCRUD.
         public async Task<IActionResult> OnPostAsync()
         {
             if (!ModelState.IsValid)
             {
+                var variations = await _variationService.GetAllVariationsWithOptionsAsync();
+                ViewData["VariationId"] = new SelectList(variations, "Id", "Name");
                 return Page();
             }
 
-            _context.VariationOptions.Add(VariationOption);
-            await _context.SaveChangesAsync();
-
-            return RedirectToPage("./Index");
+            try
+            {
+                await _variationOptionService.AddVariationOptionAsync(VariationOption);
+                return RedirectToPage("./Index");
+            }
+            catch (InvalidOperationException ex)
+            {
+                ModelState.AddModelError("VariationOption.Value", ex.Message);
+                var variations = await _variationService.GetAllVariationsWithOptionsAsync();
+                ViewData["VariationId"] = new SelectList(variations, "Id", "Name");
+                return Page();
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError("", "An error occurred while creating the variation option. Please try again.");
+                var variations = await _variationService.GetAllVariationsWithOptionsAsync();
+                ViewData["VariationId"] = new SelectList(variations, "Id", "Name");
+                return Page();
+            }
         }
     }
 }

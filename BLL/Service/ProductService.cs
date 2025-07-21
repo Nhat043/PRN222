@@ -31,11 +31,16 @@ namespace BLL.Service
             if (id <= 0)
                 throw new ArgumentException("User ID must be greater than zero.", nameof(id));
 
-            var product = await _productRepo.GetProductByIdAsync(id);
+            // Updated: include Category and Status
+            var product = await _productRepo.GetProductByIdWithCategoryAndStatusAsync(id);
             if (product == null)
                 throw new InvalidOperationException($"User with ID {id} not found.");
 
             return product;
+        }
+        public async Task<Product> GetProductByIdWithCategoryAndStatusAsync(int id)
+        {
+            return await _productRepo.GetProductByIdWithCategoryAndStatusAsync(id);
         }
         private void ValidateProduct(Product product)
         {
@@ -70,10 +75,18 @@ namespace BLL.Service
             if (id <= 0)
                 throw new ArgumentException("Product ID must be greater than zero.", nameof(id));
 
-            // Additional business logic can be added here
-            // For example: Check if product is referenced in orders before deletion
+            // Check for foreign key dependencies before deletion
+            if (await HasForeignKeyDependenciesAsync(id))
+            {
+                throw new InvalidOperationException("Cannot delete product. It has related product items, comments, or ratings. Please remove all related data first.");
+            }
 
             await _productRepo.DeleteProductAsync(id);
+        }
+
+        public async Task<bool> HasForeignKeyDependenciesAsync(int id)
+        {
+            return await _productRepo.HasForeignKeyDependenciesAsync(id);
         }
 
         public async Task<IEnumerable<ProductStatus>> GetAllProductStatusAsync()
@@ -102,6 +115,11 @@ namespace BLL.Service
         public async Task<List<Product>> GetFilteredProductsAsync(string search, string ram, string rom, string price, int? categoryId)
         {
             return await _productRepo.GetFilteredProductsAsync(search, ram, rom, price, categoryId);
+        }
+
+        public async Task<Product?> GetProductByIdWithAvailableItemsAsync(int id)
+        {
+            return await _productRepo.GetProductByIdWithAvailableItemsAsync(id);
         }
     }
 }

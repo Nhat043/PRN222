@@ -18,6 +18,6 @@ namespace BLL.Service.Interface
         Task UpdateOrderAsync(Order order);
         Task<List<Order>> GetOrdersByUserIdAsync(int userId);
         Task NotifyAdminNewOrder();
-
+        Task<List<OrderStatus>> GetAllOrderStatusAsync();
     }
 }

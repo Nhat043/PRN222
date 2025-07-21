@@ -19,5 +19,9 @@ namespace BLL.Service.Interface
         Task AddAccountAsync(Account account);
 
         Task UpdateAccountAsync(Account account);
+        
+        // New methods for ban/unban with admin protection
+        Task<bool> BanAccountAsync(int accountId);
+        Task<bool> UnbanAccountAsync(int accountId);
     }
 }

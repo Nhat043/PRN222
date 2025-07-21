@@ -21,20 +21,45 @@ namespace Razor
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
             // Add Repo to the container
+            builder.Services.AddScoped<IAccountRepo, AccountRepo>();
+            builder.Services.AddScoped<IAccountService, AccountService>();
+
             builder.Services.AddScoped<ICategoryRepo, CategoryRepo>();
             builder.Services.AddScoped<ICategoryService, CategoryService>();
 
-            builder.Services.AddScoped<IProductRepo, ProductRepo>();
-            builder.Services.AddScoped<IProductService, ProductService>();
+            builder.Services.AddScoped<ICommentStatusRepo, CommentStatusRepo>();
+            builder.Services.AddScoped<ICommentStatusService, CommentStatusService>();
+
+            builder.Services.AddScoped<IComRepo, ComRepo>();
+            builder.Services.AddScoped<IComService, ComService>();
 
             builder.Services.AddScoped<IOrderRepository, OrderRepository>();
             builder.Services.AddScoped<IOrderService, OrderService>();
 
-            builder.Services.AddScoped<IComRepo, ComRepo>();
+            builder.Services.AddScoped<IProductItemStatusRepo, ProductItemStatusRepo>();
+            builder.Services.AddScoped<IProductItemStatusService, ProductItemStatusService>();
 
-            builder.Services.AddScoped<IComService, ComService>();
+            builder.Services.AddScoped<IProductItemRepo, ProductItemRepo>();
+            builder.Services.AddScoped<IProductItemService, ProductItemService>();
 
-            builder.Services.AddScoped<ICommentStatusService, CommentStatusService>();
+            builder.Services.AddScoped<IProductRepo, ProductRepo>();
+            builder.Services.AddScoped<IProductService, ProductService>();
+
+            builder.Services.AddScoped<IProductRepo, ProductRepo>();
+            builder.Services.AddScoped<IProductService, ProductService>();
+
+            builder.Services.AddScoped<IRatingRepo, RatingRepo>();
+            builder.Services.AddScoped<IRatingService, RatingService>();
+
+            builder.Services.AddScoped<IStatisticsRepo, StatisticsRepo>();
+            builder.Services.AddScoped<IStatisticsService, StatisticsService>();
+
+            builder.Services.AddScoped<IVariationOptionRepo, VariationOptionRepo>();
+            builder.Services.AddScoped<IVariationOptionService, VariationOptionService>();
+
+
+            builder.Services.AddScoped<IVariationRepo, VariationRepo>();
+            builder.Services.AddScoped<IVariationService, VariationService>();
 
 
             builder.Services.AddDistributedMemoryCache(); // Cho phép lưu session trong RAM

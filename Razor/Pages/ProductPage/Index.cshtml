@@ -22,13 +22,90 @@
         </div>
     </div>
 
+    <!-- Filter Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-light">
+                    <h6 class="mb-0">
+                        <i class="fas fa-filter me-2"></i>Filters
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <form method="get" class="row g-3">
+                        <div class="col-md-4">
+                            <label asp-for="SearchTerm" class="form-label">Search</label>
+                            <input asp-for="SearchTerm" type="text" class="form-control" 
+                                   placeholder="Search by name or description..." />
+                        </div>
+                        <div class="col-md-3">
+                            <label asp-for="CategoryId" class="form-label">Category</label>
+                            <select asp-for="CategoryId" class="form-select">
+                                <option value="">All Categories</option>
+                                @foreach (var category in Model.Categories)
+                                {
+                                    <option value="@category.Id" selected="@(Model.CategoryId == category.Id)">
+                                        @category.Name
+                                    </option>
+                                }
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label asp-for="StatusId" class="form-label">Status</label>
+                            <select asp-for="StatusId" class="form-select">
+                                <option value="">All Statuses</option>
+                                @foreach (var status in Model.ProductStatuses)
+                                {
+                                    <option value="@status.Id" selected="@(Model.StatusId == status.Id)">
+                                        @status.Name
+                                    </option>
+                                }
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Page Size</label>
+                            <select asp-for="PageSize" class="form-select" onchange="this.form.submit()">
+                                @foreach (var size in Model.PageSizeOptions)
+                                {
+                                    <option value="@size" selected="@(Model.PageSize == size)">@size per page</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="col-md-2 d-flex align-items-end">
+                            <div class="d-grid gap-2 w-100">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-search me-2"></i>Search
+                                </button>
+                                <a href="@Url.Page("./Index")" class="btn btn-outline-secondary">
+                                    <i class="fas fa-undo me-2"></i>Reset
+                                </a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="row">
         <div class="col-12">
             <div class="card shadow-sm">
                 <div class="card-header bg-white py-3">
-                    <h5 class="mb-0 text-gray-800">
-                        <i class="fas fa-list me-2"></i>Product List
-                    </h5>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0 text-gray-800">
+                            <i class="fas fa-list me-2"></i>Product List
+                        </h5>
+                        <div class="d-flex align-items-center">
+                            <span class="badge bg-primary me-3">
+                                @Model.Product.TotalCount products found
+                            </span>
+                            <span class="text-muted small">
+                                Showing @((Model.Product.PageIndex - 1) * Model.PageSize + 1) to 
+                                @Math.Min(Model.Product.PageIndex * Model.PageSize, Model.Product.TotalCount) 
+                                of @Model.Product.TotalCount
+                            </span>
+                        </div>
+                    </div>
                 </div>
                 <div class="card-body p-0">
                     @if (Model.Product != null && Model.Product.Any())
@@ -126,13 +203,129 @@
                                 </tbody>
                             </table>
                         </div>
+
+                        <!-- Pagination -->
+                        @if (Model.Product.TotalPages > 1)
+                        {
+                            <div class="card-footer bg-white border-top">
+                                <nav aria-label="Product pagination">
+                                    <ul class="pagination justify-content-center mb-0">
+                                        <!-- Previous Page -->
+                                        @if (Model.Product.HasPreviousPage)
+                                        {
+                                            <li class="page-item">
+                                                <a class="page-link" asp-page="./Index" 
+                                                   asp-route-pageIndex="@(Model.Product.PageIndex - 1)"
+                                                   asp-route-searchTerm="@Model.SearchTerm"
+                                                   asp-route-categoryId="@Model.CategoryId"
+                                                   asp-route-statusId="@Model.StatusId"
+                                                   asp-route-pageSize="@Model.PageSize">
+                                                    <i class="fas fa-chevron-left"></i>
+                                                </a>
+                                            </li>
+                                        }
+                                        else
+                                        {
+                                            <li class="page-item disabled">
+                                                <span class="page-link">
+                                                    <i class="fas fa-chevron-left"></i>
+                                                </span>
+                                            </li>
+                                        }
+
+                                        <!-- Page Numbers -->
+                                        @{
+                                            var startPage = Math.Max(1, Model.Product.PageIndex - 2);
+                                            var endPage = Math.Min(Model.Product.TotalPages, Model.Product.PageIndex + 2);
+                                        }
+
+                                        @if (startPage > 1)
+                                        {
+                                            <li class="page-item">
+                                                <a class="page-link" asp-page="./Index" 
+                                                   asp-route-pageIndex="1"
+                                                   asp-route-searchTerm="@Model.SearchTerm"
+                                                   asp-route-categoryId="@Model.CategoryId"
+                                                   asp-route-statusId="@Model.StatusId"
+                                                   asp-route-pageSize="@Model.PageSize">1</a>
+                                            </li>
+                                            @if (startPage > 2)
+                                            {
+                                                <li class="page-item disabled">
+                                                    <span class="page-link">...</span>
+                                                </li>
+                                            }
+                                        }
+
+                                        @for (int i = startPage; i <= endPage; i++)
+                                        {
+                                            <li class="page-item @(i == Model.Product.PageIndex ? "active" : "")">
+                                                <a class="page-link" asp-page="./Index" 
+                                                   asp-route-pageIndex="@i"
+                                                   asp-route-searchTerm="@Model.SearchTerm"
+                                                   asp-route-categoryId="@Model.CategoryId"
+                                                   asp-route-statusId="@Model.StatusId"
+                                                   asp-route-pageSize="@Model.PageSize">@i</a>
+                                            </li>
+                                        }
+
+                                        @if (endPage < Model.Product.TotalPages)
+                                        {
+                                            @if (endPage < Model.Product.TotalPages - 1)
+                                            {
+                                                <li class="page-item disabled">
+                                                    <span class="page-link">...</span>
+                                                </li>
+                                            }
+                                            <li class="page-item">
+                                                <a class="page-link" asp-page="./Index" 
+                                                   asp-route-pageIndex="@Model.Product.TotalPages"
+                                                   asp-route-searchTerm="@Model.SearchTerm"
+                                                   asp-route-categoryId="@Model.CategoryId"
+                                                   asp-route-statusId="@Model.StatusId"
+                                                   asp-route-pageSize="@Model.PageSize">@Model.Product.TotalPages</a>
+                                            </li>
+                                        }
+
+                                        <!-- Next Page -->
+                                        @if (Model.Product.HasNextPage)
+                                        {
+                                            <li class="page-item">
+                                                <a class="page-link" asp-page="./Index" 
+                                                   asp-route-pageIndex="@(Model.Product.PageIndex + 1)"
+                                                   asp-route-searchTerm="@Model.SearchTerm"
+                                                   asp-route-categoryId="@Model.CategoryId"
+                                                   asp-route-statusId="@Model.StatusId"
+                                                   asp-route-pageSize="@Model.PageSize">
+                                                    <i class="fas fa-chevron-right"></i>
+                                                </a>
+                                            </li>
+                                        }
+                                        else
+                                        {
+                                            <li class="page-item disabled">
+                                                <span class="page-link">
+                                                    <i class="fas fa-chevron-right"></i>
+                                                </span>
+                                            </li>
+                                        }
+                                    </ul>
+                                </nav>
+                            </div>
+                        }
                     }
                     else
                     {
                         <div class="text-center py-5">
                             <i class="fas fa-box fa-3x text-muted mb-3"></i>
                             <h5 class="text-muted">No Products Found</h5>
-                            <p class="text-muted">Start by creating your first product.</p>
+                            <p class="text-muted">
+                                @if (!string.IsNullOrWhiteSpace(Model.SearchTerm) || Model.CategoryId.HasValue || Model.StatusId.HasValue)
+                                {
+                                    <span>Try adjusting your search criteria or </span>
+                                }
+                                Start by creating your first product.
+                            </p>
                             <a asp-page="Create" class="btn btn-primary">
                                 <i class="fas fa-plus me-2"></i>Create First Product
                             </a>
@@ -180,5 +373,29 @@
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
+    }
+
+    .pagination .page-link {
+        border: none;
+        color: #5a5c69;
+        padding: 0.5rem 0.75rem;
+        margin: 0 2px;
+        border-radius: 6px;
+    }
+
+    .pagination .page-link:hover {
+        background-color: #eaecf4;
+        color: #5a5c69;
+    }
+
+    .pagination .page-item.active .page-link {
+        background-color: #4e73df;
+        border-color: #4e73df;
+        color: white;
+    }
+
+    .pagination .page-item.disabled .page-link {
+        color: #858796;
+        background-color: transparent;
     }
 </style>

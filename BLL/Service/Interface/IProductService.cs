@@ -11,6 +11,7 @@ namespace BLL.Service.Interface
     {
         Task<IEnumerable<Product>> GetAllProductsAsync();
         Task<Product> GetProductByIdAsync(int id);
+        Task<Product> GetProductByIdWithCategoryAndStatusAsync(int id);
 
         Task AddProductAsync(Product product);
 
@@ -28,5 +29,8 @@ namespace BLL.Service.Interface
         Task<List<string>> GetAllRamOptionsAsync();
         Task<List<string>> GetAllRomOptionsAsync();
         Task<List<Product>> GetFilteredProductsAsync(string search, string ram, string rom, string price, int? categoryId);
+
+        Task<Product?> GetProductByIdWithAvailableItemsAsync(int id);
+        Task<bool> HasForeignKeyDependenciesAsync(int id);
     }
 }

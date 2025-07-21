@@ -1,9 +1,9 @@
-﻿using DAL.Datas;
+﻿using BLL.Service.Interface;
 using DAL.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
+using Microsoft.Identity.Client;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -12,11 +12,20 @@ namespace Razor.Pages.CommentPage
 {
     public class CreateModel : PageModel
     {
-        private readonly DemoContext _context;
-
-        public CreateModel(DemoContext context)
+        private readonly ICommentStatusService _statusService;
+        private readonly IComService _commentService;
+        private readonly IProductService _productService;
+        private readonly IAccountService _accountService;
+        public CreateModel(
+            ICommentStatusService statusService,
+            IComService commentService,
+            IProductService productService, 
+            IAccountService accountService)
         {
-            _context = context;
+            _statusService = statusService;
+            _commentService = commentService;
+            _productService = productService;
+            _accountService = accountService;
         }
 
         [BindProperty]
@@ -31,19 +40,11 @@ namespace Razor.Pages.CommentPage
         public string? ReplyingToUserName { get; set; }
         public bool IsReplyMode { get; set; } = false;
 
-        public async Task<IActionResult> OnGetAsync()
+        public IActionResult OnGet()
         {
-            int visibleStatusId = await _context.CommentStatuses
-                .Where(s => s.Name == "Visible")
-                .Select(s => s.Id)
-                .FirstOrDefaultAsync();
-
             if (ParentId.HasValue)
             {
-                var parent = await _context.Comments
-                    .Include(c => c.User)
-                    .FirstOrDefaultAsync(c => c.Id == ParentId);
-
+                var parent = _commentService.GetById(ParentId.Value);
                 if (parent == null)
                     return NotFound();
 
@@ -51,7 +52,7 @@ namespace Razor.Pages.CommentPage
                 {
                     ParentId = parent.Id,
                     ProductId = parent.ProductId,
-                    StatusId = visibleStatusId
+                    StatusId = _statusService.GetIdByName("Visible") ?? 1
                 };
 
                 ReplyingToUserName = parent.User?.Name;
@@ -61,41 +62,42 @@ namespace Razor.Pages.CommentPage
             {
                 Comment = new Comment
                 {
-                    StatusId = visibleStatusId
+                    StatusId = _statusService.GetIdByName("Visible") ?? 1
                 };
             }
 
-            await LoadSelectListsAsync();
+            LoadSelectLists();
             return Page();
         }
 
-        public async Task<IActionResult> OnPostAsync()
+        public IActionResult OnPost()
         {
             if (!ModelState.IsValid)
             {
-                await LoadSelectListsAsync();
+                LoadSelectLists();
                 return Page();
             }
 
-            var accountId = HttpContext.Session.GetInt32("AccountIdSession");
-            if (accountId == null)
-                return RedirectToPage("/Account/Login"); // đổi đúng route nếu cần
+            //var accountId = HttpContext.Session.GetInt32("AccountIdSession");
+            //if (accountId == null)
+            //    return RedirectToPage("/Auth/Login");
 
             Comment.CreatedAt = DateTime.Now;
-            Comment.UserId = accountId.Value;
+            //Comment.UserId = accountId.Value;
+            Comment.UserId = 1;
 
-            _context.Comments.Add(Comment);
-            await _context.SaveChangesAsync();
 
+            _commentService.CreateComment(Comment);
             return RedirectToPage("./Index");
         }
 
-        private async Task LoadSelectListsAsync()
+        private void LoadSelectLists()
         {
-            ViewData["ParentId"] = new SelectList(await _context.Comments.ToListAsync(), "Id", "Content");
-            ViewData["ProductId"] = new SelectList(await _context.Products.ToListAsync(), "Id", "Name");
-            ViewData["StatusId"] = new SelectList(await _context.CommentStatuses.ToListAsync(), "Id", "Name");
-            ViewData["UserId"] = new SelectList(await _context.Accounts.ToListAsync(), "Id", "Email");
+            ViewData["ParentId"] = new SelectList(_commentService.GetProductComments(ProductId ?? 0), "Id", "Content");
+            ViewData["ProductId"] = new SelectList(_productService.GetAllProductsAsync().Result, "Id", "Name");
+            // 🔧 THÊM 2 DÒNG DƯỚI:
+            ViewData["StatusId"] = new SelectList(_statusService.GetAll(), "Id", "Name");
+            ViewData["UserId"] = new SelectList(_accountService.GetAllAccountsAsync().Result, "Id", "Email");
         }
     }
 }
