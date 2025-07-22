@@ -50,27 +50,29 @@ namespace Razor.Pages.CommentPage
             return Page();
         }
 
-        public IActionResult OnPost()
+        public async Task<IActionResult> OnPostAsync()
         {
             if (!ModelState.IsValid)
             {
-                LoadSelectLists();
                 return Page();
             }
 
-            try
+           
+            var existingComment =  _commentService.GetById(Comment.Id);
+            if (existingComment == null)
             {
-                _commentService.UpdateComment(Comment);
-                _hubContext.Clients.All.SendAsync("load");
-            }
-            catch (Exception)
-            {
-                // Optional: Catch specific exception types if needed
-                return NotFound(); // hoặc xử lý lỗi khác tùy yêu cầu
+                return NotFound();
             }
 
+           
+            existingComment.Content = Comment.Content;
+
+           
+            _commentService.UpdateComment(existingComment);
+            await _hubContext.Clients.All.SendAsync("load");
             return RedirectToPage("./Index");
         }
+
 
         private void LoadSelectLists()
         {
