@@ -17,5 +17,6 @@ namespace BLL.Service.Interface
         Task AddVariationOptionAsync(VariationOption variationOption);
         Task UpdateVariationOptionAsync(VariationOption variationOption);
         Task DeleteVariationOptionAsync(int id);
+        Task<bool> HasForeignKeyDependenciesAsync(int id);
     }
 } 
