@@ -15,5 +15,10 @@ namespace Razor.Hubs
             await Clients.Group("AdminGroup").SendAsync("NewOrderReceived");
         }
 
+        public async Task NotifyProductQuantityChanged(int productId)
+        {
+            await Clients.Group("AdminGroup").SendAsync("ProductQuantityChanged", productId);
+        }
+
     }
 }

@@ -103,6 +103,7 @@ public class OrderController : Controller
         await _orderService.AddOrderItemsAsync(orderItems);
 
         // 3. Trừ tồn kho ProductItem
+        var notifiedProductIds = new HashSet<int>();
         foreach (var item in cart)
         {
             var productItem = await _productItemService.GetProductItemByIdAsync(item.ProductItemId);
@@ -111,6 +112,11 @@ public class OrderController : Controller
                 productItem.Quantity -= item.Quantity;
                 if (productItem.Quantity < 0) productItem.Quantity = 0; // Không để số âm
                 await _productItemService.UpdateProductItemAsync(productItem);
+                if (productItem.ProductId.HasValue && !notifiedProductIds.Contains(productItem.ProductId.Value))
+                {
+                    await _orderService.NotifyProductQuantityChanged(productItem.ProductId.Value);
+                    notifiedProductIds.Add(productItem.ProductId.Value);
+                }
             }
         }
 

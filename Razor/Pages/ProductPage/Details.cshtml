@@ -562,3 +562,23 @@
         box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
     }
 </style>
+
+@section Scripts {
+    <script src="~/microsoft/signalr/dist/browser/signalr.js"></script>
+    <script>
+        var productId = @Model.Product.Id;
+        var connection = new signalR.HubConnectionBuilder()
+            .withUrl("/DataSignalRChanel")
+            .build();
+        connection.start().then(function () {
+            // Connected
+        }).catch(function (err) {
+            console.error("SignalR error: " + err);
+        });
+        connection.on("ProductQuantityChanged", function (changedProductId) {
+            if (changedProductId === productId) {
+                location.reload();
+            }
+        });
+    </script>
+}

@@ -60,6 +60,16 @@ namespace BLL.Service
             await _connection.InvokeAsync("NotifyAdminNewOrder");
         }
 
+        public async Task NotifyProductQuantityChanged(int productId)
+        {
+            if (!_connected || _connection.State != HubConnectionState.Connected)
+            {
+                await _connection.StartAsync();
+                _connected = true;
+            }
+            await _connection.InvokeAsync("NotifyProductQuantityChanged", productId);
+        }
+
         public async Task<List<OrderStatus>> GetAllOrderStatusAsync()
         {
             return await _orderRepository.GetAllOrderStatusAsync();
