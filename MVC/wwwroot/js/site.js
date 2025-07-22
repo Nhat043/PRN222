@@ -7,7 +7,7 @@ var connection = new signalR.HubConnectionBuilder()
     .build();
 
 connection.on("load", function () {
-    location.href = '/'; // hoặc location.reload();
+    location.reload();
 });
 
 connection.start()
