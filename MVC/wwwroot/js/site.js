@@ -7,7 +7,7 @@ var connection = new signalR.HubConnectionBuilder()
     .build();
 
 connection.on("load", function () {
-    location.reload();
+    location.href = '/mvc';
 });
 
 connection.start()
