@@ -19,7 +19,7 @@ namespace BLL.Service
         {
             _repo = repo;
             _connection = new HubConnectionBuilder()
-                .WithUrl("https://localhost:44319/DataSignalRChanel") // RazorPage Host
+                .WithUrl("https://localhost:7082/DataSignalRChanel") // RazorPage Host
 
         .WithAutomaticReconnect()
         .Build();

@@ -3,14 +3,19 @@
 
 // Write your JavaScript code.
 var connection = new signalR.HubConnectionBuilder()
-    .withUrl("https://localhost:44319/DataSignalRChanel") // Host Hub
+    .withUrl("https://localhost:7082/DataSignalRChanel") // Host Hub
     .build();
 
 
 
 
 connection.on("load", function () {
-    location.href = '/Product/Detail'; // hoặc location.reload();
+    var productId = document.querySelector("input[name='productId']")?.value;
+    if (productId) {
+        location.href = '/Product/Detail/' + productId;
+    } else {
+        location.reload(); // fallback nếu không tìm thấy id
+    }
 });
 
 connection.start()

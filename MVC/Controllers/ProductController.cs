@@ -60,15 +60,19 @@ namespace MVC.Controllers
             _ratingService.RateProduct(userId.Value, productId, ratingValue);
             return RedirectToAction("Detail", new { id = productId });
         }
-
         [HttpPost]
-        public IActionResult PostComment(int productId, string content, int? parentId)
+        public async Task<IActionResult> PostComment(int productId, string content, int? parentId)
         {
             int? userId = HttpContext.Session.GetInt32("AccountIdSession");
             if (userId == null)
             {
                 TempData["Error"] = "Login required to comment.";
                 return RedirectToAction("Detail", new { id = productId });
+            }
+
+            if (productId <= 0)
+            {
+                return BadRequest("Invalid product ID");
             }
 
             var comment = new Comment
@@ -81,19 +85,24 @@ namespace MVC.Controllers
             };
 
             _comService.CreateComment(comment);
+            await _comService.NotifyLoadAsync();
+
             return RedirectToAction("Detail", new { id = productId });
         }
 
 
+
         [HttpPost]
-        public IActionResult HideComment(int commentId)
+        public async Task<IActionResult> HideComment(int commentId)
         {
             _comService.HideComment(commentId);
-            // Optionally redirect to where the comment was
+            await _comService.NotifyLoadAsync();
+
             return Redirect(Request.Headers["Referer"].ToString());
         }
+      
         [HttpPost]
-        public IActionResult EditComment(int commentId, string newContent)
+        public async Task<IActionResult> EditComment(int commentId, string newContent)
         {
             var userId = HttpContext.Session.GetInt32("AccountIdSession");
             var roleId = HttpContext.Session.GetString("RoleIdSession");
@@ -101,11 +110,12 @@ namespace MVC.Controllers
             var comment = _comService.GetById(commentId);
             if (comment == null || (comment.UserId != userId && roleId != "1")) // 1 = admin
             {
-                return Forbid(); // prevent unauthorized edit
+                return Forbid();
             }
 
             comment.Content = newContent;
             _comService.UpdateComment(comment);
+            await _comService.NotifyLoadAsync();
 
             return RedirectToAction("Detail", new { id = comment.ProductId });
         }

@@ -176,12 +176,11 @@
                         </div>
                         <form method="post" asp-action="EditComment" class="d-none" id="edit-form-@reply.Id">
                             <input type="hidden" name="commentId" value="@reply.Id" />
-                            <div class="mb-2">
-                                <textarea name="newContent" class="form-control" rows="2">@reply.Content</textarea>
-                            </div>
+                            <input type="hidden" name="productId" value="@productId" />
+                            <textarea name="newContent" class="form-control" rows="2">@reply.Content</textarea>
                             <button type="submit" class="btn btn-sm btn-warning">Save</button>
-                            <button type="button" class="btn btn-sm btn-secondary" onclick="cancelEdit(@reply.Id)">Cancel</button>
                         </form>
+
 
                         @if (currentUserId == reply.UserId || roleId == "1")
                         {
@@ -205,13 +204,14 @@
 
     @if (!string.IsNullOrEmpty(accountName))
     {
-        <form method="post" asp-action="PostComment" class="mt-4">
-            <input type="hidden" name="productId" value="@productId" />
-            <div class="mb-3">
-                <textarea name="content" class="form-control" rows="3" placeholder="Add your comment..."></textarea>
-            </div>
-            <button type="submit" class="btn btn-primary">Submit</button>
-        </form>
+       <form method="post" asp-action="PostComment" asp-controller="Product" class="mt-4">
+    <input type="hidden" name="productId" value="@productId" />
+    <div class="mb-3">
+        <textarea name="content" class="form-control" rows="3" placeholder="Add your comment..."></textarea>
+    </div>
+    <button type="submit" class="btn btn-primary">Submit</button>
+</form>
+
     }
     else
     {

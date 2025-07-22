@@ -109,10 +109,11 @@ namespace Razor
             app.UseStaticFiles();
 
             app.UseRouting();
+            app.UseCors(); // Enable CORS for SignalR
             app.MapHub<DataSignalR>("/DataSignalRChanel");
             app.UseSession();
             app.UseAuthorization();
-            app.UseCors(); // Enable CORS for SignalR
+            
             app.MapRazorPages();
 
             // Redirect root to ProductPage/Index
