@@ -91,5 +91,11 @@ namespace DAL.Repository
                 await _demoContext.SaveChangesAsync();
             }
         }
+
+        public async Task<bool> HasForeignKeyDependenciesAsync(int id)
+        {
+            // Check if any ProductItem references this VariationOption
+            return await _demoContext.ProductItems.AnyAsync(pi => pi.VariationOptions.Any(vo => vo.Id == id));
+        }
     }
 } 

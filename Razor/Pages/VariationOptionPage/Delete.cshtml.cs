@@ -51,11 +51,22 @@ namespace Razor.Pages.VariationOptionPage
             }
 
             var variationoption = await _variationOptionService.GetVariationOptionByIdAsync(id.Value);
-            if (variationoption != null)
+
+            if (variationoption == null)
             {
-                VariationOption = variationoption;
-                await _variationOptionService.DeleteVariationOptionAsync(VariationOption.Id);
+                return NotFound();
             }
+
+            VariationOption = variationoption;
+
+            // Use service method to check for foreign key dependencies
+            if (await _variationOptionService.HasForeignKeyDependenciesAsync(VariationOption.Id))
+            {
+                ModelState.AddModelError(string.Empty, "Cannot delete this Variation Option because it is referenced by one or more Product Items.");
+                return Page();
+            }
+
+            await _variationOptionService.DeleteVariationOptionAsync(VariationOption.Id);
 
             return RedirectToPage("./Index");
         }

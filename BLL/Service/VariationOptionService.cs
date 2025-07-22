@@ -95,5 +95,12 @@ namespace BLL.Service
 
             await _variationOptionRepo.DeleteVariationOptionAsync(id);
         }
+
+        public async Task<bool> HasForeignKeyDependenciesAsync(int id)
+        {
+            if (id <= 0)
+                throw new ArgumentException("VariationOption ID must be greater than zero.", nameof(id));
+            return await _variationOptionRepo.HasForeignKeyDependenciesAsync(id);
+        }
     }
 } 
