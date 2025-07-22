@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using DAL.Models;
 using BLL.Service.Interface;
+using Microsoft.AspNetCore.SignalR;
+using Razor.Hubs;
 
 namespace Razor.Pages.VariationOptionPage
 {
@@ -14,11 +16,13 @@ namespace Razor.Pages.VariationOptionPage
     {
         private readonly IVariationOptionService _variationOptionService;
         private readonly IVariationService _variationService;
+        private readonly IHubContext<DataSignalR> _hubContext;
 
-        public CreateModel(IVariationOptionService variationOptionService, IVariationService variationService)
+        public CreateModel(IVariationOptionService variationOptionService, IVariationService variationService, IHubContext<DataSignalR> hubContext)
         {
             _variationOptionService = variationOptionService;
             _variationService = variationService;
+            _hubContext = hubContext;
         }
 
         public async Task<IActionResult> OnGet()
@@ -43,6 +47,7 @@ namespace Razor.Pages.VariationOptionPage
             try
             {
                 await _variationOptionService.AddVariationOptionAsync(VariationOption);
+                await _hubContext.Clients.All.SendAsync("load");
                 return RedirectToPage("./Index");
             }
             catch (InvalidOperationException ex)

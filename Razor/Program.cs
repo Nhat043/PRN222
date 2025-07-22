@@ -5,6 +5,7 @@ using DAL.Repository.Interface;
 using DAL.Repository;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
+using Razor.Hubs;
 
 namespace Razor
 {
@@ -59,6 +60,7 @@ namespace Razor
 
             builder.Services.AddScoped<IVariationRepo, VariationRepo>();
             builder.Services.AddScoped<IVariationService, VariationService>();
+            builder.Services.AddSignalR();
 
 
             builder.Services.AddDistributedMemoryCache(); // Cho phép lưu session trong RAM
@@ -68,6 +70,20 @@ namespace Razor
                 options.Cookie.HttpOnly = true;
                 options.Cookie.IsEssential = true;
             });
+            //Add CORS policy for SignalR
+            var allowedOrigins = builder.Configuration.GetSection("AllowedOrigins").Get<string[]>();
+
+            builder.Services.AddCors(options =>
+            {
+                options.AddDefaultPolicy(policy =>
+                {
+                    policy.WithOrigins(allowedOrigins)
+                          .AllowAnyHeader()
+                          .AllowAnyMethod()
+                          .AllowCredentials(); // SignalR cần dòng này
+                });
+            });
+
 
 
             var app = builder.Build();
@@ -91,13 +107,20 @@ namespace Razor
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
-
+            app.UseRouting();
+            app.UseCors(); // Enable CORS for SignalR
             app.UseHttpsRedirection();
             app.UseStaticFiles();
 
-            app.UseRouting();
+           
+           
             app.UseSession();
+           
+            app.MapHub<DataSignalR>("/DataSignalRChanel");
             app.UseAuthorization();
+
+
+
 
             app.MapRazorPages();
 

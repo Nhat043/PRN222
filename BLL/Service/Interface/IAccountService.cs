@@ -23,5 +23,6 @@ namespace BLL.Service.Interface
         // New methods for ban/unban with admin protection
         Task<bool> BanAccountAsync(int accountId);
         Task<bool> UnbanAccountAsync(int accountId);
+        Task NotifyLoadAsync();
     }
 }

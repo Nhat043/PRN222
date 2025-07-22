@@ -8,16 +8,23 @@ using System.Threading.Tasks;
 using DAL.Repository.Interface;
 using DAL.Repository;
 using BLL.Util;
+using Microsoft.AspNetCore.SignalR.Client;
 
 namespace BLL.Service
 {
     public class AccountService : IAccountService
     {
         private readonly IAccountRepo _accountRepo;
+        private static HubConnection? _connection;
+        private static bool _connected = false;
 
         public AccountService(IAccountRepo accountRepo)
         {
             _accountRepo = accountRepo;
+            _connection = new HubConnectionBuilder()
+              .WithUrl("https://localhost:44319/DataSignalRChanel") // RazorPage Host
+               .WithAutomaticReconnect()
+               .Build();
         }
 
         private void ValidateAccount(Account account)
@@ -106,6 +113,16 @@ namespace BLL.Service
             account.StatusId = 1; // 1 = active
             await _accountRepo.UpdateAccountAsync(account);
             return true;
+        }
+        public async Task NotifyLoadAsync()
+        {
+            if (!_connected || _connection.State != HubConnectionState.Connected)
+            {
+                await _connection.StartAsync();
+                _connected = true;
+            }
+
+            await _connection.InvokeAsync("SendAllLoad");
         }
     }
 }

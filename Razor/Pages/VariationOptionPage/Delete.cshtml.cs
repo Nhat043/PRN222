@@ -7,16 +7,20 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using DAL.Datas;
 using DAL.Models;
+using BLL.Service.Interface;
+using Microsoft.AspNetCore.SignalR;
+using Razor.Hubs;
 
 namespace Razor.Pages.VariationOptionPage
 {
     public class DeleteModel : PageModel
     {
-        private readonly DAL.Datas.DemoContext _context;
-
-        public DeleteModel(DAL.Datas.DemoContext context)
+        private readonly IVariationOptionService _variationOptionService;
+        private readonly IHubContext<DataSignalR> _hubContext;
+        public DeleteModel(IVariationOptionService variationOptionService, IHubContext<DataSignalR> hubContext)
         {
-            _context = context;
+            _variationOptionService = variationOptionService;
+            _hubContext = hubContext;
         }
 
         [BindProperty]
@@ -29,7 +33,7 @@ namespace Razor.Pages.VariationOptionPage
                 return NotFound();
             }
 
-            var variationoption = await _context.VariationOptions.FirstOrDefaultAsync(m => m.Id == id);
+            var variationoption = await _variationOptionService.GetVariationOptionByIdAsync(id.Value);
 
             if (variationoption == null)
             {
@@ -49,12 +53,12 @@ namespace Razor.Pages.VariationOptionPage
                 return NotFound();
             }
 
-            var variationoption = await _context.VariationOptions.FindAsync(id);
+            var variationoption = await _variationOptionService.GetVariationOptionByIdAsync(id.Value);
             if (variationoption != null)
             {
                 VariationOption = variationoption;
-                _context.VariationOptions.Remove(VariationOption);
-                await _context.SaveChangesAsync();
+                await _variationOptionService.DeleteVariationOptionAsync(VariationOption.Id);
+                await _hubContext.Clients.All.SendAsync("load");
             }
 
             return RedirectToPage("./Index");

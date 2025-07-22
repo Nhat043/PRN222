@@ -8,16 +8,20 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using DAL.Datas;
 using DAL.Models;
 using BLL.Service.Interface;
+using Microsoft.AspNetCore.SignalR;
+using Razor.Hubs;
 
 namespace Razor.Pages.CategoryPage
 {
     public class CreateModel : PageModel
     {
         private readonly ICategoryService _categoryService;
+        private readonly IHubContext<DataSignalR> _hubContext;
 
-        public CreateModel(ICategoryService categoryService)
+        public CreateModel(ICategoryService categoryService, IHubContext<DataSignalR> hubContext)
         {
             _categoryService = categoryService;
+            _hubContext = hubContext;
         }
 
         public IActionResult OnGet()
@@ -39,6 +43,7 @@ namespace Razor.Pages.CategoryPage
             try
             {
                 await _categoryService.AddCategoryAsync(Category);
+                await _hubContext.Clients.All.SendAsync("load");
                 return RedirectToPage("./Index");
             }
             catch (InvalidOperationException ex)
