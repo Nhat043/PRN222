@@ -14,6 +14,9 @@ namespace BLL.Service.Interface
         void UpdateComment(Comment comment);
         void HideComment(int commentId);
         Comment GetById(int id);
+
+        Task<List<Comment>> GetAllCommentsAsync();
+
     }
 
 }

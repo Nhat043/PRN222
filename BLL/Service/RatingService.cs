@@ -34,6 +34,10 @@ namespace BLL.Service
 
             _ratingRepo.InsertOrUpdateRating(rating);
         }
+        public int GetReviewCount(int productId)
+        {
+            return _ratingRepo.GetReviewCount(productId);
+        }
     }
 
 }

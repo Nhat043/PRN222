@@ -39,6 +39,7 @@ namespace MVC.Controllers
             };
 
             ViewBag.AvgRating = _ratingService.GetAverageRating(id);
+            ViewBag.ReviewCount= _ratingService.GetReviewCount(id);
             ViewBag.CommentVM = commentVM;
 
             return View(product);

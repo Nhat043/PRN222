@@ -56,6 +56,15 @@ namespace DAL.Repository
         {
             return _context.Comments.Include(c => c.User).FirstOrDefault(c => c.Id == id);
         }
+        public async Task<List<Comment>> GetAllCommentsAsync()
+        {
+            return await _context.Comments
+                .Include(c => c.Parent)
+                .Include(c => c.Product)
+                .Include(c => c.Status)
+                .Include(c => c.User)
+                .ToListAsync();
+        }
 
     }
 
