@@ -86,6 +86,8 @@ namespace DAL.Repository
             existingProduct.Name = product.Name;
             existingProduct.Picture = product.Picture;
             existingProduct.Description = product.Description;
+            existingProduct.CategoryId = product.CategoryId;
+            existingProduct.StatusId = product.StatusId;
             existingProduct.Status = product.Status;
             _demoContext.Products.Update(existingProduct);
             await _demoContext.SaveChangesAsync();
