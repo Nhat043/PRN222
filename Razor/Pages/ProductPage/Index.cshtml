@@ -170,10 +170,10 @@
                                             </td>
                                             <td class="align-middle">
                                                 @{
-                                                    var statusClass = item.Status?.Name?.ToLower() switch
+                                                    var statusClass = item.Status?.Name?.Trim().ToLower() switch
                                                     {
-                                                        "active" => "bg-success",
-                                                        "inactive" => "bg-secondary",
+                                                        "available" => "bg-success",
+                                                        "unavailable" => "bg-secondary",
                                                         "draft" => "bg-warning",
                                                         "unavailable" => "bg-danger",
                                                         _ => "bg-info"

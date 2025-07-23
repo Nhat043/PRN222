@@ -71,7 +71,7 @@ namespace MVC
 
             builder.Services.AddHttpContextAccessor();
 
-
+            builder.Services.AddSignalR();
             var app = builder.Build();
 
             // Cho phép truy cập ảnh từ folder bên ngoài

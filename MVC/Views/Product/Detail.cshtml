@@ -225,6 +225,7 @@
 }
 
 @section Scripts {
+    <script src="~/microsoft/signalr/dist/browser/signalr.js"></script>
     <script>
          document.querySelectorAll('input[name="productItemId"]').forEach(radio => {
                 radio.addEventListener('change', function () {
@@ -286,6 +287,21 @@
             const form = document.getElementById(`reply-form-${commentId}`);
             form.classList.toggle("d-none");
         }
+        // SignalR: Reload page on product quantity change
+        var productId = @Model.Id;
+        var connection = new signalR.HubConnectionBuilder()
+            .withUrl("https://localhost:7082/DataSignalRChanel")
+            .build();
+        connection.start().then(function () {
+            // Connected
+        }).catch(function (err) {
+            console.error("SignalR error: " + err);
+        });
+        connection.on("ProductQuantityChanged", function (changedProductId) {
+            if (changedProductId === productId) {
+                location.reload();
+            }
+        });
     </script>
 
 }

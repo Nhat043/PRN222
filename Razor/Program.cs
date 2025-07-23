@@ -5,6 +5,7 @@ using DAL.Repository.Interface;
 using DAL.Repository;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
+using Razor.Hubs;
 
 namespace Razor
 {
@@ -69,7 +70,20 @@ namespace Razor
                 options.Cookie.IsEssential = true;
             });
 
+            builder.Services.AddSignalR();
 
+            //Add CORS policy for SignalR
+            var allowedOrigins = builder.Configuration.GetSection("AllowedOrigins").Get<string[]>();
+            builder.Services.AddCors(options =>
+            {
+                options.AddDefaultPolicy(policy =>
+                {
+                    policy.WithOrigins(allowedOrigins)
+                          .AllowAnyHeader()
+                          .AllowAnyMethod()
+                          .AllowCredentials(); // SignalR cần dòng này
+                });
+            });
             var app = builder.Build();
 
            
@@ -99,6 +113,9 @@ namespace Razor
             app.UseSession();
             app.UseAuthorization();
 
+            app.UseCors();
+
+
             app.MapRazorPages();
 
             // Redirect root to ProductPage/Index
@@ -106,7 +123,7 @@ namespace Razor
                 context.Response.Redirect("/ProductPage/Index");
                 return Task.CompletedTask;
             });
-
+            app.MapHub<DataSignalR>("/DataSignalRChanel");
             app.Run();
         }
     }
