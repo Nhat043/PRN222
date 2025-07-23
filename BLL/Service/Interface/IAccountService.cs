@@ -24,5 +24,6 @@ namespace BLL.Service.Interface
         Task<bool> BanAccountAsync(int accountId);
         Task<bool> UnbanAccountAsync(int accountId);
         Task NotifyBanAccountAsync();
+
     }
 }

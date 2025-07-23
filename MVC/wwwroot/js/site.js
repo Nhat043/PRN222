@@ -1,5 +1,4 @@
-﻿
-// Connect to DataSignalRChanel
+﻿// Connect to DataSignalRChanel
 var dataConnection = new signalR.HubConnectionBuilder()
     .withUrl("https://localhost:7082/DataSignalRChanel")
     .build();
@@ -31,3 +30,16 @@ accountConnection.on("loadBanAccount", function () {
 accountConnection.start()
     .then(() => console.log("Connected to AccountSignalRChanel"))
     .catch(err => console.error("Error connecting to AccountSignalRChanel:", err.toString()));
+
+// Connect to VarianSignalR
+var varianConnection = new signalR.HubConnectionBuilder()
+    .withUrl("https://localhost:7082/VarianSignalR")
+    .build();
+
+varianConnection.on("load", function () {
+    location.href = '/mvc/Product/Index'; // hoặc location.reload();
+});
+
+varianConnection.start()
+    .then(() => console.log("SignalR connected from MVC (VarianSignalR)"))
+    .catch(err => console.error("Lỗi kết nối SignalR (VarianSignalR):", err.toString()));

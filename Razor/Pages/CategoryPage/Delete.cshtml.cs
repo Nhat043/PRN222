@@ -8,16 +8,20 @@ using Microsoft.EntityFrameworkCore;
 using DAL.Datas;
 using DAL.Models;
 using BLL.Service.Interface;
+using Microsoft.AspNetCore.SignalR;
+using Razor.Hubs;
 
 namespace Razor.Pages.CategoryPage
 {
     public class DeleteModel : PageModel
     {
         private readonly ICategoryService _categoryService;
+        private readonly IHubContext<VarianSignalR> _hubContext;
 
-        public DeleteModel(ICategoryService categoryService)
+        public DeleteModel(ICategoryService categoryService, IHubContext<VarianSignalR> hubContext)
         {
             _categoryService = categoryService;
+            _hubContext = hubContext;
         }
 
         [BindProperty]
@@ -53,6 +57,7 @@ namespace Razor.Pages.CategoryPage
             try
             {
                 await _categoryService.DeleteCategoryAsync(id.Value);
+                await _hubContext.Clients.All.SendAsync("load");
                 return RedirectToPage("./Index");
             }
             catch (InvalidOperationException ex)

@@ -135,3 +135,23 @@
         }
     </div>
 </div>
+@section Scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/8.0.0/signalr.min.js"></script>
+    <script>
+        const connection = new signalR.HubConnectionBuilder()
+            .withUrl("https://localhost:7082/DataSignalRChanel") // Razor's SignalR hub URL
+            .withAutomaticReconnect()
+            .build();
+
+        connection.on("load", function () {
+            // Option 1: Reload whole page
+            location.reload();
+
+            // Option 2: You could refetch data via AJAX instead
+        });
+
+        connection.start()
+            .then(() => console.log("SignalR connected on Product Page"))
+            .catch(err => console.error("SignalR connection error:", err));
+    </script>
+}

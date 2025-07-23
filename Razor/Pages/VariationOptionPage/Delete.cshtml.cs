@@ -9,16 +9,22 @@ using DAL.Datas;
 using DAL.Models;
 using BLL.Service.Interface;
 
+using Microsoft.AspNetCore.SignalR;
+using Razor.Hubs;
+
+
 namespace Razor.Pages.VariationOptionPage
 {
     public class DeleteModel : PageModel
     {
         private readonly IVariationOptionService _variationOptionService;
 
-        public DeleteModel(IVariationOptionService variationOptionService)
+        private readonly IHubContext<VarianSignalR> _hubContext;
+        public DeleteModel(IVariationOptionService variationOptionService, IHubContext<VarianSignalR> hubContext)
         {
             _variationOptionService = variationOptionService;
-        }
+            _hubContext = hubContext; }
+
 
         [BindProperty]
         public VariationOption VariationOption { get; set; } = default!;
@@ -54,7 +60,15 @@ namespace Razor.Pages.VariationOptionPage
 
             if (variationoption == null)
             {
+
+                VariationOption = variationoption;
+                await _variationOptionService.DeleteVariationOptionAsync(VariationOption.Id);
+
+                await _hubContext.Clients.All.SendAsync("load");
+
+
                 return NotFound();
+
             }
 
             VariationOption = variationoption;

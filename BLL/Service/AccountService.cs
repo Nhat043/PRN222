@@ -10,12 +10,16 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using DAL.Repository.Interface;
+using DAL.Repository;
+using BLL.Util;
 
 namespace BLL.Service
 {
     public class AccountService : IAccountService
     {
         private readonly IAccountRepo _accountRepo;
+    
 
         private static HubConnection? _connection;
         private static bool _connected = false;
@@ -23,10 +27,12 @@ namespace BLL.Service
         public AccountService(IAccountRepo accountRepo)
         {
             _accountRepo = accountRepo;
+
             _connection = new HubConnectionBuilder()
                 .WithUrl("https://localhost:7082/AccountSignalRChanel") 
                 .WithAutomaticReconnect()
                 .Build();
+
         }
 
         private void ValidateAccount(Account account)
@@ -117,6 +123,7 @@ namespace BLL.Service
             return true;
         }
 
+
         public async Task NotifyBanAccountAsync()
         {
             if (!_connected || _connection.State != HubConnectionState.Connected)
@@ -125,8 +132,9 @@ namespace BLL.Service
                 _connected = true;
             }
 
-            await _connection.InvokeAsync("SendAllLoad");
+            await _connection.InvokeAsync("SendAllLoadBanAccount");
         }
+
 
     }
 }

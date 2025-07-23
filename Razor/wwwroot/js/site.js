@@ -1,5 +1,4 @@
-﻿
-// Please see documentation at https://learn.microsoft.com/aspnet/core/client-side/bundling-and-minification
+﻿// Please see documentation at https://learn.microsoft.com/aspnet/core/client-side/bundling-and-minification
 // for details on configuring this project to bundle and minify static web assets.
 
 // Write your JavaScript code.
@@ -31,3 +30,16 @@ accountConnection.on("load", function () {
 accountConnection.start()
     .then(() => console.log("Connected to AccountSignalRChanel"))
     .catch(err => console.error("Error connecting to AccountSignalRChanel:", err.toString()));
+
+// Connect to VarianSignalR
+var varianConnection = new signalR.HubConnectionBuilder()
+    .withUrl("/VarianSignalR")
+    .build();
+
+varianConnection.on("load", function () {
+    location.href = '/VariationOptionPage';
+});
+
+varianConnection.start()
+    .then(() => console.log("Connected to VarianSignalR"))
+    .catch(err => console.error("Error connecting to VarianSignalR:", err.toString()));

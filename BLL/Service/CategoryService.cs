@@ -2,6 +2,7 @@
 using DAL.Models;
 using DAL.Repository;
 using DAL.Repository.Interface;
+using Microsoft.AspNetCore.SignalR.Client;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,10 +14,16 @@ namespace BLL.Service
     public class CategoryService : ICategoryService
     {
         private readonly ICategoryRepo _categoryRepo;
+        private static HubConnection? _connection;
+        private static bool _connected = false;
 
         public CategoryService(ICategoryRepo categoryRepo)
         {
             _categoryRepo = categoryRepo;
+            _connection = new HubConnectionBuilder()
+               .WithUrl("https://localhost:7082/DataSignalRChanel") // RazorPage Host
+                .WithAutomaticReconnect()
+                .Build();
         }
         private void ValidateCategory(Category category)
         {
@@ -96,6 +103,16 @@ namespace BLL.Service
                 throw new InvalidOperationException($"User with ID {id} not found.");
 
             return user;
+        }
+        public async Task NotifyLoadAsync()
+        {
+            if (!_connected || _connection.State != HubConnectionState.Connected)
+            {
+                await _connection.StartAsync();
+                _connected = true;
+            }
+
+            await _connection.InvokeAsync("SendAllLoad");
         }
     }
 }

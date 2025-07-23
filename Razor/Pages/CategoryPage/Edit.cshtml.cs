@@ -9,16 +9,20 @@ using Microsoft.EntityFrameworkCore;
 using DAL.Datas;
 using DAL.Models;
 using BLL.Service.Interface;
+using Microsoft.AspNetCore.SignalR;
+using Razor.Hubs;
 
 namespace Razor.Pages.CategoryPage
 {
     public class EditModel : PageModel
     {
         private readonly ICategoryService _categoryService;
+        private readonly IHubContext<VarianSignalR> _hubContext;
 
-        public EditModel(ICategoryService categoryService)
+        public EditModel(ICategoryService categoryService, IHubContext<VarianSignalR> hubContext)
         {
             _categoryService = categoryService;
+            _hubContext = hubContext;
         }
 
         [BindProperty]
@@ -52,6 +56,7 @@ namespace Razor.Pages.CategoryPage
             try
             {
                 await _categoryService.UpdateCategoryAsync(Category);
+                await _hubContext.Clients.All.SendAsync("load");
                 return RedirectToPage("./Index");
             }
             catch (InvalidOperationException ex)
