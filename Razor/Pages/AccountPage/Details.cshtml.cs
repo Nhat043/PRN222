@@ -8,23 +8,27 @@ using Microsoft.EntityFrameworkCore;
 using DAL.Datas;
 using DAL.Models;
 using BLL.Service.Interface;
+using Razor.Models;
 
 namespace Razor.Pages_AccountPage
 {
     public class DetailsModel : PageModel
     {
         private readonly IAccountService _accountService;
+        private readonly IOrderService _orderService;
 
-        public DetailsModel(IAccountService accountService)
+        public DetailsModel(IAccountService accountService, IOrderService orderService)
         {
             _accountService = accountService;
+            _orderService = orderService;
         }
 
         public Account Account { get; set; } = default!;
         public string? ErrorMessage { get; set; }
         public string? SuccessMessage { get; set; }
+        public PaginatedList<Order> OrderHistory { get; set; } = default!;
 
-        public async Task<IActionResult> OnGetAsync(int? id)
+        public async Task<IActionResult> OnGetAsync(int? id, int pageIndex = 1, int pageSize = 5)
         {
             if (id == null)
             {
@@ -34,6 +38,8 @@ namespace Razor.Pages_AccountPage
             try
             {
                 Account = await _accountService.GetAccountByIdAsync(id.Value);
+                var (orders, totalCount) = await _orderService.GetPaginatedOrdersByUserIdAsync(id.Value, pageIndex, pageSize);
+                OrderHistory = new PaginatedList<Order>(orders, totalCount, pageIndex, pageSize);
             }
             catch (InvalidOperationException)
             {
