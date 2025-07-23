@@ -78,12 +78,10 @@ namespace Razor.Pages.CommentPage
                 return Page();
             }
 
-            //var accountId = HttpContext.Session.GetInt32("AccountIdSession");
-            //if (accountId == null)
-            //    return RedirectToPage("/Auth/Login");
+           
 
             Comment.CreatedAt = DateTime.Now;
-            //Comment.UserId = accountId.Value;
+           
             Comment.UserId = 1;
 
 
@@ -95,7 +93,7 @@ namespace Razor.Pages.CommentPage
         {
             ViewData["ParentId"] = new SelectList(_commentService.GetProductComments(ProductId ?? 0), "Id", "Content");
             ViewData["ProductId"] = new SelectList(_productService.GetAllProductsAsync().Result, "Id", "Name");
-            // 🔧 THÊM 2 DÒNG DƯỚI:
+            
             ViewData["StatusId"] = new SelectList(_statusService.GetAll(), "Id", "Name");
             ViewData["UserId"] = new SelectList(_accountService.GetAllAccountsAsync().Result, "Id", "Email");
         }

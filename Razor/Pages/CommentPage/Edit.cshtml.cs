@@ -44,26 +44,29 @@ namespace Razor.Pages.CommentPage
             return Page();
         }
 
-        public IActionResult OnPost()
+        public async Task<IActionResult> OnPost()
         {
             if (!ModelState.IsValid)
             {
-                LoadSelectLists();
                 return Page();
             }
 
-            try
+           
+            var existingComment =  _commentService.GetById(Comment.Id);
+            if (existingComment == null)
             {
-                _commentService.UpdateComment(Comment);
+                return NotFound();
             }
-            catch (Exception)
-            {
-                // Optional: Catch specific exception types if needed
-                return NotFound(); // hoặc xử lý lỗi khác tùy yêu cầu
-            }
+
+           
+            existingComment.Content = Comment.Content;
+
+            
+             _commentService.UpdateComment(existingComment);
 
             return RedirectToPage("./Index");
         }
+
 
         private void LoadSelectLists()
         {
