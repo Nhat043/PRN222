@@ -1,13 +1,15 @@
+using BLL.Service.Interface;
+using DAL.Datas;
+using DAL.Models;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.SignalR;
+using Microsoft.EntityFrameworkCore;
+using Razor.Hubs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.EntityFrameworkCore;
-using DAL.Datas;
-using DAL.Models;
-using BLL.Service.Interface;
 
 namespace Razor.Pages_AccountPage
 {
@@ -40,6 +42,10 @@ namespace Razor.Pages_AccountPage
             {
                 SuccessMessage = "Account banned successfully.";
             }
+
+            // Notify clients about the ban action
+            await _accountService.NotifyBanAccountAsync();
+
             return RedirectToPage();
         }
 

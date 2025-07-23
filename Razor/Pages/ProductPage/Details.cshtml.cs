@@ -1,11 +1,13 @@
-﻿using System;
+﻿using BLL.Service.Interface;
+using DAL.Models;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.SignalR;
+using Razor.Hubs;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
-using DAL.Models;
-using BLL.Service.Interface;
 
 namespace Razor.Pages.ProductPage
 {
@@ -15,13 +17,15 @@ namespace Razor.Pages.ProductPage
         private readonly IProductItemService _productItemService;
         private readonly IVariationService _variationService;
         private readonly IProductItemStatusService _statusService;
+        private readonly IHubContext<AccountSignalR> _hubContext;
 
-        public DetailsModel(IProductService productService, IProductItemService productItemService, IVariationService variationService, IProductItemStatusService statusService)
+        public DetailsModel(IProductService productService, IProductItemService productItemService, IVariationService variationService, IProductItemStatusService statusService, IHubContext<AccountSignalR> hubContext)
         {
             _productService = productService;
             _productItemService = productItemService;
             _variationService = variationService;
             _statusService = statusService;
+            _hubContext = hubContext;
         }
 
         public Product Product { get; set; } = default!;

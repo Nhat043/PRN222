@@ -70,7 +70,9 @@ namespace Razor
                 options.Cookie.IsEssential = true;
             });
 
+
             builder.Services.AddSignalR();
+
 
             //Add CORS policy for SignalR
             var allowedOrigins = builder.Configuration.GetSection("AllowedOrigins").Get<string[]>();
@@ -110,6 +112,11 @@ namespace Razor
             app.UseStaticFiles();
 
             app.UseRouting();
+
+            app.UseCors();
+            // Enable SignalR
+            app.MapHub<AccountSignalR>("/AccountSignalRChanel");
+
             app.UseSession();
             app.UseAuthorization();
 
