@@ -173,7 +173,7 @@
                                                     var statusClass = item.Status?.Name?.Trim().ToLower() switch
                                                     {
                                                         "available" => "bg-success",
-                                                        "unavailable" => "bg-secondary",
+                                                        "inactive" => "bg-secondary",
                                                         "draft" => "bg-warning",
                                                         "unavailable" => "bg-danger",
                                                         _ => "bg-info"
