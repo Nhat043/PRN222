@@ -50,7 +50,9 @@ namespace Razor.Pages.CommentPage
             return Page();
         }
 
+
         public async Task<IActionResult> OnPostAsync()
+
         {
             if (!ModelState.IsValid)
             {
@@ -67,9 +69,12 @@ namespace Razor.Pages.CommentPage
            
             existingComment.Content = Comment.Content;
 
+
            
             _commentService.UpdateComment(existingComment);
             await _hubContext.Clients.All.SendAsync("load");
+
+
             return RedirectToPage("./Index");
         }
 

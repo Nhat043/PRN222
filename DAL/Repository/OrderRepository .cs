@@ -57,9 +57,12 @@ namespace DAL.Repository
         public async Task<List<Order>> GetOrdersByUserIdAsync(int userId)
         {
             return await _dbContext.Orders
-                .Where(o => o.UserId == userId) // ✅ CORRECT
+                .Where(o => o.UserId == userId)
                 .Include(o => o.User)
                 .Include(o => o.Status)
+                .Include(o => o.OrderItems)
+                    .ThenInclude(oi => oi.ProductItem)
+                        .ThenInclude(pi => pi.Product)
                 .OrderByDescending(o => o.Date)
                 .ToListAsync();
         }

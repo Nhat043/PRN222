@@ -40,8 +40,10 @@ namespace Razor.Pages.CommentPage
             if (id == null)
                 return NotFound();
 
-            _commentService.HideComment(id.Value); // ❗ Soft delete (statusId = 2)
+
+            _commentService.HideComment(id.Value); 
             _hubContext.Clients.All.SendAsync("load");
+
 
             return RedirectToPage("./Index");
         }

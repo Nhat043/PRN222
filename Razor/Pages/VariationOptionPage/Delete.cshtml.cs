@@ -7,16 +7,17 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using DAL.Datas;
 using DAL.Models;
+using BLL.Service.Interface;
 
 namespace Razor.Pages.VariationOptionPage
 {
     public class DeleteModel : PageModel
     {
-        private readonly DAL.Datas.DemoContext _context;
+        private readonly IVariationOptionService _variationOptionService;
 
-        public DeleteModel(DAL.Datas.DemoContext context)
+        public DeleteModel(IVariationOptionService variationOptionService)
         {
-            _context = context;
+            _variationOptionService = variationOptionService;
         }
 
         [BindProperty]
@@ -29,7 +30,7 @@ namespace Razor.Pages.VariationOptionPage
                 return NotFound();
             }
 
-            var variationoption = await _context.VariationOptions.FirstOrDefaultAsync(m => m.Id == id);
+            var variationoption = await _variationOptionService.GetVariationOptionByIdAsync(id.Value);
 
             if (variationoption == null)
             {
@@ -49,13 +50,23 @@ namespace Razor.Pages.VariationOptionPage
                 return NotFound();
             }
 
-            var variationoption = await _context.VariationOptions.FindAsync(id);
-            if (variationoption != null)
+            var variationoption = await _variationOptionService.GetVariationOptionByIdAsync(id.Value);
+
+            if (variationoption == null)
             {
-                VariationOption = variationoption;
-                _context.VariationOptions.Remove(VariationOption);
-                await _context.SaveChangesAsync();
+                return NotFound();
             }
+
+            VariationOption = variationoption;
+
+            // Use service method to check for foreign key dependencies
+            if (await _variationOptionService.HasForeignKeyDependenciesAsync(VariationOption.Id))
+            {
+                ModelState.AddModelError(string.Empty, "Cannot delete this Variation Option because it is referenced by one or more Product Items.");
+                return Page();
+            }
+
+            await _variationOptionService.DeleteVariationOptionAsync(VariationOption.Id);
 
             return RedirectToPage("./Index");
         }
