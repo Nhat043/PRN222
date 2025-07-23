@@ -2,7 +2,7 @@
 
 namespace Razor.Hubs
 {
-    public class DataSignalR:Hub
+    public class DataSignalR : Hub
     {
         public override async Task OnConnectedAsync()
         {
@@ -20,5 +20,20 @@ namespace Razor.Hubs
             await Clients.Group("AdminGroup").SendAsync("ProductQuantityChanged", productId);
         }
 
+        public async Task SendMessage(string message)
+        {
+            await Clients.All.SendAsync("ReceiveMessage", message);
+        }
+
+        public async Task SendAllLoad()
+        {
+            await Clients.All.SendAsync("load");
+        }
+
+        public async Task SendAllLoadComment()
+        {
+            await Clients.All.SendAsync("loadComment");
+        }
+        
     }
 }

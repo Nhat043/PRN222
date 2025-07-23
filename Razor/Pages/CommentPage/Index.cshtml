@@ -129,12 +129,16 @@
                                                     }
 
                                                     <!--  Nút Reply mới thêm -->
-                                                    <a asp-page="./Create"
-                                                       asp-route-parentId="@item.Id"
-                                                       asp-route-productId="@item.ProductId"
-                                                       class="btn btn-sm btn-outline-secondary" title="Reply">
-                                                        <i class="fas fa-reply"></i>
-                                                    </a>
+                                                    @if(item.Parent == null)
+                                                    {
+                                                        <a asp-page="./Create"
+                                                           asp-route-parentId="@item.Id"
+                                                           asp-route-productId="@item.ProductId"
+                                                           class="btn btn-sm btn-outline-secondary" title="Reply">
+                                                            <i class="fas fa-reply"></i>
+                                                        </a>
+                                                    }
+                                                    
                                                 </div>
                                             </td>
                                         </tr>

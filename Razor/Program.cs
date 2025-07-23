@@ -74,6 +74,7 @@ namespace Razor
             builder.Services.AddSignalR();
 
 
+
             //Add CORS policy for SignalR
             var allowedOrigins = builder.Configuration.GetSection("AllowedOrigins").Get<string[]>();
             builder.Services.AddCors(options =>

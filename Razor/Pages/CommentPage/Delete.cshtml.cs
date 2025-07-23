@@ -1,18 +1,22 @@
-﻿using System.Threading.Tasks;
+﻿using BLL.Service.Interface;
+using DAL.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using DAL.Models;
-using BLL.Service.Interface;
+using Microsoft.AspNetCore.SignalR;
+using Razor.Hubs;
+using System.Threading.Tasks;
 
 namespace Razor.Pages.CommentPage
 {
     public class DeleteModel : PageModel
     {
         private readonly IComService _commentService;
+        private readonly IHubContext<DataSignalR> _hubContext;
 
-        public DeleteModel(IComService commentService)
+        public DeleteModel(IComService commentService, IHubContext<DataSignalR> hubContext)
         {
             _commentService = commentService;
+            _hubContext = hubContext;
         }
 
         [BindProperty]
@@ -36,7 +40,11 @@ namespace Razor.Pages.CommentPage
             if (id == null)
                 return NotFound();
 
+
             _commentService.HideComment(id.Value); 
+            _hubContext.Clients.All.SendAsync("load");
+
+
             return RedirectToPage("./Index");
         }
     }

@@ -6,7 +6,12 @@ var dataConnection = new signalR.HubConnectionBuilder()
 
 dataConnection.on("load", function () {
     // handle event for DataSignalRChanel
-    console.log("DataSignalRChanel load event");
+    var productId = document.querySelector("input[name='productId']")?.value;
+    if (productId) {
+        location.href = '/Product/Detail/' + productId;
+    } else {
+        location.reload(); // fallback nếu không tìm thấy id
+    }
 });
 
 dataConnection.start()
@@ -18,7 +23,7 @@ var accountConnection = new signalR.HubConnectionBuilder()
     .withUrl("https://localhost:7082/AccountSignalRChanel")
     .build();
 
-accountConnection.on("load", function () {
+accountConnection.on("loadBanAccount", function () {
     // handle event for AccountSignalRChanel
     location.href = '/mvc';
 });
@@ -26,4 +31,3 @@ accountConnection.on("load", function () {
 accountConnection.start()
     .then(() => console.log("Connected to AccountSignalRChanel"))
     .catch(err => console.error("Error connecting to AccountSignalRChanel:", err.toString()));
-

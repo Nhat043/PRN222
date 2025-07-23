@@ -8,9 +8,9 @@ namespace Razor.Hubs
         {
             await Clients.All.SendAsync("ReceiveMessage", message);
         }
-        public async Task SendAllLoad()
+        public async Task SendAllLoadBanAccount()
         {
-            await Clients.All.SendAsync("load");
+            await Clients.All.SendAsync("loadBanAccount");
         }
     }
 }

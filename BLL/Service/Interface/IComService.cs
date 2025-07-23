@@ -16,7 +16,7 @@ namespace BLL.Service.Interface
         Comment GetById(int id);
 
         Task<List<Comment>> GetAllCommentsAsync();
-
+        Task NotifyLoadAsync();
     }
 
 }
