@@ -19,8 +19,8 @@ namespace Razor.Pages.VariationOptionPage
     {
         private readonly IVariationOptionService _variationOptionService;
 
-        private readonly IHubContext<DataSignalR> _hubContext;
-        public DeleteModel(IVariationOptionService variationOptionService, IHubContext<DataSignalR> hubContext)
+        private readonly IHubContext<VarianSignalR> _hubContext;
+        public DeleteModel(IVariationOptionService variationOptionService, IHubContext<VarianSignalR> hubContext)
         {
             _variationOptionService = variationOptionService;
             _hubContext = hubContext; }

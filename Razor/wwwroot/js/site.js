@@ -1,5 +1,5 @@
 ﻿var connection = new signalR.HubConnectionBuilder()
-    .withUrl("/DataSignalRChanel")
+    .withUrl("/VarianSignalR")
     .build();
 
 //setup lắng nghe message “load” thì thực hiện

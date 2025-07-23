@@ -16,9 +16,9 @@ namespace Razor.Pages.CategoryPage
     public class DeleteModel : PageModel
     {
         private readonly ICategoryService _categoryService;
-        private readonly IHubContext<DataSignalR> _hubContext;
+        private readonly IHubContext<VarianSignalR> _hubContext;
 
-        public DeleteModel(ICategoryService categoryService, IHubContext<DataSignalR> hubContext)
+        public DeleteModel(ICategoryService categoryService, IHubContext<VarianSignalR> hubContext)
         {
             _categoryService = categoryService;
             _hubContext = hubContext;

@@ -1,9 +1,9 @@
 ﻿var connection = new signalR.HubConnectionBuilder()
-    .withUrl("https://localhost:7082/DataSignalRChanel") // Host Hub
+    .withUrl("https://localhost:7082/VarianSignalR") // Host Hub
     .build();
 
 connection.on("load", function () {
-    location.reload(); // hoặc location.reload();
+    location.href = '/mvc/Product/Index';// hoặc location.reload();
 });
 
 connection.start()

@@ -89,7 +89,7 @@ namespace MVC.Controllers
             };
 
             await _accountService.UpdateAccountAsync(account);
-            await _accountService.NotifyLoadAsync();
+           
 
             TempData["Message"] = "Profile updated successfully.";
             return RedirectToAction("Profile", new { username = model.Name });

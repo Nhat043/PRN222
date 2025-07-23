@@ -17,9 +17,9 @@ namespace Razor.Pages.CategoryPage
     public class EditModel : PageModel
     {
         private readonly ICategoryService _categoryService;
-        private readonly IHubContext<DataSignalR> _hubContext;
+        private readonly IHubContext<VarianSignalR> _hubContext;
 
-        public EditModel(ICategoryService categoryService, IHubContext<DataSignalR> hubContext)
+        public EditModel(ICategoryService categoryService, IHubContext<VarianSignalR> hubContext)
         {
             _categoryService = categoryService;
             _hubContext = hubContext;

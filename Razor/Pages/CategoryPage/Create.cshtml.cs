@@ -16,9 +16,9 @@ namespace Razor.Pages.CategoryPage
     public class CreateModel : PageModel
     {
         private readonly ICategoryService _categoryService;
-        private readonly IHubContext<DataSignalR> _hubContext;
+        private readonly IHubContext<VarianSignalR> _hubContext;
 
-        public CreateModel(ICategoryService categoryService, IHubContext<DataSignalR> hubContext)
+        public CreateModel(ICategoryService categoryService, IHubContext<VarianSignalR> hubContext)
         {
             _categoryService = categoryService;
             _hubContext = hubContext;

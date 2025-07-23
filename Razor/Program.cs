@@ -116,7 +116,7 @@ namespace Razor
            
             app.UseSession();
            
-            app.MapHub<DataSignalR>("/DataSignalRChanel");
+            app.MapHub<VarianSignalR>("/VarianSignalR");
             app.UseAuthorization();
 
 

@@ -2,7 +2,7 @@
 
 namespace Razor.Hubs
 {
-    public class DataSignalR : Hub
+    public class VarianSignalR : Hub
     {
         public async Task SendMessage(string message)
         {
