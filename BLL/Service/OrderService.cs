@@ -45,6 +45,14 @@ namespace BLL.Service
             return await _orderRepository.GetOrdersByUserIdAsync(userId);
         }
 
+        public async Task<(List<Order> Orders, int TotalCount)> GetPaginatedOrdersByUserIdAsync(int userId, int pageIndex, int pageSize)
+        {
+            var allOrders = await _orderRepository.GetOrdersByUserIdAsync(userId);
+            var totalCount = allOrders.Count;
+            var pagedOrders = allOrders.Skip((pageIndex - 1) * pageSize).Take(pageSize).ToList();
+            return (pagedOrders, totalCount);
+        }
+
         public async Task<List<OrderStatus>> GetAllOrderStatusAsync()
         {
             return await _orderRepository.GetAllOrderStatusAsync();

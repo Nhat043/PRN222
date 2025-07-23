@@ -17,6 +17,7 @@ namespace BLL.Service.Interface
         Task<Order> GetOrderByIdAsync(int id);
         Task UpdateOrderAsync(Order order);
         Task<List<Order>> GetOrdersByUserIdAsync(int userId);
+        Task<(List<Order> Orders, int TotalCount)> GetPaginatedOrdersByUserIdAsync(int userId, int pageIndex, int pageSize);
         Task<List<OrderStatus>> GetAllOrderStatusAsync();
     }
 }
