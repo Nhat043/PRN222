@@ -1,4 +1,4 @@
-@page
+﻿@page
 @model Razor.Pages.OrderPage.IndexModel
 
 @{
@@ -116,8 +116,8 @@
                                         <tr>
                                             <td>#@order.Id</td>
                                             <td>
-                                                <div class="fw-medium">@order.User?.Name ?? "Unknown"</div>
-                                                <small class="text-muted">@order.User?.Email</small>
+                                                <div class="fw-medium">@((order.User != null && !string.IsNullOrWhiteSpace(order.User.Name)) ? order.User.Name : "Unknown")</div>
+                                                <small class="text-muted">@(order.User?.Email ?? "")</small>
                                             </td>
                                             <td>
                                                 <div class="fw-medium">@order.Date.ToString("dd/MM/yyyy")</div>
