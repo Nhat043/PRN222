@@ -102,10 +102,7 @@ namespace MVC
 
             // Use session middleware
             app.UseSession();
-            app.MapControllerRoute(
-    name: "default",
-    pattern: "{controller=Auth}/{action=CheckIsLogin}/{id?}");
-
+          
             app.MapControllerRoute(
                 name: "mvc",
                 pattern: "mvc/{controller=Auth}/{action=Login}/{id?}");
@@ -115,11 +112,11 @@ namespace MVC
 
             app.MapRazorPages();
 
-            //app.MapGet("/", context =>
-            //{
-            //    context.Response.Redirect("/mvc/auth/CheckIsLogin");
-            //    return Task.CompletedTask;
-            //});
+            app.MapGet("/", context =>
+            {
+                context.Response.Redirect("/mvc/auth/CheckIsLogin");
+                return Task.CompletedTask;
+            });
 
             app.Run();
         }
