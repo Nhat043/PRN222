@@ -3,7 +3,7 @@
 
 // Write your JavaScript code.
 var connection = new signalR.HubConnectionBuilder()
-    .withUrl("/DataSignalRChanel")
+    .withUrl("/CommentSignalRChanel")
     .build();
 
 //setup lắng nghe message “load” thì thực hiện

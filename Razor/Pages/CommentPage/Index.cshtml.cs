@@ -16,8 +16,8 @@ namespace Razor.Pages.CommentPage
     public class IndexModel : PageModel
     {
         private readonly IComService _context;
-        private readonly IHubContext<DataSignalR> _hubContext;
-        public IndexModel(IComService context, IHubContext<DataSignalR> hubContext)
+        private readonly IHubContext<CommentSignalR> _hubContext;
+        public IndexModel(IComService context, IHubContext<CommentSignalR> hubContext)
         {
             _context = context;
             _hubContext = hubContext;

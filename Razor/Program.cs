@@ -110,7 +110,7 @@ namespace Razor
 
             app.UseRouting();
             app.UseCors(); // Enable CORS for SignalR
-            app.MapHub<DataSignalR>("/DataSignalRChanel");
+            app.MapHub<CommentSignalR>("/CommentSignalRChanel");
             app.UseSession();
             app.UseAuthorization();
             

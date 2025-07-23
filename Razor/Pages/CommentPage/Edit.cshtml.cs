@@ -17,7 +17,7 @@ namespace Razor.Pages.CommentPage
         private readonly IProductService _productService;
         private readonly ICommentStatusService _statusService;
         private readonly IAccountService _accountService;
-        private readonly IHubContext<DataSignalR> _hubContext;
+        private readonly IHubContext<CommentSignalR> _hubContext;
 
 
         public EditModel(
@@ -25,7 +25,7 @@ namespace Razor.Pages.CommentPage
             IProductService productService,
             ICommentStatusService statusService,
             IAccountService accountService, 
-            IHubContext<DataSignalR> hubContext)
+            IHubContext<CommentSignalR> hubContext)
         {
             _commentService = commentService;
             _productService = productService;

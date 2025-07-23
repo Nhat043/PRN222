@@ -103,6 +103,8 @@ namespace MVC
             // Use session middleware
             app.UseSession();
           
+
+
             app.MapControllerRoute(
                 name: "mvc",
                 pattern: "mvc/{controller=Auth}/{action=Login}/{id?}");
@@ -110,7 +112,7 @@ namespace MVC
             app.MapRazorPages();
 
 
-            app.MapRazorPages();
+
 
             app.MapGet("/", context =>
             {

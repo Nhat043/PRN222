@@ -18,13 +18,13 @@ namespace Razor.Pages.CommentPage
         private readonly IComService _commentService;
         private readonly IProductService _productService;
         private readonly IAccountService _accountService;
-        private readonly IHubContext<DataSignalR> _hubContext;
+        private readonly IHubContext<CommentSignalR> _hubContext;
         public CreateModel(
             ICommentStatusService statusService,
             IComService commentService,
             IProductService productService, 
             IAccountService accountService,
-            IHubContext<DataSignalR> hubContext)
+            IHubContext<CommentSignalR> hubContext)
         {
             _statusService = statusService;
             _commentService = commentService;

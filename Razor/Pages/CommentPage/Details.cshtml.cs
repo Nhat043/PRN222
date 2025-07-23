@@ -11,10 +11,10 @@ namespace Razor.Pages.CommentPage
     public class DetailsModel : PageModel
     {
         private readonly IComService _commentService;
-        private readonly IHubContext<DataSignalR> _hubContext;
+        private readonly IHubContext<CommentSignalR> _hubContext;
 
 
-        public DetailsModel(IComService commentService, IHubContext<DataSignalR> hubContext)
+        public DetailsModel(IComService commentService, IHubContext<CommentSignalR> hubContext)
         {
             _commentService = commentService;
             _hubContext = hubContext;

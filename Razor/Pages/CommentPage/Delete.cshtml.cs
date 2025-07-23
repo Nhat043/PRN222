@@ -11,9 +11,9 @@ namespace Razor.Pages.CommentPage
     public class DeleteModel : PageModel
     {
         private readonly IComService _commentService;
-        private readonly IHubContext<DataSignalR> _hubContext;
+        private readonly IHubContext<CommentSignalR> _hubContext;
 
-        public DeleteModel(IComService commentService, IHubContext<DataSignalR> hubContext)
+        public DeleteModel(IComService commentService, IHubContext<CommentSignalR> hubContext)
         {
             _commentService = commentService;
             _hubContext = hubContext;
