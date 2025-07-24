@@ -12,5 +12,6 @@ namespace DAL.Repository.Interface
         Task<IList<ProductItem>> GetProductItemsByProductIdAsync(int productId);
         Task SetVariationOptionsAsync(int productItemId, List<int> variationOptionIds);
         Task<bool> HasForeignKeyDependenciesAsync(int id);
+        Task<bool> IsProductItemDuplicateAsync(int productId, List<int> variationOptionIds);
     }
 }

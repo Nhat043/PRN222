@@ -87,5 +87,23 @@ namespace DAL.Repository
             }
             await _context.SaveChangesAsync();
         }
+
+        public async Task<bool> IsProductItemDuplicateAsync(int productId, List<int> variationOptionIds)
+        {
+            // Get all product items for the product
+            var items = await _context.ProductItems
+                .Include(pi => pi.VariationOptions)
+                .Where(pi => pi.ProductId == productId)
+                .ToListAsync();
+            foreach (var item in items)
+            {
+                var itemOptionIds = item.VariationOptions.Select(vo => vo.Id).OrderBy(id => id).ToList();
+                if (itemOptionIds.SequenceEqual(variationOptionIds.OrderBy(id => id)))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
     }
 }

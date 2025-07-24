@@ -97,7 +97,16 @@ namespace Razor.Pages.ProductPage
                     }
                 }
             }
-            await _productItemService.AddProductItemWithVariationsAsync(NewProductItem, variationOptionIds);
+            try
+            {
+                await _productItemService.AddProductItemWithVariationsAsync(NewProductItem, variationOptionIds);
+            }
+            catch (InvalidOperationException ex)
+            {
+                ModelState.AddModelError("", ex.Message);
+                await OnGetAsync(productId);
+                return Page();
+            }
             return RedirectToPage(new { id = productId });
         }
         
