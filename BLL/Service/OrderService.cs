@@ -13,15 +13,29 @@ namespace BLL.Service
     public class OrderService : IOrderService
     {
         private readonly IOrderRepository _orderRepository;
+        private readonly IProductItemRepo _productItemRepo;
         private static HubConnection? _connection;
         private bool _connected = false;
-        public OrderService(IOrderRepository orderRepository)
+        public OrderService(IOrderRepository orderRepository, IProductItemRepo productItemRepo)
         {
             _orderRepository = orderRepository;
             _connection = new HubConnectionBuilder()
                 .WithUrl("https://localhost:7082/DataSignalRChanel") // SignalR Host
                 .WithAutomaticReconnect()
                 .Build();
+            _productItemRepo = productItemRepo;
+        }
+
+        public async Task<Boolean> CheckQuantity(List<OrderItem> listOrderItem)
+        {
+         
+            foreach(var productItem in listOrderItem)
+            {
+                var checkProQuantity = await _productItemRepo.GetProductItemByIdAsync((int)productItem.ProductItemId);
+                if (productItem.Quantity > checkProQuantity.Quantity)
+                    return false;
+            }
+            return true;
         }
 
         public async Task<List<Order>> GetAllOrdersAsync()

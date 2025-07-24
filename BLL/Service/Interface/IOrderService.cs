@@ -21,5 +21,7 @@ namespace BLL.Service.Interface
         Task NotifyAdminNewOrder();
         Task<List<OrderStatus>> GetAllOrderStatusAsync();
         Task NotifyProductQuantityChanged(int productId);
+
+        Task<Boolean> CheckQuantity(List<OrderItem> listOrderItem);
     }
 }
