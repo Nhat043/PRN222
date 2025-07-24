@@ -12,6 +12,7 @@ namespace DAL.Repository.Interface
         double GetAverageRating(int productId);
         void InsertOrUpdateRating(Rating rating);
         public int GetReviewCount(int productId);
+        public int GetUserRating(int userId, int productId);
     }
 
 }

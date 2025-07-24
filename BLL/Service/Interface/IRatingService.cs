@@ -11,6 +11,7 @@ namespace BLL.Service.Interface
         double GetAverageRating(int productId);
         void RateProduct(int userId, int productId, int ratingValue);
         int GetReviewCount(int productId);
+        public int GetUserRating(int userId, int productId);
     }
 
 }

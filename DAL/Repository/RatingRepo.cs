@@ -46,6 +46,13 @@ namespace DAL.Repository
 
             _context.SaveChanges();
         }
+        public int GetUserRating(int userId, int productId)
+        {
+            var rating = _context.Ratings
+                .FirstOrDefault(r => r.UserId == userId && r.ProductId == productId && r.RatingValue.HasValue);
+
+            return rating?.RatingValue ?? 0;
+        }
     }
 
 }

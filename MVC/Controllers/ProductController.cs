@@ -39,11 +39,13 @@ namespace MVC.Controllers
             };
 
             ViewBag.AvgRating = _ratingService.GetAverageRating(id);
-            ViewBag.ReviewCount= _ratingService.GetReviewCount(id);
+            ViewBag.ReviewCount = _ratingService.GetReviewCount(id);
+            ViewBag.UserRating = userId.HasValue ? _ratingService.GetUserRating(userId.Value, id) : 0;
             ViewBag.CommentVM = commentVM;
 
             return View(product);
         }
+
 
         [HttpPost]
         public IActionResult Rate(int productId, int ratingValue)
