@@ -38,6 +38,10 @@ namespace BLL.Service
         {
             return _ratingRepo.GetReviewCount(productId);
         }
+        public int GetUserRating(int userId, int productId)
+        {
+            return _ratingRepo.GetUserRating(userId, productId);
+        }
     }
 
 }
