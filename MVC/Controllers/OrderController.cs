@@ -100,6 +100,14 @@ public class OrderController : Controller
             Quantity = item.Quantity,
             Price = item.SellingPrice ?? 0
         }).ToList();
+
+
+
+        if (await _orderService.CheckQuantity(orderItems) == false)
+        {
+            TempData["Error"] = "Some products in the cart are out of stock or insufficient in quantity. Please check again";
+            return RedirectToAction("Checkout", "Order");
+        }
         await _orderService.AddOrderItemsAsync(orderItems);
 
         // 3. Trừ tồn kho ProductItem
