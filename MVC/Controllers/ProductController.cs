@@ -75,6 +75,25 @@ namespace MVC.Controllers
                 return BadRequest("Invalid product ID");
             }
 
+            if (parentId == null)
+            {
+                // Check if user already commented (only top-level)
+                var existingComment = _comService.GetProductComments(productId)
+                    .FirstOrDefault(c => c.UserId == userId && c.ParentId == null);
+
+                if (existingComment != null)
+                {
+                    // Update existing comment
+                    existingComment.Content = content;
+                    existingComment.CreatedAt = DateTime.Now;
+                    _comService.UpdateComment(existingComment);
+                    await _comService.NotifyLoadAsync();
+
+                    return RedirectToAction("Detail", new { id = productId });
+                }
+            }
+
+            // Else: create new comment (reply or first time)
             var comment = new Comment
             {
                 ProductId = productId,
