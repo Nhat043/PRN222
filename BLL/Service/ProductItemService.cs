@@ -33,8 +33,17 @@ namespace BLL.Service
             return await _productItemRepo.GetProductItemsByProductIdAsync(productId);
         }
 
+        public async Task<bool> IsProductItemDuplicateAsync(int productId, List<int> variationOptionIds)
+        {
+            return await _productItemRepo.IsProductItemDuplicateAsync(productId, variationOptionIds);
+        }
+
         public async Task AddProductItemWithVariationsAsync(ProductItem item, List<int> variationOptionIds)
         {
+            if (await IsProductItemDuplicateAsync(item.ProductId ?? 0, variationOptionIds))
+            {
+                throw new InvalidOperationException("A product item with the same variation options already exists for this product.");
+            }
             await _productItemRepo.AddProductItemAsync(item);
             if (variationOptionIds != null && variationOptionIds.Count > 0)
             {
