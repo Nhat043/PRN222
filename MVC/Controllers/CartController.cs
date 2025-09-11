@@ -23,7 +23,7 @@ public class CartController : Controller
     }
 
     // POST: /Cart/AddToCart
-    [HttpPost]
+    
     [HttpPost]
     public async Task<IActionResult> AddToCart(int productItemId)
     {

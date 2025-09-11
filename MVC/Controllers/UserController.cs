@@ -31,6 +31,11 @@ namespace MVC.Controllers
                 return NotFound("Account not found.");
             }
 
+            if (account.StatusId == 2)
+            {
+                return Redirect($"{Request.Scheme}://{Request.Host}/mvc");
+            }
+
             var orders = await _orderService.GetOrdersByUserIdAsync(account.Id); // 👈 load orders
 
             var viewModel = new ProfileViewModel
@@ -89,6 +94,7 @@ namespace MVC.Controllers
             };
 
             await _accountService.UpdateAccountAsync(account);
+           
 
             TempData["Message"] = "Profile updated successfully.";
             return RedirectToAction("Profile", new { username = model.Name });

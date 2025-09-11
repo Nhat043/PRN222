@@ -100,9 +100,18 @@ public class OrderController : Controller
             Quantity = item.Quantity,
             Price = item.SellingPrice ?? 0
         }).ToList();
+
+
+
+        if (await _orderService.CheckQuantity(orderItems) == false)
+        {
+            TempData["Error"] = "Some products in the cart are out of stock or insufficient in quantity. Please check again";
+            return RedirectToAction("Checkout", "Order");
+        }
         await _orderService.AddOrderItemsAsync(orderItems);
 
         // 3. Trừ tồn kho ProductItem
+        var notifiedProductIds = new HashSet<int>();
         foreach (var item in cart)
         {
             var productItem = await _productItemService.GetProductItemByIdAsync(item.ProductItemId);
@@ -111,12 +120,18 @@ public class OrderController : Controller
                 productItem.Quantity -= item.Quantity;
                 if (productItem.Quantity < 0) productItem.Quantity = 0; // Không để số âm
                 await _productItemService.UpdateProductItemAsync(productItem);
+                if (productItem.ProductId.HasValue && !notifiedProductIds.Contains(productItem.ProductId.Value))
+                {
+                    await _orderService.NotifyProductQuantityChanged(productItem.ProductId.Value);
+                    notifiedProductIds.Add(productItem.ProductId.Value);
+                }
             }
         }
 
         // 4. Xoá giỏ hàng và thông báo
         HttpContext.Session.Remove("Cart");
-        TempData["Message"] = "Đặt hàng thành công!";
+        TempData["Message"] = "Order successfully!";
+        await _orderService.NotifyAdminNewOrder();
         return RedirectToAction("Index", "Home");
     }
 
@@ -146,6 +161,17 @@ public class OrderController : Controller
         {
             TempData["Error"] = "Giỏ hàng rỗng!";
             return RedirectToAction("Index", "Cart");
+        }
+
+        // Check product item quantities before creating PayPal order
+        foreach (var item in cart)
+        {
+            var productItem = await _productItemService.GetProductItemByIdAsync(item.ProductItemId);
+            if (productItem == null || item.Quantity > (productItem.Quantity ?? 0))
+            {
+                TempData["Error"] = $"Product item '{item.ProductName}' is out of stock.";
+                return RedirectToAction("Checkout");
+            }
         }
 
         int total = (int)cart.Sum(item => {
@@ -214,6 +240,21 @@ public class OrderController : Controller
             {
                 TempData["Error"] = "Session hết hạn hoặc không hợp lệ.";
                 return RedirectToAction("Checkout");
+            }
+
+            // Check product item quantities again before finalizing order
+            foreach (var item in cart)
+            {
+                var productItem = await _productItemService.GetProductItemByIdAsync(item.ProductItemId);
+                if (productItem == null || item.Quantity > (productItem.Quantity ?? 0))
+                {
+                    TempData["Error"] = $"Sản phẩm '{item.ProductName}' không đủ số lượng trong kho. Đơn hàng không được ghi nhận.";
+                    // Clean up pending PayPal session
+                    HttpContext.Session.Remove("PendingPaypalCart");
+                    HttpContext.Session.Remove("PendingPaypalTotal");
+                    HttpContext.Session.Remove("PendingPaypalAccountId");
+                    return RedirectToAction("Checkout");
+                }
             }
 
             // 1. Tạo Order và lưu

@@ -5,6 +5,7 @@ using DAL.Repository.Interface;
 using DAL.Repository;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
+using Razor.Hubs;
 
 namespace Razor
 {
@@ -59,6 +60,7 @@ namespace Razor
 
             builder.Services.AddScoped<IVariationRepo, VariationRepo>();
             builder.Services.AddScoped<IVariationService, VariationService>();
+            builder.Services.AddSignalR();
 
 
             builder.Services.AddDistributedMemoryCache(); // Cho phép lưu session trong RAM
@@ -67,6 +69,19 @@ namespace Razor
                 options.IdleTimeout = TimeSpan.FromMinutes(60); // thời gian hết hạn session
                 options.Cookie.HttpOnly = true;
                 options.Cookie.IsEssential = true;
+            });
+            //Add CORS policy for SignalR
+            var allowedOrigins = builder.Configuration.GetSection("AllowedOrigins").Get<string[]>();
+
+            builder.Services.AddCors(options =>
+            {
+                options.AddDefaultPolicy(policy =>
+                {
+                    policy.WithOrigins(allowedOrigins)
+                          .AllowAnyHeader()
+                          .AllowAnyMethod()
+                          .AllowCredentials(); // SignalR cần dòng này
+                });
             });
 
 
@@ -91,13 +106,24 @@ namespace Razor
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
-
+            app.UseRouting();
+            app.UseCors(); // Enable CORS for SignalR
             app.UseHttpsRedirection();
             app.UseStaticFiles();
 
+
             app.UseRouting();
+
+            app.UseCors();
+            // Enable SignalR
+            app.MapHub<AccountSignalR>("/AccountSignalRChanel");
+
+
             app.UseSession();
+           
+            app.MapHub<VarianSignalR>("/VarianSignalR");
             app.UseAuthorization();
+
 
             app.MapRazorPages();
 
@@ -106,7 +132,7 @@ namespace Razor
                 context.Response.Redirect("/ProductPage/Index");
                 return Task.CompletedTask;
             });
-
+            app.MapHub<DataSignalR>("/DataSignalRChanel");
             app.Run();
         }
     }

@@ -1,0 +1,16 @@
+﻿using Microsoft.AspNetCore.SignalR;
+
+namespace Razor.Hubs
+{
+    public class AccountSignalR : Hub
+    {
+        public async Task SendMessage(string message)
+        {
+            await Clients.All.SendAsync("ReceiveMessage", message);
+        }
+        public async Task SendAllLoadBanAccount()
+        {
+            await Clients.All.SendAsync("loadBanAccount");
+        }
+    }
+}

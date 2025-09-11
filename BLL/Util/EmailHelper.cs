@@ -133,5 +133,41 @@ namespace BLL.Util
             }
 
         }
+
+        public static async Task SendBanNotificationEmail(string _to)
+        {
+            string _from = "meocho0432004@gmail.com";
+            string _password = "pnrc uxpz dlxw pjqp";
+            string _subject = "Your Electronic Shop Account Has Been Banned";
+            string _body = "<div style='font-family:Arial,sans-serif;font-size:14px;color:#333;'>"
+                + "<h3 style='color:red;'>Account Banned Notification</h3>"
+                + "<p>Your account has been <b style='color:red;'>permanently banned</b> due to violations of our terms of service.</p>"
+                + "<p>If you believe this was a mistake or would like to appeal, please contact our support team.</p>"
+                + "<p>Thank you for your understanding.</p>"
+                + "</div>";
+
+            MailMessage message = new MailMessage(_from, _to, _subject, _body);
+            message.BodyEncoding = System.Text.Encoding.UTF8;
+            message.SubjectEncoding = System.Text.Encoding.UTF8;
+            message.IsBodyHtml = true;
+
+            message.ReplyToList.Add(new MailAddress(_from));
+            message.Sender = new MailAddress(_from);
+
+            using var smtpClient = new System.Net.Mail.SmtpClient("smtp.gmail.com");
+            smtpClient.Port = 587;
+            smtpClient.EnableSsl = true;
+            smtpClient.Credentials = new NetworkCredential(_from, _password);
+
+            try
+            {
+                await smtpClient.SendMailAsync(message);
+            }
+            catch (Exception ex)
+            {
+                // Log or handle exception
+            }
+        }
+
     }
 }

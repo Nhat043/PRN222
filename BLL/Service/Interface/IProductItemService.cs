@@ -13,5 +13,6 @@ namespace BLL.Service.Interface
         Task UpdateProductItemWithVariationsAsync(ProductItem item, List<int> variationOptionIds);
         Task DeleteProductItemAsync(int productItemId);
         Task<bool> HasForeignKeyDependenciesAsync(int id);
+        Task<bool> IsProductItemDuplicateAsync(int productId, List<int> variationOptionIds);
     }
 }

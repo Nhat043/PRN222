@@ -47,9 +47,14 @@
     <div class="row">
         <div class="col-md-5 text-center">
             <img src="@Model.Picture" alt="@Model.Name" class="img-fluid rounded shadow" />
+
         </div>
         <div class="col-md-7">
-            <h2 class="fw-bold">@Model.Name</h2>
+            <h2 class="fw-bold d-flex align-items-center">
+                @Model.Name
+                <small class="text-warning fs-5 ms-3">(@ViewBag.AvgRating.ToString("0.0") ★)</small>
+            </h2>
+
             <h4 id="displayPrice" class="text-secondary mb-3">@price.ToString("N0") VND</h4>
 
             <form id="addToCartForm" method="post" autocomplete="off">
@@ -92,13 +97,13 @@
             <form method="post" asp-action="Rate" asp-controller="Product">
                 <input type="hidden" name="productId" value="@Model.Id" />
                 <div class="rating">
-                    @for (int i = 5; i >= 1; i--) // Reverse loop for proper CSS effect
+                    @for (int i = 5; i >= 1; i--)
                     {
-                        <input type="radio" id="star-@i" name="ratingValue" value="@i" onclick="this.form.submit();" />
+                        var isChecked = (ViewBag.UserRating != null && ViewBag.UserRating == i) ? "checked" : "";
+                        <input type="radio" id="star-@i" name="ratingValue" value="@i" @Html.Raw(isChecked) onclick="this.form.submit();" />
                         <label for="star-@i">&#9733;</label>
                     }
                 </div>
-
             </form>
         }
         else
@@ -176,12 +181,11 @@
                         </div>
                         <form method="post" asp-action="EditComment" class="d-none" id="edit-form-@reply.Id">
                             <input type="hidden" name="commentId" value="@reply.Id" />
-                            <div class="mb-2">
-                                <textarea name="newContent" class="form-control" rows="2">@reply.Content</textarea>
-                            </div>
+                            <input type="hidden" name="productId" value="@productId" />
+                            <textarea name="newContent" class="form-control" rows="2">@reply.Content</textarea>
                             <button type="submit" class="btn btn-sm btn-warning">Save</button>
-                            <button type="button" class="btn btn-sm btn-secondary" onclick="cancelEdit(@reply.Id)">Cancel</button>
                         </form>
+
 
                         @if (currentUserId == reply.UserId || roleId == "1")
                         {
@@ -205,13 +209,14 @@
 
     @if (!string.IsNullOrEmpty(accountName))
     {
-        <form method="post" asp-action="PostComment" class="mt-4">
-            <input type="hidden" name="productId" value="@productId" />
-            <div class="mb-3">
-                <textarea name="content" class="form-control" rows="3" placeholder="Add your comment..."></textarea>
-            </div>
-            <button type="submit" class="btn btn-primary">Submit</button>
-        </form>
+       <form method="post" asp-action="PostComment" asp-controller="Product" class="mt-4">
+    <input type="hidden" name="productId" value="@productId" />
+    <div class="mb-3">
+        <textarea name="content" class="form-control" rows="3" placeholder="Add your comment..."></textarea>
+    </div>
+    <button type="submit" class="btn btn-primary">Submit</button>
+</form>
+
     }
     else
     {
@@ -225,6 +230,7 @@
 }
 
 @section Scripts {
+    <script src="~/microsoft/signalr/dist/browser/signalr.js"></script>
     <script>
          document.querySelectorAll('input[name="productItemId"]').forEach(radio => {
                 radio.addEventListener('change', function () {
@@ -286,6 +292,21 @@
             const form = document.getElementById(`reply-form-${commentId}`);
             form.classList.toggle("d-none");
         }
+        // SignalR: Reload page on product quantity change
+        var productId = @Model.Id;
+        var connection = new signalR.HubConnectionBuilder()
+            .withUrl("https://localhost:7082/DataSignalRChanel")
+            .build();
+        connection.start().then(function () {
+            // Connected
+        }).catch(function (err) {
+            console.error("SignalR error: " + err);
+        });
+        connection.on("ProductQuantityChanged", function (changedProductId) {
+            if (changedProductId === productId) {
+                location.reload();
+            }
+        });
     </script>
 
 }

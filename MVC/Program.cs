@@ -71,7 +71,7 @@ namespace MVC
 
             builder.Services.AddHttpContextAccessor();
 
-
+            builder.Services.AddSignalR();
             var app = builder.Build();
 
             // Cho phép truy cập ảnh từ folder bên ngoài
@@ -102,6 +102,9 @@ namespace MVC
 
             // Use session middleware
             app.UseSession();
+            app.MapControllerRoute(
+    name: "default",
+    pattern: "{controller=Auth}/{action=CheckIsLogin}/{id?}");
 
             app.MapControllerRoute(
                 name: "mvc",
@@ -109,11 +112,14 @@ namespace MVC
 
             app.MapRazorPages();
 
-            app.MapGet("/", context =>
-            {
-                context.Response.Redirect("/mvc/auth/CheckIsLogin");
-                return Task.CompletedTask;
-            });
+
+            app.MapRazorPages();
+
+            //app.MapGet("/", context =>
+            //{
+            //    context.Response.Redirect("/mvc/auth/CheckIsLogin");
+            //    return Task.CompletedTask;
+            //});
 
             app.Run();
         }

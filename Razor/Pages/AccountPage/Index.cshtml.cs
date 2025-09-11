@@ -1,13 +1,16 @@
+using BLL.Service.Interface;
+using BLL.Util;
+using DAL.Datas;
+using DAL.Models;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.SignalR;
+using Microsoft.EntityFrameworkCore;
+using Razor.Hubs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.EntityFrameworkCore;
-using DAL.Datas;
-using DAL.Models;
-using BLL.Service.Interface;
 
 namespace Razor.Pages_AccountPage
 {
@@ -31,6 +34,8 @@ namespace Razor.Pages_AccountPage
 
         public async Task<IActionResult> OnPostBanAsync(int id)
         {
+            var account = await _accountService.GetAccountByIdAsync(id); 
+
             var success = await _accountService.BanAccountAsync(id);
             if (!success)
             {
@@ -39,9 +44,18 @@ namespace Razor.Pages_AccountPage
             else
             {
                 SuccessMessage = "Account banned successfully.";
+
+                if (account != null && !string.IsNullOrEmpty(account.Email))
+                {
+                    await EmailHelper.SendBanNotificationEmail(account.Email);
+                }
             }
+
+            await _accountService.NotifyBanAccountAsync();
+
             return RedirectToPage();
         }
+
 
         public async Task<IActionResult> OnPostUnbanAsync(int id)
         {

@@ -1,5 +1,10 @@
-﻿using DAL.Models;
-using BLL.Service.Interface;
+﻿using BLL.Service.Interface;
+using BLL.Util;
+using DAL.Models;
+using DAL.Repository;
+using DAL.Repository.Interface;
+using Microsoft.AspNetCore.SignalR;
+using Microsoft.AspNetCore.SignalR.Client;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,10 +19,20 @@ namespace BLL.Service
     public class AccountService : IAccountService
     {
         private readonly IAccountRepo _accountRepo;
+    
+
+        private static HubConnection? _connection;
+        private static bool _connected = false;
 
         public AccountService(IAccountRepo accountRepo)
         {
             _accountRepo = accountRepo;
+
+            _connection = new HubConnectionBuilder()
+                .WithUrl("https://localhost:7082/AccountSignalRChanel") 
+                .WithAutomaticReconnect()
+                .Build();
+
         }
 
         private void ValidateAccount(Account account)
@@ -107,5 +122,19 @@ namespace BLL.Service
             await _accountRepo.UpdateAccountAsync(account);
             return true;
         }
+
+
+        public async Task NotifyBanAccountAsync()
+        {
+            if (!_connected || _connection.State != HubConnectionState.Connected)
+            {
+                await _connection.StartAsync();
+                _connected = true;
+            }
+
+            await _connection.InvokeAsync("SendAllLoadBanAccount");
+        }
+
+
     }
 }

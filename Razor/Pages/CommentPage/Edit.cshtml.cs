@@ -1,11 +1,13 @@
-﻿using System;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using BLL.Service.Interface;
+using DAL.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using BLL.Service.Interface;
-using DAL.Models;
+using Microsoft.AspNetCore.SignalR;
+using Razor.Hubs;
+using System;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Razor.Pages.CommentPage
 {
@@ -15,17 +17,21 @@ namespace Razor.Pages.CommentPage
         private readonly IProductService _productService;
         private readonly ICommentStatusService _statusService;
         private readonly IAccountService _accountService;
+        private readonly IHubContext<DataSignalR> _hubContext;
+
 
         public EditModel(
             IComService commentService,
             IProductService productService,
             ICommentStatusService statusService,
-            IAccountService accountService)
+            IAccountService accountService, 
+            IHubContext<DataSignalR> hubContext)
         {
             _commentService = commentService;
             _productService = productService;
             _statusService = statusService;
             _accountService = accountService;
+            _hubContext = hubContext;
         }
 
         [BindProperty]
@@ -44,7 +50,9 @@ namespace Razor.Pages.CommentPage
             return Page();
         }
 
-        public async Task<IActionResult> OnPost()
+
+        public async Task<IActionResult> OnPostAsync()
+
         {
             if (!ModelState.IsValid)
             {
@@ -61,8 +69,11 @@ namespace Razor.Pages.CommentPage
            
             existingComment.Content = Comment.Content;
 
-            
-             _commentService.UpdateComment(existingComment);
+
+           
+            _commentService.UpdateComment(existingComment);
+            await _hubContext.Clients.All.SendAsync("load");
+
 
             return RedirectToPage("./Index");
         }

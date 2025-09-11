@@ -39,11 +39,13 @@ namespace MVC.Controllers
             };
 
             ViewBag.AvgRating = _ratingService.GetAverageRating(id);
-            ViewBag.ReviewCount= _ratingService.GetReviewCount(id);
+            ViewBag.ReviewCount = _ratingService.GetReviewCount(id);
+            ViewBag.UserRating = userId.HasValue ? _ratingService.GetUserRating(userId.Value, id) : 0;
             ViewBag.CommentVM = commentVM;
 
             return View(product);
         }
+
 
         [HttpPost]
         public IActionResult Rate(int productId, int ratingValue)
@@ -60,9 +62,8 @@ namespace MVC.Controllers
             _ratingService.RateProduct(userId.Value, productId, ratingValue);
             return RedirectToAction("Detail", new { id = productId });
         }
-
         [HttpPost]
-        public IActionResult PostComment(int productId, string content, int? parentId)
+        public async Task<IActionResult> PostComment(int productId, string content, int? parentId)
         {
             int? userId = HttpContext.Session.GetInt32("AccountIdSession");
             if (userId == null)
@@ -71,6 +72,30 @@ namespace MVC.Controllers
                 return RedirectToAction("Detail", new { id = productId });
             }
 
+            if (productId <= 0)
+            {
+                return BadRequest("Invalid product ID");
+            }
+
+            if (parentId == null)
+            {
+                // Check if user already commented (only top-level)
+                var existingComment = _comService.GetProductComments(productId)
+                    .FirstOrDefault(c => c.UserId == userId && c.ParentId == null);
+
+                if (existingComment != null)
+                {
+                    // Update existing comment
+                    existingComment.Content = content;
+                    existingComment.CreatedAt = DateTime.Now;
+                    _comService.UpdateComment(existingComment);
+                    await _comService.NotifyLoadAsync();
+
+                    return RedirectToAction("Detail", new { id = productId });
+                }
+            }
+
+            // Else: create new comment (reply or first time)
             var comment = new Comment
             {
                 ProductId = productId,
@@ -81,19 +106,24 @@ namespace MVC.Controllers
             };
 
             _comService.CreateComment(comment);
+            await _comService.NotifyLoadAsync();
+
             return RedirectToAction("Detail", new { id = productId });
         }
 
 
+
         [HttpPost]
-        public IActionResult HideComment(int commentId)
+        public async Task<IActionResult> HideComment(int commentId)
         {
             _comService.HideComment(commentId);
-            // Optionally redirect to where the comment was
+            await _comService.NotifyLoadAsync();
+
             return Redirect(Request.Headers["Referer"].ToString());
         }
+      
         [HttpPost]
-        public IActionResult EditComment(int commentId, string newContent)
+        public async Task<IActionResult> EditComment(int commentId, string newContent)
         {
             var userId = HttpContext.Session.GetInt32("AccountIdSession");
             var roleId = HttpContext.Session.GetString("RoleIdSession");
@@ -101,11 +131,12 @@ namespace MVC.Controllers
             var comment = _comService.GetById(commentId);
             if (comment == null || (comment.UserId != userId && roleId != "1")) // 1 = admin
             {
-                return Forbid(); // prevent unauthorized edit
+                return Forbid();
             }
 
             comment.Content = newContent;
             _comService.UpdateComment(comment);
+            await _comService.NotifyLoadAsync();
 
             return RedirectToAction("Detail", new { id = comment.ProductId });
         }

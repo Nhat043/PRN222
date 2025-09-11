@@ -1,0 +1,22 @@
+{
+  "version": "3.0",
+<<<<<<< HEAD
+  "defaultProvider": "jsdelivr",
+  "libraries": [
+    {
+      "library": "@microsoft/signalr@latest",
+      "destination": "wwwroot/microsoft/signalr/",
+      "files": [
+        "dist/browser/signalr.js",
+        "dist/browser/signalr.min.js"
+      ]
+=======
+  "defaultProvider": "cdnjs",
+  "libraries": [
+    {
+      "library": "microsoft-signalr@8.0.7",
+      "destination": "wwwroot/microsoft-signalr/"
+>>>>>>> fde00f0320e15825b9dc1ce42dd8e4054d210618
+    }
+  ]
+}

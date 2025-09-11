@@ -129,12 +129,16 @@
                                                     }
 
                                                     <!--  Nút Reply mới thêm -->
-                                                    <a asp-page="./Create"
-                                                       asp-route-parentId="@item.Id"
-                                                       asp-route-productId="@item.ProductId"
-                                                       class="btn btn-sm btn-outline-secondary" title="Reply">
-                                                        <i class="fas fa-reply"></i>
-                                                    </a>
+                                                    @if(item.Parent == null)
+                                                    {
+                                                        <a asp-page="./Create"
+                                                           asp-route-parentId="@item.Id"
+                                                           asp-route-productId="@item.ProductId"
+                                                           class="btn btn-sm btn-outline-secondary" title="Reply">
+                                                            <i class="fas fa-reply"></i>
+                                                        </a>
+                                                    }
+                                                    
                                                 </div>
                                             </td>
                                         </tr>
@@ -148,10 +152,10 @@
                         <div class="text-center py-5">
                             <i class="fas fa-comments fa-3x text-muted mb-3"></i>
                             <h5 class="text-muted">No Comments Found</h5>
-                            <p class="text-muted">Start by creating your first comment.</p>
+                           @*  <p class="text-muted">Start by creating your first comment.</p>
                             <a asp-page="Create" class="btn btn-primary">
                                 <i class="fas fa-plus me-2"></i>Create First Comment
-                            </a>
+                            </a> *@
                         </div>
                     }
                 </div>

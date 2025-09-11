@@ -3,7 +3,9 @@ using DAL.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.Identity.Client;
+using Razor.Hubs;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -16,16 +18,19 @@ namespace Razor.Pages.CommentPage
         private readonly IComService _commentService;
         private readonly IProductService _productService;
         private readonly IAccountService _accountService;
+        private readonly IHubContext<DataSignalR> _hubContext;
         public CreateModel(
             ICommentStatusService statusService,
             IComService commentService,
             IProductService productService, 
-            IAccountService accountService)
+            IAccountService accountService,
+            IHubContext<DataSignalR> hubContext)
         {
             _statusService = statusService;
             _commentService = commentService;
             _productService = productService;
             _accountService = accountService;
+            _hubContext = hubContext;
         }
 
         [BindProperty]
@@ -86,6 +91,7 @@ namespace Razor.Pages.CommentPage
 
 
             _commentService.CreateComment(Comment);
+            _hubContext.Clients.All.SendAsync("load");
             return RedirectToPage("./Index");
         }
 
